@@ -3,6 +3,7 @@ import { MapPin, ChevronDown, ArrowRight, Loader2, AlertCircle, Shield, CheckCir
 import { geocodeAddress, fetchEstimate, SERVICE_TO_VEHICLE_TYPE, detectCurrentCity, SERVED_CITIES, CITY_HERO_IMAGES } from "../../api/pricingApi"
 import EstimateResultModal from "../EstimateResultModal"
 import AddressAutocomplete from "../AddressAutocomplete"
+import CitySelectorModal from "../CitySelectorModal"
 
 const PERSON_TYPES = [
   { value: "", label: "Choose" },
@@ -141,52 +142,26 @@ export default function TruckHero({ city, setCity }) {
           <div className="bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] p-4 sm:p-5 flex flex-col border border-slate-100">
 
             {/* City Selector */}
-            <div className="relative pb-2 border-b border-slate-100 mb-3" ref={cityRef}>
+            <div className="relative pb-2 border-b border-slate-100 mb-3">
               <button
                 type="button"
-                onClick={() => setCityOpen((o) => !o)}
+                onClick={() => setCityOpen(true)}
                 className="flex items-center gap-2 text-slate-900 font-bold text-sm cursor-pointer w-fit hover:text-brand-600 transition-colors"
               >
                 <MapPin size={18} className="text-brand-600 shrink-0" />
                 {cityDetecting ? (
                   <span className="flex items-center gap-1.5 text-slate-400 font-normal">
                     <Loader2 size={13} className="animate-spin" />
-                    Detecting…
+                    Detecting...
                   </span>
                 ) : (
                   <span>{city}</span>
                 )}
                 <ChevronDown
                   size={14}
-                  className={`text-slate-400 transition-transform duration-200 ${cityOpen ? "rotate-180" : ""}`}
+                  className="text-slate-400"
                 />
               </button>
-
-              {cityOpen && (
-                <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 pt-2 pb-1">
-                    Select city
-                  </p>
-                  <ul>
-                    {SERVED_CITIES.map((c) => (
-                      <li key={c}>
-                        <button
-                          type="button"
-                          onClick={() => { setCity(c); setCityOpen(false) }}
-                          className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors
-                            ${c === city
-                              ? "bg-brand-600/5 text-brand-600 font-semibold"
-                              : "text-slate-700 hover:bg-slate-50"
-                            }`}
-                        >
-                          <MapPin size={13} className={c === city ? "text-brand-600" : "text-slate-300"} />
-                          {c}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
 
             {/* Error Banner */}
@@ -300,6 +275,12 @@ export default function TruckHero({ city, setCity }) {
           </div>
         </div>
       </section>
+
+      {/* Global City Selector Modal */}
+      <CitySelectorModal
+        isOpen={cityOpen}
+        onClose={() => setCityOpen(false)}
+      />
 
       {/* Estimate Result Modal */}
       {showResult && estimateResult && (
