@@ -45,7 +45,7 @@ export default function GlobalFABs() {
         aria-label="Chat on WhatsApp"
         title="Chat on WhatsApp"
       >
-        <img src="/whatsapp-fab.webp" alt="WhatsApp" className="w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] object-contain" />
+        <img src="/whatsapp-fab.webp" alt="WhatsApp" className="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] object-contain scale-110" />
         {/* Tooltip for desktop */}
         <span className="absolute right-full mr-4 bg-gray-900 text-white text-xs font-semibold py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap hidden sm:block">
           Chat on WhatsApp
