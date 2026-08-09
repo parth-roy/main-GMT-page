@@ -5,14 +5,19 @@ import { SEO_CITIES } from "../lib/cities";
 import { CITY_HERO_IMAGES } from "../api/pricingApi";
 
 const TOP_CITIES = [
-  { name: "Mumbai", slug: "mumbai" },
-  { name: "Delhi", slug: "new-delhi" },
-  { name: "Bengaluru", slug: "bengaluru" },
-  { name: "Hyderabad", slug: "hyderabad" },
-  { name: "Chennai", slug: "chennai" },
-  { name: "Kolkata", slug: "kolkata" },
-  { name: "Pune", slug: "pune" },
-  { name: "Ahmedabad", slug: "ahmedabad" },
+  { name: "Mumbai", slug: "mumbai", image: "/cities/mumbai.jpg" },
+  { name: "Delhi NCR", slug: "new-delhi", image: "/cities/delhi.jpg" },
+  { name: "Bengaluru", slug: "bengaluru", image: "/cities/bengaluru.jpg" },
+  { name: "Hyderabad", slug: "hyderabad", image: "/cities/hyderabad.jpg" },
+  { name: "Chennai", slug: "chennai", image: "/cities/chennai.jpg" },
+  { name: "Ahmedabad", slug: "ahmedabad", image: "/cities/ahmedabad.jpg" },
+  { name: "Pune", slug: "pune", image: "/cities/pune.jpg" },
+  { name: "Surat", slug: "surat", image: "/cities/surat.jpg" },
+  { name: "Jaipur", slug: "jaipur", image: "/cities/jaipur.jpg" },
+  { name: "Kolkata", slug: "kolkata", image: "/cities/kolkata.jpg" },
+  { name: "Lucknow", slug: "lucknow", image: "/cities/lucknow.jpg" },
+  { name: "Coimbatore", slug: "coimbatore", image: "/cities/coimbatore.jpg" },
+  { name: "Indore", slug: "indore", image: "/cities/indore.jpg" },
 ];
 
 export default function CitySelectorModal({ isOpen, onClose }) {
@@ -99,7 +104,7 @@ export default function CitySelectorModal({ isOpen, onClose }) {
                 >
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden shadow-sm border border-slate-100 group-hover:shadow-md transition-shadow">
                     <img 
-                      src={CITY_HERO_IMAGES[city.name] || "/hero-bg.webp"} 
+                      src={city.image || CITY_HERO_IMAGES[city.name] || "/hero-bg.webp"} 
                       alt={city.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
