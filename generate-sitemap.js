@@ -18,7 +18,8 @@ function getCategory(route) {
   
   const coreRoutes = [
     '/', '/about', '/support', '/driver-partner', '/workforce', '/contact', 
-    '/enterprise', '/fleet-partner-registration', '/gomytruck-verified', '/freight-rate-index'
+    '/enterprise', '/fleet-partner-registration', '/gomytruck-verified', '/freight-rate-index',
+    '/driver-onboarding'
   ];
   if (coreRoutes.includes(route) || route.startsWith('/legal/') || route.startsWith('/services/')) {
     return 'core';

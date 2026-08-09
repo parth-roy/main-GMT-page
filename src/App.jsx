@@ -34,6 +34,7 @@ const LocalTransportPage = lazy(() => import("./pages/LocalTransportPage"))
 const IntercityTransportPage = lazy(() => import("./pages/IntercityTransportPage"))
 const BlogPage = lazy(() => import("./pages/BlogPage"))
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"))
+const DynamicSeoPage = lazy(() => import("./pages/DynamicSeoPage"))
 
 const MiniTruckKolkataPage = lazy(() => import("./pages/MiniTruckKolkataPage"))
 const PickupTruckKolkataPage = lazy(() => import("./pages/PickupTruckKolkataPage"))
@@ -52,6 +53,7 @@ const StateHubPage = lazy(() => import("./pages/StateHubPage"))
 const ResourcesPage = lazy(() => import("./pages/ResourcesPage"))
 const FreightRateIndexPage = lazy(() => import("./pages/FreightRateIndexPage"))
 const BlogPostPage = lazy(() => import("./pages/BlogPostPage"))
+const DriverOnboardingPage = lazy(() => import("./pages/DriverOnboardingPage"))
 
 // A simple premium spinner for Suspense fallback
 const PageLoader = () => (
@@ -130,6 +132,7 @@ export default function App() {
               />
             } />
             <Route path="/truck" element={<TruckPage />} />
+            <Route path="/driver-onboarding" element={<DriverOnboardingPage />} />
             <Route path="/bike" element={<BikePage />} />
             <Route path="/packers-and-movers" element={<PackersAndMoversPage />} />
             <Route path="/services" element={<Navigate to="/goods-transport-services" replace />} />
@@ -304,6 +307,12 @@ export default function App() {
             <Route path="/community-guidelines" element={<Navigate to="/legal/community-guidelines" replace />} />
             
             <Route path="/delete-account" element={<DeleteAccountPage />} />
+
+            {/* DYNAMIC PSEO ROUTES FOR 70+ CITIES */}
+            <Route path="/:city" element={<DynamicSeoPage serviceType="hub" />} />
+            <Route path="/:city/truck-booking" element={<DynamicSeoPage serviceType="truck-booking" />} />
+            <Route path="/:city/pickup-truck-for-rent" element={<DynamicSeoPage serviceType="pickup-rent" />} />
+            <Route path="/:city/moving-truck-hire" element={<DynamicSeoPage serviceType="moving-truck" />} />
 
             {/* Catch-all 404 Route */}
             <Route path="*" element={<NotFoundPage />} />

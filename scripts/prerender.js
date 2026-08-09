@@ -36,5 +36,6 @@ for (const route of PRERENDER_ROUTES) {
   await writeRoute(route)
 }
 
-await writeRoute("/__not-found__", path.join(DIST, "404.html"))
+// We use a deep path to ensure it bypasses dynamic /:city routes and hits the catch-all
+await writeRoute("/404/not/found/page", path.join(DIST, "404.html"))
 console.log(`Prerendered ${PRERENDER_ROUTES.length} routes plus 404.html`)

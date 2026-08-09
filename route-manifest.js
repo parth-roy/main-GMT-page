@@ -1,6 +1,9 @@
+import { SEO_CITIES } from './src/lib/cities.js';
+
 export const INDEXABLE_ROUTES = [
   "/",
   "/truck",
+  "/driver-onboarding",
   "/bike",
   "/packers-and-movers",
   "/enterprise",
@@ -64,6 +67,17 @@ export const INDEXABLE_ROUTES = [
   "/resources/hsn-codes-for-logistics",
   "/resources/section-9-5-vs-52-gta"
 ]
+
+// Dynamically generate PSEO routes
+SEO_CITIES.forEach(city => {
+  const slug = city.slug;
+  if (!INDEXABLE_ROUTES.includes(`/${slug}`)) {
+    INDEXABLE_ROUTES.push(`/${slug}`);
+  }
+  INDEXABLE_ROUTES.push(`/${slug}/truck-booking`);
+  INDEXABLE_ROUTES.push(`/${slug}/pickup-truck-for-rent`);
+  INDEXABLE_ROUTES.push(`/${slug}/moving-truck-hire`);
+});
 export const NOINDEX_ROUTES = ["/delete-account"]
 
 export const PRERENDER_ROUTES = [...INDEXABLE_ROUTES, ...NOINDEX_ROUTES]

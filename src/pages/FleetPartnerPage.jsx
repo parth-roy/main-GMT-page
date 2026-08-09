@@ -34,10 +34,10 @@ export default function FleetPartnerPage() {
   return (
     <>
       <SEOHead
-        title="Fleet Partner Registration | Attach Your Trucks & Earn — GoMyTruck"
-        description="Fleet owners can apply to register eligible vehicles, review available loads, bid where enabled, and manage accepted trips. Work and earnings are subject to verification and demand."
+        title="Rent Out My Truck | Fleet Partner Registration & Attach Trucks - GoMyTruck"
+        description="Fleet owners can apply to register eligible vehicles, review available loads, bid where enabled, and manage accepted trips. Rent out my truck and earn with GoMyTruck today."
         canonical="/fleet-partner-registration"
-        keywords="fleet partner registration, fleet owner registration, attach truck to company, commercial vehicle registration, truck fleet onboarding, transport company tie up, fleet management logistics, attach fleet to GoMyTruck, truck owner earn money, logistics fleet partner, return load for fleet, fleet truck booking India"
+        keywords="rent out my truck, fleet partner registration, fleet owner registration, attach truck to company, commercial vehicle registration, attach fleet to GoMyTruck, go my truck, gomy truck, go mytruck, my truck, truck booking, truck owner earn money, logistics fleet partner"
         jsonLd={schema}
       />
       
