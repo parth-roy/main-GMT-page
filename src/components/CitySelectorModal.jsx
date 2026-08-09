@@ -20,7 +20,7 @@ const TOP_CITIES = [
   { name: "Indore", slug: "indore", image: "/cities/indore.webp" },
 ];
 
-export default function CitySelectorModal({ isOpen, onClose }) {
+export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,7 +38,13 @@ export default function CitySelectorModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const handleCitySelect = (citySlug) => {
+  const handleCitySelect = (citySlug, cityName) => {
+    if (onCitySelect) {
+      onCitySelect(cityName || citySlug);
+      onClose();
+      return;
+    }
+
     // Current pathname could be:
     // / (home)
     // /kolkata (city hub)
@@ -99,7 +105,7 @@ export default function CitySelectorModal({ isOpen, onClose }) {
               {TOP_CITIES.map((city) => (
                 <button
                   key={city.slug}
-                  onClick={() => handleCitySelect(city.slug)}
+                  onClick={() => handleCitySelect(city.slug, city.name)}
                   className="group flex flex-col items-center justify-center gap-2 p-3 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200"
                 >
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden shadow-sm border border-slate-100 group-hover:shadow-md transition-shadow">
@@ -139,7 +145,7 @@ export default function CitySelectorModal({ isOpen, onClose }) {
                 {filteredCities.map((city) => (
                   <button
                     key={city.slug}
-                    onClick={() => handleCitySelect(city.slug)}
+                    onClick={() => handleCitySelect(city.slug, city.name)}
                     className="flex items-center gap-3 w-full text-left p-3 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition-colors group"
                   >
                     <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-brand-100 transition-colors shrink-0">

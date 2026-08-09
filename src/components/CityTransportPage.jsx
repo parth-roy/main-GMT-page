@@ -64,6 +64,7 @@ export default function CityTransportPage({
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               to="/book-truck-online"
+              state={{ selectedCity: city }}
               className="bg-brand-600 hover:bg-brand-500 text-white font-bold px-7 py-3.5 rounded-xl shadow-xl transition-all active:scale-95 flex items-center gap-2"
             >
               Book Transport Now <ArrowRight size={18} />
