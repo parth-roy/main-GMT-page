@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { MapPin, ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
+import CitySelectorModal from "./CitySelectorModal"
 
 export default function Hero({ 
   selectedService, 
@@ -9,6 +10,9 @@ export default function Hero({
   onSelectVehicle
 }) {
   const [sliderValue, setSliderValue] = useState(10000)
+  const [cityOpen, setCityOpen] = useState(false)
+  const { city: slug } = useParams()
+  const currentCity = slug ? slug.charAt(0).toUpperCase() + slug.slice(1).replace("-", " ") : "Kolkata"
   
   const services = [
     {
