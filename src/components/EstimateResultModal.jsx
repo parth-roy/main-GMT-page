@@ -518,10 +518,10 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                   {/* Top section */}
                   <div className="flex justify-between items-start mb-8 z-10">
                     <h2 className="text-2xl md:text-3xl font-bold max-w-[200px] leading-snug">Supercharge Your Logistics!</h2>
-                    <div className="bg-blue-600 rounded-xl px-3 py-2 flex flex-col items-center shadow-lg border border-blue-500">
+                    <a href="https://play.google.com/store/apps/details?id=com.gomytruck.customer&pcampaignid=web_share" target="_blank" rel="noreferrer" className="bg-blue-600 rounded-xl px-3 py-2 flex flex-col items-center shadow-lg border border-blue-500 hover:scale-105 hover:bg-blue-500 transition-transform cursor-pointer">
                       <span className="text-[10px] font-bold tracking-wider mb-1">GoMyTruck</span>
                       <div className="bg-white text-slate-900 text-xs font-bold px-2 py-0.5 rounded">App</div>
-                    </div>
+                    </a>
                   </div>
                   
                   {/* Features List */}
@@ -536,7 +536,7 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                   <div className="mt-auto text-center z-10">
                     <p className="font-bold text-sm mb-4">Scan the QR code to download the app!</p>
                     <div className="bg-white p-3 rounded-xl inline-block shadow-xl">
-                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://vahan.com" alt="QR Code" className="w-40 h-40" />
+                      <img src="/download-qr.webp" alt="Download GoMyTruck App QR Code" className="w-56 h-auto" />
                     </div>
                   </div>
                   

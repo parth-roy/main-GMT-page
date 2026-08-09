@@ -9,15 +9,17 @@ const TOP_CITIES = [
   { name: "Delhi NCR", slug: "new-delhi", image: "/cities/delhi.webp" },
   { name: "Bengaluru", slug: "bengaluru", image: "/cities/bengaluru.webp" },
   { name: "Hyderabad", slug: "hyderabad", image: "/cities/hyderabad.webp" },
-  { name: "Chennai", slug: "chennai", image: "/cities/chennai.webp" },
+  { name: "Chennai", slug: "chennai", image: "/cities/chennai-icon.webp" },
   { name: "Ahmedabad", slug: "ahmedabad", image: "/cities/ahmedabad.webp" },
   { name: "Pune", slug: "pune", image: "/cities/pune.webp" },
   { name: "Surat", slug: "surat", image: "/cities/surat.webp" },
-  { name: "Jaipur", slug: "jaipur", image: "/cities/jaipur.webp" },
+  { name: "Jaipur", slug: "jaipur", image: "/cities/jaipur-icon.webp" },
   { name: "Kolkata", slug: "kolkata", image: "/cities/kolkata.webp" },
   { name: "Lucknow", slug: "lucknow", image: "/cities/lucknow.webp" },
-  { name: "Coimbatore", slug: "coimbatore", image: "/cities/coimbatore.webp" },
+  { name: "Coimbatore", slug: "coimbatore", image: "/cities/coimbatore-icon.webp" },
   { name: "Indore", slug: "indore", image: "/cities/indore.webp" },
+  { name: "Chandigarh", slug: "chandigarh", image: "/cities/chandigarh-icon.webp" },
+  { name: "Kochi", slug: "kochi", image: "/cities/kochi-icon.webp" },
 ];
 
 export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
