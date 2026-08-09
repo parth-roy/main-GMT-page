@@ -1,7 +1,8 @@
-import React, { useState } from "react"
-import { MapPin, ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp } from "lucide-react"
+import React, { useState, useEffect } from "react"
+import { MapPin, ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp, Loader2 } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import CitySelectorModal from "./CitySelectorModal"
+import { detectCurrentCity } from "../api/pricingApi"
 
 export default function Hero({ 
   selectedService, 
@@ -12,7 +13,24 @@ export default function Hero({
   const [sliderValue, setSliderValue] = useState(10000)
   const [cityOpen, setCityOpen] = useState(false)
   const { city: slug } = useParams()
-  const currentCity = slug ? slug.charAt(0).toUpperCase() + slug.slice(1).replace("-", " ") : "Kolkata"
+  
+  const [detectedCity, setDetectedCity] = useState("Kolkata")
+  const [cityDetecting, setCityDetecting] = useState(true)
+
+  useEffect(() => {
+    if (slug) {
+      setDetectedCity(slug.charAt(0).toUpperCase() + slug.slice(1).replace("-", " "))
+      setCityDetecting(false)
+    } else {
+      detectCurrentCity().then((detected) => {
+        setDetectedCity(detected)
+        setCityDetecting(false)
+      })
+    }
+  }, [slug])
+
+  const currentCity = detectedCity
+
   
   const services = [
     {
@@ -100,10 +118,23 @@ export default function Hero({
         {/* Floating Services Bar */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-full px-4 z-20 flex justify-center">
           <div className="bg-brand-50 rounded-xl shadow-2xl p-6 sm:p-8 sm:px-12 flex flex-col gap-6 border border-slate-100 w-full sm:w-fit">
-            <div className="flex items-center gap-2 text-slate-900 font-bold text-sm px-2 w-fit">
-              <MapPin size={20} className="text-[#001f3f]" />
-              <span>City: Kolkata</span>
-            </div>
+              <div 
+                className="flex items-center gap-2 text-slate-900 font-bold text-sm px-2 w-fit cursor-pointer hover:text-brand-600 transition-colors"
+                onClick={() => setCityOpen(true)}
+              >
+                <MapPin size={20} className="text-brand-600" />
+                {cityDetecting ? (
+                  <span className="flex items-center gap-1.5 text-slate-400 font-normal">
+                    <Loader2 size={13} className="animate-spin" />
+                    Detecting...
+                  </span>
+                ) : (
+                  <>
+                    <span>City: {currentCity}</span>
+                    <span className="text-xs text-brand-500 font-normal ml-1 underline underline-offset-2">Change</span>
+                  </>
+                )}
+              </div>
 
             <div className="flex flex-col sm:flex-row justify-center items-center gap-10 lg:gap-16">
               {/* Service Tabs */}
@@ -236,6 +267,13 @@ export default function Hero({
           </div>
         </div>
       </section>
+
+      {/* Global City Selector Modal */}
+      <CitySelectorModal
+        isOpen={cityOpen}
+        onClose={() => setCityOpen(false)}
+      />
     </>
   )
 }
+
