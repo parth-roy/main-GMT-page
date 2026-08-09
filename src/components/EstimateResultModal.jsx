@@ -6,15 +6,19 @@ import { trackBookingSubmitted } from "../utils/analytics"
 
 // Local image map — backend imageUrl is null; use verified local blueprints
 const VEHICLE_IMAGES = {
-  BIKE:          "/bikes/bike.webp",
-  THREE_WHEELER: "/trucks/3-Wheeler.webp",
-  TATA_ACE:      "/trucks/Tata Ace.webp",
-  MINI_TRUCK:    "/trucks/14ft-Truck.webp",
+  BIKE:           "/vehicles/Standard Bike.webp",
+  THREE_WHEELER:  "/vehicles/Mahindra Jeeto.webp",
+  TATA_ACE:       "/vehicles/Tata Ace.webp",
+  MINI_TRUCK:     "/vehicles/Bolero Pickup.webp",
+  TRUCK_14FT:     "/vehicles/14 Ft Open Truck.webp",
+  TRUCK_17FT:     "/vehicles/17 Ft Closed Truck.webp",
+  TRUCK_20FT:     "/vehicles/19 Ft Truck.webp",
+  CONTAINER_32FT: "/vehicles/LCV Box Truck.webp",
 }
 
 // Which vehicleTypes to show per service context
 const SERVICE_VEHICLE_FILTER = {
-  truck: ["THREE_WHEELER", "TATA_ACE", "MINI_TRUCK"],
+  truck: ["THREE_WHEELER", "TATA_ACE", "MINI_TRUCK", "TRUCK_14FT", "TRUCK_17FT", "TRUCK_20FT", "CONTAINER_32FT"],
   bike:  ["BIKE"],
 }
 import { useAuth } from "../context/AuthContext"
