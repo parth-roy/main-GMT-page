@@ -5,19 +5,19 @@ import { SEO_CITIES } from "../lib/cities";
 import { CITY_HERO_IMAGES } from "../api/pricingApi";
 
 const TOP_CITIES = [
-  { name: "Mumbai", slug: "mumbai", image: "/cities/mumbai.jpg" },
-  { name: "Delhi NCR", slug: "new-delhi", image: "/cities/delhi.jpg" },
-  { name: "Bengaluru", slug: "bengaluru", image: "/cities/bengaluru.jpg" },
-  { name: "Hyderabad", slug: "hyderabad", image: "/cities/hyderabad.jpg" },
-  { name: "Chennai", slug: "chennai", image: "/cities/chennai.jpg" },
-  { name: "Ahmedabad", slug: "ahmedabad", image: "/cities/ahmedabad.jpg" },
-  { name: "Pune", slug: "pune", image: "/cities/pune.jpg" },
-  { name: "Surat", slug: "surat", image: "/cities/surat.jpg" },
-  { name: "Jaipur", slug: "jaipur", image: "/cities/jaipur.jpg" },
-  { name: "Kolkata", slug: "kolkata", image: "/cities/kolkata.jpg" },
-  { name: "Lucknow", slug: "lucknow", image: "/cities/lucknow.jpg" },
-  { name: "Coimbatore", slug: "coimbatore", image: "/cities/coimbatore.jpg" },
-  { name: "Indore", slug: "indore", image: "/cities/indore.jpg" },
+  { name: "Mumbai", slug: "mumbai", image: "/cities/mumbai.webp" },
+  { name: "Delhi NCR", slug: "new-delhi", image: "/cities/delhi.webp" },
+  { name: "Bengaluru", slug: "bengaluru", image: "/cities/bengaluru.webp" },
+  { name: "Hyderabad", slug: "hyderabad", image: "/cities/hyderabad.webp" },
+  { name: "Chennai", slug: "chennai", image: "/cities/chennai.webp" },
+  { name: "Ahmedabad", slug: "ahmedabad", image: "/cities/ahmedabad.webp" },
+  { name: "Pune", slug: "pune", image: "/cities/pune.webp" },
+  { name: "Surat", slug: "surat", image: "/cities/surat.webp" },
+  { name: "Jaipur", slug: "jaipur", image: "/cities/jaipur.webp" },
+  { name: "Kolkata", slug: "kolkata", image: "/cities/kolkata.webp" },
+  { name: "Lucknow", slug: "lucknow", image: "/cities/lucknow.webp" },
+  { name: "Coimbatore", slug: "coimbatore", image: "/cities/coimbatore.webp" },
+  { name: "Indore", slug: "indore", image: "/cities/indore.webp" },
 ];
 
 export default function CitySelectorModal({ isOpen, onClose }) {

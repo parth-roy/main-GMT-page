@@ -41,11 +41,11 @@ export default function GlobalFABs() {
         data-analytics-context={`desktop-fab:${pathname}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="pointer-events-auto bg-[#128C3E] hover:bg-[#0B6B2E] text-white p-3.5 sm:p-4 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group"
+        className="pointer-events-auto hover:-translate-y-1 transition-transform duration-300 flex items-center justify-center group relative drop-shadow-lg hover:drop-shadow-xl"
         aria-label="Chat on WhatsApp"
         title="Chat on WhatsApp"
       >
-        <MessageCircle size={28} className="fill-current" />
+        <img src="/whatsapp-fab.webp" alt="WhatsApp" className="w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] object-contain" />
         {/* Tooltip for desktop */}
         <span className="absolute right-full mr-4 bg-gray-900 text-white text-xs font-semibold py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap hidden sm:block">
           Chat on WhatsApp
