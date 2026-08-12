@@ -3,6 +3,7 @@ import SEOHead from "../seo/SEOHead";
 export default function DriverOnboardingPage() {
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     phone: "",
     altPhone: "",
     city: "",
@@ -33,7 +34,23 @@ export default function DriverOnboardingPage() {
   const handleFileChange = (e) => {
     const { name, files: selectedFiles } = e.target;
     if (selectedFiles && selectedFiles[0]) {
-      setFiles(prev => ({ ...prev, [name]: selectedFiles[0] }));
+      const file = selectedFiles[0];
+      const maxBytes = 10 * 1024 * 1024; // 10MB
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
+      
+      if (file.size > maxBytes) {
+        alert(`File ${file.name} is too large. Max size is 10MB.`);
+        e.target.value = ''; // Reset input
+        return;
+      }
+      
+      if (!allowedTypes.includes(file.type)) {
+        alert(`File type ${file.type} is not supported. Please upload JPEG, PNG, WEBP, GIF, or PDF.`);
+        e.target.value = ''; // Reset input
+        return;
+      }
+
+      setFiles(prev => ({ ...prev, [name]: file }));
     }
   };
 
@@ -126,6 +143,10 @@ export default function DriverOnboardingPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                 <input required type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 py-2 px-3 border" placeholder="John Doe" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                <input required type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 py-2 px-3 border" placeholder="driver@example.com" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
