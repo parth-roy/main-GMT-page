@@ -1,16 +1,11 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { Facebook, Twitter, Linkedin, Instagram, Youtube, Smartphone } from "lucide-react"
+import { SEO_CITIES } from "../lib/cities"
 
 export default function Footer({ onScrollToSection }) {
-  const cities = [
-    { name: "Kolkata",       to: "/kolkata" },
-    { name: "Barrackpore",   to: "/barrackpore" },
-    { name: "Howrah",        to: "/howrah" },
-    { name: "Salt Lake",     to: "/salt-lake" },
-    { name: "New Town",      to: "/new-town" },
-    { name: "Kolkata–Asansol", to: "/routes/kolkata-to-asansol" },
-  ]
+  // All SEO city pages — dynamically mapped from the single source of truth in cities.js
+  const cities = SEO_CITIES.map((c) => ({ name: c.name, to: `/${c.slug}` }))
 
   // Popular Searches — consolidated to prevent Link Equity Dilution
   const popularSearches = [

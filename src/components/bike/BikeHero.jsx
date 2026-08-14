@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect } from "react"
 import { MapPin, ChevronDown, ArrowRight, Loader2, AlertCircle } from "lucide-react"
-import { geocodeAddress, fetchEstimate, SERVICE_TO_VEHICLE_TYPE, detectCurrentCity, SERVED_CITIES, CITY_HERO_IMAGES } from "../../api/pricingApi"
+import { geocodeAddress, fetchEstimate, SERVICE_TO_VEHICLE_TYPE, detectCurrentCity, CITY_HERO_IMAGES } from "../../api/pricingApi"
 import EstimateResultModal from "../EstimateResultModal"
 import AddressAutocomplete from "../AddressAutocomplete"
+import CitySelectorModal from "../CitySelectorModal"
 
 const PERSON_TYPES = [
   { value: "",         label: "Choose" },
@@ -19,7 +20,6 @@ export default function BikeHero({ city, setCity }) {
 
   const [cityDetecting, setCityDetecting] = useState(true)
   const [cityOpen, setCityOpen] = useState(false)
-  const cityRef = useRef(null)
 
   useEffect(() => {
     detectCurrentCity().then((detected) => {
@@ -27,14 +27,6 @@ export default function BikeHero({ city, setCity }) {
       setCityDetecting(false)
     })
   }, [setCity])
-
-  useEffect(() => {
-    function handleOutside(e) {
-      if (cityRef.current && !cityRef.current.contains(e.target)) setCityOpen(false)
-    }
-    document.addEventListener("mousedown", handleOutside)
-    return () => document.removeEventListener("mousedown", handleOutside)
-  }, [])
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -117,11 +109,11 @@ export default function BikeHero({ city, setCity }) {
         <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[95%] xl:w-[90%] max-w-[1500px] z-20">
           <div className="bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] p-4 sm:p-5 flex flex-col border border-slate-100">
 
-            {/* City Selector */}
-            <div className="relative pb-2 border-b border-slate-100 mb-3" ref={cityRef}>
+            {/* City Selector — triggers global CitySelectorModal (same as /truck page) */}
+            <div className="pb-2 border-b border-slate-100 mb-3">
               <button
                 type="button"
-                onClick={() => setCityOpen((o) => !o)}
+                onClick={() => setCityOpen(true)}
                 className="flex items-center gap-2 text-slate-900 font-bold text-sm cursor-pointer w-fit hover:text-brand-600 transition-colors"
               >
                 <MapPin size={18} className="text-brand-600 shrink-0" />
@@ -133,30 +125,8 @@ export default function BikeHero({ city, setCity }) {
                 ) : (
                   <span>{city}</span>
                 )}
-                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${cityOpen ? "rotate-180" : ""}`} />
+                <ChevronDown size={14} className="text-slate-400 transition-transform duration-200" />
               </button>
-
-              {cityOpen && (
-                <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 pt-2 pb-1">Select city</p>
-                  <ul>
-                    {SERVED_CITIES.map((c) => (
-                      <li key={c}>
-                        <button
-                          type="button"
-                          onClick={() => { setCity(c); setCityOpen(false) }}
-                          className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
-                            c === city ? "bg-brand-600/5 text-brand-600 font-semibold" : "text-slate-700 hover:bg-slate-50"
-                          }`}
-                        >
-                          <MapPin size={13} className={c === city ? "text-brand-600" : "text-slate-300"} />
-                          {c}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
 
             {/* Error */}
@@ -243,6 +213,16 @@ export default function BikeHero({ city, setCity }) {
           </div>
         </div>
       </section>
+
+      {/* Global City Selector Modal — matches /truck page behavior */}
+      <CitySelectorModal
+        isOpen={cityOpen}
+        onClose={() => setCityOpen(false)}
+        onCitySelect={(selectedCity) => {
+          setCity(selectedCity)
+          setCityOpen(false)
+        }}
+      />
 
       {showResult && estimateResult && (
         <EstimateResultModal
