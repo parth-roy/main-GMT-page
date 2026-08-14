@@ -63,6 +63,7 @@ function generateSitemaps() {
     routes.forEach(route => {
       xml += `  <url>\n`;
       xml += `    <loc>${BASE_URL}${route}</loc>\n`;
+      xml += `    <lastmod>\${new Date().toISOString()}</lastmod>\n`;
       xml += `  </url>\n`;
     });
 

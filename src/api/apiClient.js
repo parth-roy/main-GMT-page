@@ -1,4 +1,4 @@
-export const API_BASE_URL = "https://api.gomytruck.com/api/v1";
+export const API_BASE_URL = "https://api-test.gomytruck.com/api/v1";
 
 let getAuthToken = null;
 let setAuthToken = null;

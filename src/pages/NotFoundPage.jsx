@@ -1,14 +1,15 @@
 import React from "react"
 import { Link } from "react-router-dom"
-import SEOHead from "../seo/SEOHead"
+import { Helmet } from "react-helmet-async"
 
 export default function NotFoundPage() {
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center bg-slate-50 px-4 text-center">
-      <SEOHead 
-        title="Page Not Found | GoMyTruck" 
-        description="The page you are looking for does not exist or has been moved."
-      />
+      <Helmet>
+        <title>Page Not Found | GoMyTruck</title>
+        <meta name="description" content="The page you are looking for does not exist or has been moved." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <h1 className="text-6xl font-display font-extrabold text-brand-600 mb-4">404</h1>
       <h2 className="text-2xl font-bold text-slate-800 mb-6">Page Not Found</h2>
       <p className="text-slate-600 mb-8 max-w-md mx-auto">

@@ -161,6 +161,11 @@
     Cache-Control = "public, max-age=2592000"
 
 [[headers]]
+  for = "/**/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"

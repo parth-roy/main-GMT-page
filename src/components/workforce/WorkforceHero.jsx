@@ -37,7 +37,7 @@ export default function WorkforceHero() {
         }
 
         // Send data to backend
-        const response = await fetch("https://api.gomytruck.com/api/v1/leads", {
+        const response = await fetch("https://api-test.gomytruck.com/api/v1/leads", {
           method: "POST",
           headers,
           body: JSON.stringify({ name, phone, city, role })

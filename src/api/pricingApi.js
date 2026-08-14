@@ -4,7 +4,7 @@
  * Server base URL: http://139.59.60.77:5000/api/v1
  */
 
-const BASE_URL = 'https://api.gomytruck.com/api/v1';
+const BASE_URL = 'https://api-test.gomytruck.com/api/v1';
 
 /**
  * GET /api/v1/pricing/vehicles

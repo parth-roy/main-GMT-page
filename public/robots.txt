@@ -1,7 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /cdn-cgi/
-Disallow: /*?*
 Disallow: /search*
 
 Sitemap: https://gomytruck.com/sitemap.xml

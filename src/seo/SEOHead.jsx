@@ -49,8 +49,8 @@ const DEFAULT_GLOBAL_SCHEMA = {
       ]
     },
     {
-      "@type": ["LocalBusiness", "TransportationService"],
-      "@id": "https://gomytruck.com/#localbusiness",
+      "@type": "TransportationService",
+      "@id": "https://gomytruck.com/#transportationservice",
       "name": "GoMyTruck",
       "image": "https://gomytruck.com/og-image.webp",
       "url": "https://gomytruck.com",
@@ -130,7 +130,7 @@ export default function SEOHead({
   
   // Custom Global Schema for injected props
   const customGlobalSchema = JSON.parse(JSON.stringify(DEFAULT_GLOBAL_SCHEMA))
-  const localBusiness = customGlobalSchema["@graph"].find(g => g["@id"].includes("#localbusiness"))
+  const localBusiness = customGlobalSchema["@graph"].find(g => g["@id"].includes("#transportationservice"))
   
   if (offerCatalog && localBusiness) {
     localBusiness.hasOfferCatalog = offerCatalog

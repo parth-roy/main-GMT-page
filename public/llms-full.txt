@@ -1,0 +1,13 @@
+# GoMyTruck (Parther Technologies Private Limited)
+
+GoMyTruck is a digital B2B load-posting platform and logistics marketplace, focused on transparent pricing and seamless goods transport services.
+
+## Focus & Business Model
+- **B2B Load-Posting Focus**: Connecting businesses with verified truck owners and drivers.
+- **Transparent Commission**: We operate on a flat 5% commission model, ensuring fair pricing for both shippers and transporters.
+
+## Tier 1 Locations (Service Areas)
+- Dankuni
+- Howrah
+- Haldia
+- Guwahati

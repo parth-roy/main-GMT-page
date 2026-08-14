@@ -81,7 +81,7 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch("https://api.gomytruck.com/api/v1/contact", {
+      const res = await fetch("https://api-test.gomytruck.com/api/v1/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form)

@@ -19,7 +19,7 @@ export default function EnterpriseHero() {
         }
         
         // Save as a lead in backend with role 'Enterprise'
-        await fetch("https://api.gomytruck.com/api/v1/leads/workforce", {
+        await fetch("https://api-test.gomytruck.com/api/v1/leads/workforce", {
           method: "POST",
           headers,
           body: JSON.stringify({

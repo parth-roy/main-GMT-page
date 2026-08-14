@@ -54,6 +54,7 @@ const ResourcesPage = lazy(() => import("./pages/ResourcesPage"))
 const FreightRateIndexPage = lazy(() => import("./pages/FreightRateIndexPage"))
 const BlogPostPage = lazy(() => import("./pages/BlogPostPage"))
 const DriverOnboardingPage = lazy(() => import("./pages/DriverOnboardingPage"))
+const DirectoryPage = lazy(() => import("./pages/DirectoryPage"))
 
 // A simple premium spinner for Suspense fallback
 const PageLoader = () => (
@@ -157,6 +158,7 @@ export default function App() {
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/freight-rate-index" element={<FreightRateIndexPage />} />
+            <Route path="/directory" element={<DirectoryPage />} />
 
             {/* NEW SILO ARCHITECTURE ROUTES */}
             <Route path="/kolkata/truck-booking" element={<TransportKolkataPage />} />

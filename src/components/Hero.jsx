@@ -16,6 +16,16 @@ export default function Hero({
   
   const [detectedCity, setDetectedCity] = useState("Kolkata")
   const [cityDetecting, setCityDetecting] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
   useEffect(() => {
     if (slug) {
@@ -80,17 +90,25 @@ export default function Hero({
       <section className="relative min-h-[85vh] pt-24 pb-24 sm:pb-32 flex flex-col justify-end items-center bg-slate-900 overflow-visible mb-32">
         {/* Full-bleed Video Background */}
         <div className="absolute inset-0 z-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster="/hero-bg-960.webp"
-            className="h-full w-full object-cover object-center"
-          >
-            <source src="/hero-video.webm" type="video/webm" />
-            <source src="/hero-video.mp4" type="video/mp4" />
-          </video>
+          {isMobile ? (
+            <img 
+              src="/hero-bg-960.webp" 
+              alt="GoMyTruck logistics"
+              className="h-full w-full object-cover object-center"
+            />
+          ) : (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster="/hero-bg-960.webp"
+              className="h-full w-full object-cover object-center"
+            >
+              <source src="/hero-video.webm" type="video/webm" />
+              <source src="/hero-video.mp4" type="video/mp4" />
+            </video>
+          )}
           <div className="absolute inset-0 bg-slate-900/65" />
         </div>
 

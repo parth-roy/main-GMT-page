@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://api.gomytruck.com/api/v1';
+export const BASE_URL = 'https://api-test.gomytruck.com/api/v1';
 
 export async function sendOtp(phone, role = 'CUSTOMER') {
   const res = await fetch(`${BASE_URL}/auth/send-otp`, {

@@ -201,7 +201,7 @@ const StateHubPage = ({ stateKey }) => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
-                to="/estimate" 
+                to="/" 
                 className="inline-flex justify-center items-center px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-lg transition-colors"
               >
                 Get Estimate <ArrowRight className="ml-2 w-5 h-5" />
@@ -332,13 +332,13 @@ const StateHubPage = ({ stateKey }) => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              to="/estimate" 
+              to="/" 
               className="px-8 py-4 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-lg transition-colors text-lg"
             >
               Get Instant Estimate
             </Link>
             <Link 
-              to="/partner" 
+              to="/driver-onboarding" 
               className="px-8 py-4 bg-transparent border-2 border-slate-700 hover:border-slate-500 hover:bg-slate-800 text-white font-bold rounded-lg transition-colors text-lg"
             >
               Partner as Fleet Owner
