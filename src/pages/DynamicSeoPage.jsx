@@ -57,17 +57,11 @@ export default function DynamicSeoPage({ serviceType }) {
     }
   ];
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl font-semibold">Loading...</div>
-      </div>
-    );
-  }
-
+  // Always render the page structure so SSR/Prerender generates valid SEO tags (Title, H1, Meta).
+  // We use fallback values initially, which are overwritten when seoData fetches.
   const header = seoData?.header || `Transport Services in ${cityName}`;
   const bannerText = seoData?.bannerText || `Your trusted partner for truck booking in ${cityName}`;
-  const descText = seoData?.description || `Logistics services and on-demand fleet in ${cityName}.`;
+  const descText = seoData?.description || `Logistics services and on-demand fleet in ${cityName}. We offer affordable and reliable goods transport solutions tailored for B2B and retail needs.`;
   
   const keywordsArr = Array.isArray(seoData?.keywords) ? seoData.keywords : [];
   const metaKeywords = keywordsArr.join(", ");
