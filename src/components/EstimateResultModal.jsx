@@ -4,16 +4,16 @@ import { fetchEstimate, fetchVehicles } from "../api/pricingApi"
 import { createBooking, confirmBooking, cancelBooking } from "../api/bookingApi"
 import { trackBookingSubmitted } from "../utils/analytics"
 
-// Local image map — backend imageUrl is null; use verified local blueprints
-const VEHICLE_IMAGES = {
-  BIKE:           "/vehicles/Standard Bike.webp",
-  THREE_WHEELER:  "/vehicles/Mahindra Jeeto.webp",
-  TATA_ACE:       "/vehicles/Tata Ace.webp",
-  MINI_TRUCK:     "/vehicles/Bolero Pickup.webp",
-  TRUCK_14FT:     "/vehicles/14 Ft Open Truck.webp",
-  TRUCK_17FT:     "/vehicles/17 Ft Closed Truck.webp",
-  TRUCK_20FT:     "/vehicles/19 Ft Truck.webp",
-  CONTAINER_32FT: "/vehicles/LCV Box Truck.webp",
+// Local image map — backend imageUrl is null; use verified local blueprints with corrected names
+const VEHICLE_DISPLAY_CONFIG = {
+  BIKE:           { image: "/vehicles/Standard Bike.webp", name: "2-Wheeler (Bike)" },
+  THREE_WHEELER:  { image: "/vehicles/Mini Open Pickup.webp", name: "3-Wheeler / Ape" },
+  TATA_ACE:       { image: "/vehicles/Tata Ace.webp", name: "Tata Ace" },
+  MINI_TRUCK:     { image: "/vehicles/Bolero Pickup.webp", name: "Bolero Pickup" },
+  TRUCK_14FT:     { image: "/vehicles/14 Ft Open Truck.webp", name: "14ft Open Truck" },
+  TRUCK_17FT:     { image: "/vehicles/17 Ft Closed Truck.webp", name: "17ft Closed Truck" },
+  TRUCK_20FT:     { image: "/vehicles/19 Ft Truck.webp", name: "19ft / 20ft Truck" },
+  CONTAINER_32FT: { image: "/vehicles/LCV Box Truck.webp", name: "32ft Container" },
 }
 
 // Which vehicleTypes to show per service context
@@ -177,7 +177,13 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
 
                 <div className="relative pl-6 space-y-10">
                   {/* Timeline line */}
-                  <div className="absolute top-2 bottom-6 left-1.5 w-0.5 border-l-2 border-dashed border-slate-300"></div>
+                  <div className="absolute top-2 bottom-6 left-1.5 w-0.5 border-l-2 border-dashed border-slate-300 flex items-center justify-center">
+                    {liveEstimate?.estimatedDistanceKm && (
+                      <div className="bg-slate-50 px-2 py-0.5 text-[10px] font-bold text-slate-500 border border-slate-200 rounded-md z-10 whitespace-nowrap translate-x-[2px] shadow-sm">
+                        {liveEstimate.estimatedDistanceKm} km
+                      </div>
+                    )}
+                  </div>
 
                   {/* Pickup Node */}
                   <div className="relative">
@@ -283,16 +289,19 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                         {filteredVehicles.map(v => {
                           const isSelected = selectedVehicleType === v.vehicleType
                           const fare = isSelected ? currentFare : null
-                          const imgSrc = VEHICLE_IMAGES[v.vehicleType] || "/navy_truck.webp"
+                          
+                          const config = VEHICLE_DISPLAY_CONFIG[v.vehicleType] || {}
+                          const imgSrc = config.image || "/navy_truck.webp"
+                          const displayName = config.name || v.displayName
 
                           if (isSelected) {
                             return (
                               <div key={v.vehicleType} className="border-2 border-blue-600 bg-white rounded-2xl p-4 shadow-sm relative transition-all">
                                 <div className="absolute top-2 left-2 right-2 bottom-2 bg-blue-50/30 rounded-xl pointer-events-none"></div>
                                 <div className="w-full bg-slate-50 rounded-xl overflow-hidden mb-3 relative z-10">
-                                  <img src={imgSrc} alt={v.displayName} className="w-full h-auto" />
+                                  <img src={imgSrc} alt={displayName} loading="lazy" decoding="async" className="w-full h-auto" />
                                 </div>
-                                <h4 className="font-bold text-slate-800 text-lg text-center relative z-10">{v.displayName}</h4>
+                                <h4 className="font-bold text-slate-800 text-lg text-center relative z-10">{displayName}</h4>
                                 <div className="flex justify-between items-end mt-2 relative z-10">
                                   <span className="text-sm font-semibold text-slate-600">{v.capacityDesc || `${v.capacityKg} Kg`}</span>
                                   <span className="text-xl font-black text-slate-900">{estimateRefreshing ? "Refreshing…" : `₹ ${Math.round(fare)}`}</span>
@@ -309,10 +318,10 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                             >
                               <div className="flex items-center gap-4">
                                 <div className="w-24 bg-slate-50 rounded-lg overflow-hidden shrink-0">
-                                  <img src={imgSrc} alt={v.displayName} className="w-full h-auto" />
+                                  <img src={imgSrc} alt={displayName} loading="lazy" decoding="async" className="w-full h-auto" />
                                 </div>
                                 <div>
-                                  <h4 className="font-bold text-slate-800 text-sm">{v.displayName}</h4>
+                                  <h4 className="font-bold text-slate-800 text-sm">{displayName}</h4>
                                   <span className="text-xs font-semibold text-slate-500">{v.capacityDesc || `${v.capacityKg} Kg`}</span>
                                 </div>
                               </div>
