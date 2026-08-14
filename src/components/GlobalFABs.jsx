@@ -56,12 +56,12 @@ export default function GlobalFABs() {
       {/* Book a Truck FAB */}
       <Link
         to="/truck"
-        className="pointer-events-auto bg-brand-600 hover:bg-brand-700 p-3.5 sm:p-4 rounded-full shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group relative"
+        className="pointer-events-auto hover:-translate-y-1 transition-transform duration-300 flex items-center justify-center group relative drop-shadow-lg hover:drop-shadow-xl rounded-full"
         aria-label="Book a Truck"
         title="Book a Truck"
       >
-        <div className="absolute inset-0 bg-white/20 rounded-full animate-ping opacity-75"></div>
-        <img src="/truck-icon.webp" alt="Truck" className="relative z-10 w-7 h-7 sm:w-8 sm:h-8 object-contain" />
+        <div className="absolute inset-1 sm:inset-2 bg-brand-600/40 rounded-full animate-ping opacity-75 z-0"></div>
+        <img src="/truck-icon.webp" alt="Truck" className="relative z-10 w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] object-contain scale-110" />
         {/* Tooltip for desktop */}
         <span className="absolute right-full mr-4 bg-brand-700 text-white text-xs font-semibold py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap hidden sm:block">
           Book a Truck
