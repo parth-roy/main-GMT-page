@@ -179,7 +179,7 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                   {/* Timeline line */}
                   <div className="absolute top-2 bottom-6 left-1.5 w-0.5 border-l-2 border-dashed border-slate-300 flex items-center justify-center">
                     {liveEstimate?.estimatedDistanceKm && (
-                      <div className="bg-slate-50 px-2 py-0.5 text-[10px] font-bold text-slate-500 border border-slate-200 rounded-md z-10 whitespace-nowrap translate-x-[2px] shadow-sm">
+                      <div className="bg-slate-50 px-3 py-1 text-xs font-extrabold text-slate-600 border border-slate-200 rounded-lg z-10 whitespace-nowrap translate-x-[2px] shadow-sm">
                         {liveEstimate.estimatedDistanceKm} km
                       </div>
                     )}
@@ -190,14 +190,14 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                     <div className="absolute -left-[27px] top-1.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white shadow-sm z-10"></div>
                     <div className="flex justify-between items-start gap-4">
                       <div>
-                        <p className="text-sm font-semibold text-slate-900">
-                          {estimateData.name || "Customer"} <span className="text-slate-400 font-normal">• {estimateData.phone}</span>
+                        <p className="text-base font-bold text-slate-900">
+                          {estimateData.name || "Customer"} <span className="text-slate-400 font-medium ml-1">• {estimateData.phone}</span>
                         </p>
-                        <p className="text-sm text-slate-500 mt-1 leading-snug pr-4">
+                        <p className="text-base text-slate-600 font-medium mt-1.5 leading-snug pr-4">
                           {estimateData.pickupAddress}
                         </p>
                       </div>
-                      <button onClick={onClose} className="text-xs font-semibold text-blue-600 hover:underline shrink-0">Edit</button>
+                      <button onClick={onClose} className="text-sm font-bold text-blue-600 hover:underline shrink-0">Edit</button>
                     </div>
                   </div>
 
