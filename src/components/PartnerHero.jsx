@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { Send, BadgeCheck, ShieldCheck, MapPin, X } from "lucide-react"
 import { trackFleetRegistration } from "../utils/analytics"
 import { useAuth } from "../context/AuthContext"
 
 export default function PartnerHero({ isFleetOwner = false }) {
+  const navigate = useNavigate();
   const [driverName, setDriverName] = useState("")
   const [driverPhone, setDriverPhone] = useState("")
   const [driverCity, setDriverCity] = useState("")
@@ -96,7 +98,7 @@ export default function PartnerHero({ isFleetOwner = false }) {
         {/* Bouncing Map Pin — centred perfectly in the middle */}
         <div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-1 cursor-pointer group"
-          onClick={() => setIsOpen(true)}
+          onClick={() => navigate('/driver-onboarding')}
           role="button"
           aria-label="Join our driver network"
         >

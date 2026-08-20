@@ -74,7 +74,7 @@ export default function DriverOnboardingPage() {
         }
       });
 
-      const response = await fetch("https://api-test.gomytruck.com/api/v1/form-driver-leads", {
+      const response = await fetch("https://api.gomytruck.com/api/v1/form-driver-leads", {
         method: "POST",
         body: data,
       });

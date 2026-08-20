@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { MapPin, ChevronDown, ArrowRight, AlertCircle } from "lucide-react"
+import { MapPin, ChevronDown, ArrowRight, AlertCircle, Shield, CheckCircle } from "lucide-react"
 import { SERVED_CITIES } from "../../api/pricingApi"
 import AddressAutocomplete from "../AddressAutocomplete"
 import { trackLead, trackWhatsAppClick } from "../../utils/analytics"
@@ -193,6 +193,11 @@ export default function PackersHero({ city, setCity }) {
                   Request Quote
                   <ArrowRight size={16} />
                 </button>
+                <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 text-[9px] sm:text-[10px] text-slate-400 font-medium tracking-wide w-full">
+                  <span className="flex items-center gap-1 whitespace-nowrap"><Shield size={10} className="text-emerald-500" /> Secure 256-bit Booking</span>
+                  <span className="hidden sm:inline text-slate-300">|</span>
+                  <span className="flex items-center gap-1 whitespace-nowrap"><CheckCircle size={10} className="text-blue-500" /> Verified Partners</span>
+                </div>
               </div>
 
             </form>
