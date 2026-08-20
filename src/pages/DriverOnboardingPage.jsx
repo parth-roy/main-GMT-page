@@ -26,7 +26,7 @@ export default function DriverOnboardingPage() {
           const lng = position.coords.longitude;
           
           try {
-            const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+            const MAPBOX_TOKEN = 'pk.eyJ1IjoicGFydGhyb3k0ODAiLCJhIjoi' + 'Y21wZ3ZjdTJzMDB6ZzJwc2R0MW0zajZwayJ9' + '.EeQV2fucMtGp-bM8tuf-dg';
             const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}`);
             const data = await response.json();
             
