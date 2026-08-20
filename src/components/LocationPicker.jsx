@@ -34,8 +34,16 @@ export default function LocationPicker({ onLocationChange }) {
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
       center: [locationDetails.lng, locationDetails.lat],
-      zoom: 12
+      zoom: 12,
+      trackResize: true
     });
+    
+    // Force a resize just in case the container was hidden or didn't have dimensions yet
+    setTimeout(() => {
+      if (map.current) {
+        map.current.resize();
+      }
+    }, 500);
 
     marker.current = new mapboxgl.Marker({ draggable: true, color: '#10b981' })
       .setLngLat([locationDetails.lng, locationDetails.lat])
@@ -151,8 +159,8 @@ export default function LocationPicker({ onLocationChange }) {
         )}
       </div>
 
-      <div className="relative border rounded-lg overflow-hidden h-64">
-        <div ref={mapContainer} className="absolute inset-0" />
+      <div className="relative border rounded-lg overflow-hidden h-[300px]" style={{ minHeight: '300px' }}>
+        <div ref={mapContainer} className="absolute inset-0 w-full h-full" style={{ width: '100%', height: '100%' }} />
         <div className="absolute top-2 left-2 bg-white px-2 py-1 text-xs font-medium rounded shadow z-10 pointer-events-none">
           Drag pin to your exact location
         </div>
