@@ -59,6 +59,20 @@ export default function LocationPicker({ onLocationChange }) {
       reverseGeocode(e.lngLat.lng, e.lngLat.lat);
     });
 
+    // Try to get user's actual location and fly there
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        if (map.current && marker.current) {
+          map.current.flyTo({ center: [longitude, latitude], zoom: 14 });
+          marker.current.setLngLat([longitude, latitude]);
+          reverseGeocode(longitude, latitude);
+        }
+      }, () => {
+        // Silently fail if they deny permission, map stays in Kolkata
+      });
+    }
+
   }, []);
 
   // Geocoding function
