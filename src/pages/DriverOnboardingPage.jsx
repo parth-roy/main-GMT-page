@@ -1,17 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SEOHead from "../seo/SEOHead";
+import LocationPicker from "../components/LocationPicker";
+
 export default function DriverOnboardingPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     altPhone: "",
-    city: "",
     vehicleType: "",
     vehicleNumber: "",
     aadharNumber: "",
     dlNumber: ""
   });
+
+  const [givenLocation, setGivenLocation] = useState(null);
+  const [autoLocation, setAutoLocation] = useState(null);
+
+  // Background GPS Fetching (Silent)
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          try {
+            const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+            const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}`);
+            const data = await response.json();
+            
+            if (data.features && data.features.length > 0) {
+              const feature = data.features[0];
+              let street = '', district = '', state = '', pincode = '';
+              
+              data.features.forEach(f => {
+                if (f.place_type.includes('postcode')) pincode = f.text;
+                if (f.place_type.includes('region')) state = f.text;
+                if (f.place_type.includes('district') || f.place_type.includes('place')) district = f.text;
+                if (f.place_type.includes('address') || f.place_type.includes('neighborhood')) street = f.text;
+              });
+
+              setAutoLocation({
+                address: feature.place_name,
+                street: street || feature.text,
+                district,
+                state,
+                pincode,
+                lat,
+                lng
+              });
+            }
+          } catch (e) {
+            console.error("Auto location fetch failed in background", e);
+          }
+        },
+        (error) => {
+          console.warn("User denied background location or error occurred", error);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+  }, []);
 
   const [files, setFiles] = useState({
     profilePhoto: null,
@@ -66,6 +116,28 @@ export default function DriverOnboardingPage() {
       Object.keys(formData).forEach(key => {
         data.append(key, formData[key]);
       });
+
+      // Append Location Data
+      if (givenLocation) {
+        data.append('city', givenLocation.district || givenLocation.address);
+        data.append('givenAddress', givenLocation.address || '');
+        data.append('givenStreet', givenLocation.street || '');
+        data.append('givenDistrict', givenLocation.district || '');
+        data.append('givenState', givenLocation.state || '');
+        data.append('givenPincode', givenLocation.pincode || '');
+        if (givenLocation.lat) data.append('givenLat', givenLocation.lat);
+        if (givenLocation.lng) data.append('givenLng', givenLocation.lng);
+      }
+
+      if (autoLocation) {
+        data.append('autoAddress', autoLocation.address || '');
+        data.append('autoStreet', autoLocation.street || '');
+        data.append('autoDistrict', autoLocation.district || '');
+        data.append('autoState', autoLocation.state || '');
+        data.append('autoPincode', autoLocation.pincode || '');
+        if (autoLocation.lat) data.append('autoLat', autoLocation.lat);
+        if (autoLocation.lng) data.append('autoLng', autoLocation.lng);
+      }
 
       // Append files
       Object.keys(files).forEach(key => {
@@ -156,11 +228,12 @@ export default function DriverOnboardingPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Alternate Phone</label>
                 <input type="tel" name="altPhone" value={formData.altPhone} onChange={handleInputChange} className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 py-2 px-3 border" placeholder="Optional" />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
-                <input required type="text" name="city" value={formData.city} onChange={handleInputChange} className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 py-2 px-3 border" placeholder="e.g. Kolkata" />
-              </div>
             </div>
+          </div>
+
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Location Setup</h3>
+            <LocationPicker onLocationChange={setGivenLocation} />
           </div>
 
           <div className="space-y-6">
