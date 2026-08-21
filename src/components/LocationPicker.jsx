@@ -45,6 +45,14 @@ export default function LocationPicker({ onLocationChange }) {
       }
     }, 500);
 
+    // Add Current Location Button (GeolocateControl)
+    const geolocate = new mapboxgl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true },
+      trackUserLocation: false, // Don't constantly track, just once per click
+      showUserLocation: false   // We use our own green marker
+    });
+    map.current.addControl(geolocate, 'bottom-right');
+
     marker.current = new mapboxgl.Marker({ draggable: true, color: '#10b981' })
       .setLngLat([locationDetails.lng, locationDetails.lat])
       .addTo(map.current);
@@ -57,6 +65,15 @@ export default function LocationPicker({ onLocationChange }) {
     map.current.on('click', (e) => {
       marker.current.setLngLat(e.lngLat);
       reverseGeocode(e.lngLat.lng, e.lngLat.lat);
+    });
+
+    geolocate.on('geolocate', (e) => {
+      const lng = e.coords.longitude;
+      const lat = e.coords.latitude;
+      if (marker.current) {
+        marker.current.setLngLat([lng, lat]);
+        reverseGeocode(lng, lat);
+      }
     });
 
     // Try to get user's actual location and fly there
@@ -147,7 +164,7 @@ export default function LocationPicker({ onLocationChange }) {
 
   return (
     <div className="space-y-4">
-      <div className="relative">
+      <div className="relative z-50">
         <label className="block text-sm font-medium text-gray-700 mb-1">Search Location (Auto-fills below)</label>
         <input 
           type="text" 
@@ -159,7 +176,7 @@ export default function LocationPicker({ onLocationChange }) {
         {isSearching && <div className="absolute right-3 top-9 text-xs text-gray-400">Searching...</div>}
         
         {searchResults.length > 0 && (
-          <ul className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+          <ul className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
             {searchResults.map((feature) => (
               <li 
                 key={feature.id} 

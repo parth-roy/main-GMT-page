@@ -120,6 +120,7 @@ export default function DriverOnboardingPage() {
       // Append Location Data
       if (givenLocation) {
         data.append('city', givenLocation.district || givenLocation.address);
+        data.append('state', givenLocation.state || '');
         data.append('givenAddress', givenLocation.address || '');
         data.append('givenStreet', givenLocation.street || '');
         data.append('givenDistrict', givenLocation.district || '');
