@@ -79,7 +79,7 @@ const pages = {
     intro: "Plan a household or small-office move with pickup, destination, inventory and access details captured before the quote. Packing material, workforce and vehicle requirements depend on the declared inventory.",
     context: "List bulky or fragile items, floor and lift access, dismantling needs and preferred moving time. The initial estimate can change if the on-site inventory or service scope differs from what was declared.",
     areas: ["Central Kolkata", "South Kolkata", "North Kolkata", "Salt Lake", "New Town", "Howrah"],
-    services: [["Moving service", "/packers-and-movers"], ["Mini truck", "/kolkata/mini-truck-booking"], ["Workforce", "/workforce"], ["Terms", "/legal/terms"]],
+    services: [["Moving service", "/packers-and-movers"], ["Mini truck", "/kolkata/mini-truck-booking"], ["Tata Ace", "/kolkata/tata-ace-booking"], ["Terms", "/legal/terms"]],
   },
   "barrackpore-labour": {
     canonical: "/barrackpore/loading-unloading-labour",
@@ -90,7 +90,7 @@ const pages = {
     intro: "Add workforce requirements to an eligible goods-transport request, including worker count, task type and estimated duration. Labour assignment is separate from vehicle assignment and remains subject to availability.",
     context: "Describe stairs, lift access, item weight and specialist handling before confirming. Drivers are not automatically responsible for loading or unloading unless that service is expressly included in the booking.",
     areas: ["Barrackpore", "Titagarh", "Khardah", "Sodepur", "Shyamnagar", "Naihati"],
-    services: [["Barrackpore transport", "/barrackpore/truck-booking"], ["Goods transport", "/barrackpore/goods-transport"], ["Workforce programme", "/workforce"], ["Contact support", "/contact"]],
+    services: [["Barrackpore transport", "/barrackpore/truck-booking"], ["Goods transport", "/barrackpore/goods-transport"], ["Partner plans", "/plans"], ["Contact support", "/contact"]],
   },
   "howrah-goods": {
     canonical: "/howrah/goods-transport",

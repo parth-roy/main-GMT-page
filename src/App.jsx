@@ -20,7 +20,6 @@ const EnterprisePage = lazy(() => import("./pages/EnterprisePage"))
 const AboutPage = lazy(() => import("./pages/AboutPage"))
 const SupportPage = lazy(() => import("./pages/SupportPage"))
 const DriversPage = lazy(() => import("./pages/DriversPage"))
-const WorkforcePage = lazy(() => import("./pages/WorkforcePage"))
 
 const PackersAndMoversPage = lazy(() => import("./pages/PackersAndMoversPage"))
 const BookTruckOnlinePage = lazy(() => import("./pages/BookTruckOnlinePage"))
@@ -90,9 +89,6 @@ export default function App() {
     } else if (id === "driver-partner") {
       navigate("/driver-partner")
       window.scrollTo({ top: 0, behavior: "smooth" })
-    } else if (id === "workforce") {
-      navigate("/workforce")
-      window.scrollTo({ top: 0, behavior: "smooth" })
     } else if (id === "support") {
       navigate("/support")
       window.scrollTo({ top: 0, behavior: "smooth" })
@@ -141,7 +137,6 @@ export default function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/support" element={<SupportPage />} />
             <Route path="/driver-partner" element={<DriversPage />} />
-            <Route path="/workforce" element={<WorkforcePage />} />
             {/* SEO Landing Pages */}
             <Route path="/book-truck-online" element={<BookTruckOnlinePage />} />
             <Route path="/mini-truck-booking" element={<MiniTruckBookingPage />} />

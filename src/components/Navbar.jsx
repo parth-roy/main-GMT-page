@@ -129,7 +129,6 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
 
   const simpleNavItems = [
     { name: "Enterprise", id: "enterprise" },
-    { name: "Workforce", url: "https://workforce.gomytruck.com" },
     { name: "About", id: "about" },
     { name: "Support", id: "support" },
   ]

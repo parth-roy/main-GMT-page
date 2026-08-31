@@ -94,7 +94,6 @@ export default function Footer({ onScrollToSection }) {
                 <ul className="space-y-3">
                   <li><Link to="/about" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium" title="About GoMyTruck - Online Truck Booking Company India">About Us</Link></li>
                   <li><Link to="/contact" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium">Contact Us</Link></li>
-                  <li><Link to="/workforce" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium">Join Workforce</Link></li>
                   <li><Link to="/plans" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium">Partner Plans</Link></li>
                   <li><Link to="/blog" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium">Blog</Link></li>
                   <li><Link to="/gomytruck-verified" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium">GoMyTruck Verified</Link></li>

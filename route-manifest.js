@@ -10,7 +10,6 @@ export const INDEXABLE_ROUTES = [
   "/about",
   "/support",
   "/driver-partner",
-  "/workforce",
   "/contact",
   // "/pricing",
   "/blog",

@@ -25,10 +25,6 @@
     <lastmod>${new Date().toISOString()}</lastmod>
   </url>
   <url>
-    <loc>https://gomytruck.com/workforce</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-  </url>
-  <url>
     <loc>https://gomytruck.com/contact</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
   </url>
