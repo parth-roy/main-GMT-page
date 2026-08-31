@@ -1,7 +1,8 @@
 import React, { useEffect } from "react"
-import { Link } from "react-router-dom"
-import { ArrowRight, CheckCircle2, MapPin, Phone, BadgePercent } from "lucide-react"
+import { Link, Navigate } from "react-router-dom"
+import { ArrowRight, CheckCircle2, MapPin, Phone, BadgePercent, MessageCircleQuestion } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
+import { generateCityFaqs, generateRouteFaqs } from "../lib/locationFaqHelper"
 
 const pages = {
   kolkata: {
@@ -538,11 +539,28 @@ export default function LocalSeoPage({ pageKey }) {
   const page = pages[pageKey]
   useEffect(() => { window.scrollTo(0, 0) }, [pageKey])
 
-  const faqs = [
-    ["How is the transport price calculated?", "The booking flow uses the declared route, vehicle, load and trip conditions. It shows the available fare components before payment; toll, waiting, labour, taxes or other disclosed charges may apply."],
-    ["Is a vehicle assigned immediately?", "Not always. An estimate is not a vehicle-allocation guarantee. Assignment and arrival timing depend on a matching partner, the route, traffic and current availability."],
-    ["What should I provide before booking?", "Enter accurate pickup and drop details and disclose the goods type, weight, quantity, dimensions, photos when requested and any loading or unloading workforce needs."],
-  ]
+  if (!page) {
+    return <Navigate to="/404" replace />
+  }
+
+  // Dynamic FAQ generation for either corridor routes or local city/hub pages
+  let dynamicFaqData;
+  if (page.canonical?.startsWith("/routes/")) {
+    const rawClean = page.h1.replace(/—.*$/, "").replace(/Goods Transport.*/, "").trim()
+    const parts = rawClean.split(" to ")
+    const fromCity = parts[0] ? parts[0].trim() : "Kolkata"
+    const toCity = parts[1] ? parts[1].trim() : "Destination"
+    dynamicFaqData = generateRouteFaqs(fromCity, toCity, "standard highway corridor distance", "12 to 36 hours", "National Highway")
+  } else {
+    const rawCity = page.h1.includes(" in ")
+      ? page.h1.split(" in ")[1].split(",")[0].trim()
+      : (page.areas[0] || page.eyebrow.split(" ")[0] || "Kolkata")
+    dynamicFaqData = generateCityFaqs({ name: rawCity, slug: pageKey }, "hub", page.areas)
+  }
+
+  const activeFaqs = dynamicFaqData.faqs
+  const faqSchema = dynamicFaqData.jsonLdSchema
+
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -561,14 +579,7 @@ export default function LocalSeoPage({ pageKey }) {
         { "@type": "ListItem", position: 2, name: page.h1, item: `https://gomytruck.com${page.canonical}` },
       ],
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: faqs.map(([question, answer]) => ({
-        "@type": "Question", name: question,
-        acceptedAnswer: { "@type": "Answer", text: answer },
-      })),
-    },
+    faqSchema,
   ]
 
   return (
@@ -648,9 +659,17 @@ export default function LocalSeoPage({ pageKey }) {
 
         <section className="py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-black text-slate-900 text-center">Booking questions</h2>
+            <h2 className="text-3xl font-black text-slate-900 text-center">Frequently Asked Questions</h2>
+            <p className="text-slate-600 text-center mt-2 max-w-xl mx-auto">
+              Everything you need to know about pricing, vehicle assignment, and goods transport on this location.
+            </p>
             <div className="mt-8 space-y-4">
-              {faqs.map(([question, answer]) => <details key={question} className="border border-slate-200 rounded-xl p-5"><summary className="font-bold cursor-pointer">{question}</summary><p className="mt-3 text-slate-700 leading-7">{answer}</p></details>)}
+              {activeFaqs.map((faq, idx) => (
+                <details key={idx} className="border border-slate-200 rounded-xl p-5 bg-white shadow-xs open:border-brand-300">
+                  <summary className="font-bold cursor-pointer text-slate-900">{faq.question}</summary>
+                  <p className="mt-3 text-slate-600 leading-relaxed">{faq.answer}</p>
+                </details>
+              ))}
             </div>
           </div>
         </section>

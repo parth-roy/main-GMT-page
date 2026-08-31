@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { ArrowRight, MapPin, Phone, TrendingUp, Package, Building2, Truck } from 'lucide-react';
+import { ArrowRight, MapPin, Phone, TrendingUp, Package, Building2, Truck, MessageCircleQuestion } from 'lucide-react';
 import SEOHead from '../seo/SEOHead';
+import { generateStateFaqs } from '../lib/locationFaqHelper';
 
 const states = {
   "west-bengal": {
@@ -132,6 +133,9 @@ const StateHubPage = ({ stateKey }) => {
     keyRoutes,
     industries
   } = data;
+  const stateNameClean = h1.split('Across ')[1] || h1.split('in ')[1] || "the State";
+  const stateFaqData = generateStateFaqs(stateNameClean, industrialHubs.length, industrialHubs.map(h => h.name));
+  const activeFaqs = stateFaqData.faqs;
 
   const jsonLd = [
     {
@@ -144,7 +148,7 @@ const StateHubPage = ({ stateKey }) => {
       },
       "areaServed": {
         "@type": "State",
-        "name": h1.split('Across ')[1] || h1.split('in ')[1] || "India"
+        "name": stateNameClean
       },
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
@@ -173,7 +177,8 @@ const StateHubPage = ({ stateKey }) => {
           "item": `https://gomytruck.com${canonical}`
         }
       ]
-    }
+    },
+    stateFaqData.jsonLdSchema
   ];
 
   return (
@@ -319,6 +324,32 @@ const StateHubPage = ({ stateKey }) => {
             </div>
           </div>
 
+        </div>
+      </section>
+
+      {/* State FAQ Section */}
+      <section className="py-20 px-4 md:px-8 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-100 border border-brand-200 text-brand-700 text-xs font-bold tracking-widest uppercase mb-3">
+              <MessageCircleQuestion size={14} /> State Logistics FAQs
+            </div>
+            <h2 className="text-3xl font-bold text-slate-900 mb-3">
+              Frequently Asked Questions About Transport in {stateNameClean}
+            </h2>
+            <p className="text-slate-600 text-base">
+              Learn how GoMyTruck provides transparent, verified freight transportation across {stateNameClean}.
+            </p>
+          </div>
+          
+          <div className="space-y-4">
+            {activeFaqs.map((faq, idx) => (
+              <details key={idx} className="border border-slate-200 rounded-xl p-5 bg-white shadow-xs open:border-brand-400">
+                <summary className="font-bold cursor-pointer text-slate-900 text-base sm:text-lg">{faq.question}</summary>
+                <p className="mt-3 text-slate-600 leading-relaxed text-sm sm:text-base border-t border-slate-100 pt-3">{faq.answer}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 

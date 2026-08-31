@@ -35,9 +35,26 @@ export default function DynamicSeoPage({ serviceType }) {
   const { name: cityName, state } = cityConfig;
 
   let urlSegment = "";
-  if (serviceType === "truck-booking") urlSegment = "truck-booking";
-  else if (serviceType === "pickup-rent") urlSegment = "pickup-truck-for-rent";
-  else if (serviceType === "moving-truck") urlSegment = "moving-truck-hire";
+  let serviceHeadline = `Transport Services in ${cityName}`;
+  let serviceBanner = `Your trusted partner for truck booking and goods transport in ${cityName}`;
+  let serviceDesc = `On-demand goods transport and commercial truck booking in ${cityName}, ${state}. Flat 5% commission, verified drivers, and transparent live pricing.`;
+
+  if (serviceType === "truck-booking") {
+    urlSegment = "truck-booking";
+    serviceHeadline = `Online Truck Booking in ${cityName}`;
+    serviceBanner = `Book mini trucks, Tata Ace, and commercial transport in ${cityName}`;
+    serviceDesc = `Hire trucks online in ${cityName}. Fast dispatch for Tata Ace, 14ft, 20ft, and 32ft commercial freight at transparent per-km rates with zero broker margin.`;
+  } else if (serviceType === "pickup-rent") {
+    urlSegment = "pickup-truck-for-rent";
+    serviceHeadline = `Pickup Truck for Rent in ${cityName}`;
+    serviceBanner = `Mahindra Bolero Pickup and 8ft / 9ft mini trucks on rent in ${cityName}`;
+    serviceDesc = `Rent pickup trucks in ${cityName} for local goods delivery, furniture shifting, and wholesale transport. Upfront fares with instant booking.`;
+  } else if (serviceType === "moving-truck") {
+    urlSegment = "moving-truck-hire";
+    serviceHeadline = `Moving Truck Hire in ${cityName}`;
+    serviceBanner = `Household shifting and office relocation moving trucks in ${cityName}`;
+    serviceDesc = `Hire moving trucks in ${cityName} for safe house shifting and office relocation. Dedicated closed container trucks and careful cargo transport.`;
+  }
 
   const routePath = serviceType === "hub" ? `/${city}` : `/${city}/${urlSegment}`;
 
@@ -57,11 +74,9 @@ export default function DynamicSeoPage({ serviceType }) {
     }
   ];
 
-  // Always render the page structure so SSR/Prerender generates valid SEO tags (Title, H1, Meta).
-  // We use fallback values initially, which are overwritten when seoData fetches.
-  const header = seoData?.header || `Transport Services in ${cityName}`;
-  const bannerText = seoData?.bannerText || `Your trusted partner for truck booking in ${cityName}`;
-  const descText = seoData?.description || `Logistics services and on-demand fleet in ${cityName}. We offer affordable and reliable goods transport solutions tailored for B2B and retail needs.`;
+  const header = seoData?.header || serviceHeadline;
+  const bannerText = seoData?.bannerText || serviceBanner;
+  const descText = seoData?.description || serviceDesc;
   
   const keywordsArr = Array.isArray(seoData?.keywords) ? seoData.keywords : [];
   const metaKeywords = keywordsArr.join(", ");
@@ -70,6 +85,8 @@ export default function DynamicSeoPage({ serviceType }) {
     <CityTransportPage
       city={cityName}
       slug={city}
+      state={state}
+      serviceType={serviceType}
       canonical={routePath}
       seoTitle={`${header} | GoMyTruck`}
       description={descText}
