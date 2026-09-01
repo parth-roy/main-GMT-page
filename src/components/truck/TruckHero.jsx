@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useLocation } from "react-router-dom"
 import { MapPin, ChevronDown, ArrowRight, Loader2, AlertCircle, Shield, CheckCircle, BadgePercent } from "lucide-react"
-import { geocodeAddress, fetchEstimate, SERVICE_TO_VEHICLE_TYPE, detectCurrentCity, SERVED_CITIES, CITY_HERO_IMAGES } from "../../api/pricingApi"
+import { fetchEstimate, SERVICE_TO_VEHICLE_TYPE, detectCurrentCity, SERVED_CITIES, CITY_HERO_IMAGES } from "../../api/pricingApi"
 import EstimateResultModal from "../EstimateResultModal"
-import AddressAutocomplete from "../AddressAutocomplete"
+import GoogleAddressAutocomplete, { geocodeGoogleAddress } from "../GoogleAddressAutocomplete"
 import CitySelectorModal from "../CitySelectorModal"
 
 const PERSON_TYPES = [
@@ -78,8 +78,8 @@ export default function TruckHero({ city, setCity }) {
     try {
       // 1. Geocode both addresses
       const [pickupCoords, dropCoords] = await Promise.all([
-        geocodeAddress(form.pickup),
-        geocodeAddress(form.drop),
+        geocodeGoogleAddress(form.pickup),
+        geocodeGoogleAddress(form.drop),
       ])
 
       // 2. Fetch real estimate from server
@@ -183,7 +183,7 @@ export default function TruckHero({ city, setCity }) {
             {/* Form */}
             <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
               
-              <AddressAutocomplete
+              <GoogleAddressAutocomplete
                 id="pickup-address-truck"
                 autoComplete="street-address"
                 label="Pickup Address *"
@@ -191,7 +191,7 @@ export default function TruckHero({ city, setCity }) {
                 onAddressSelect={(res) => setForm(prev => ({ ...prev, pickup: res.address, pickupCoords: { lat: res.lat, lng: res.lng } }))}
               />
 
-              <AddressAutocomplete
+              <GoogleAddressAutocomplete
                 id="drop-address-truck"
                 label="Drop Address *"
                 placeholder="e.g. Salt Lake, Kolkata"
