@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import DirectDriverContactBanner from '../../components/common/DirectDriverContactBanner';
 
 export default function LocationPage() {
   const { location } = useParams();
@@ -13,7 +14,10 @@ export default function LocationPage() {
         <p className="text-xl">Find immediate gigs and daily work opportunities in {cityName}.</p>
       </section>
 
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-12">
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-10">
+        {/* Floating Direct Driver & Partner Contact Card */}
+        <DirectDriverContactBanner categoryName="Drivers & Logistics Labour" cityName={cityName} />
+
         {/* Workforce context */}
         <section className="bg-white p-8 rounded-lg shadow">
           <h2 className="text-2xl font-bold mb-4">Logistics Hub: {cityName}</h2>

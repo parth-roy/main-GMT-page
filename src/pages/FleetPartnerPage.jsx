@@ -5,6 +5,7 @@ import PartnerHero from "../components/PartnerHero"
 import PartnerBenefits from "../components/PartnerBenefits"
 import PartnerVehicles from "../components/PartnerVehicles"
 import PartnerHowItWorks from "../components/PartnerHowItWorks"
+import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
 
 const schema = [
   {
@@ -43,6 +44,9 @@ export default function FleetPartnerPage() {
       
       <main className="font-sans">
         <PartnerHero isFleetOwner={true} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <DirectDriverContactBanner categoryName="Fleet Partners & Transporters" />
+        </div>
         <PartnerVehicles />
         <PartnerHowItWorks />
         <PartnerBenefits />

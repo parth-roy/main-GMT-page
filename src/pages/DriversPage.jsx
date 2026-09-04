@@ -5,6 +5,7 @@ import PartnerBenefits from '../components/PartnerBenefits';
 import PartnerVehicles from '../components/PartnerVehicles';
 import PartnerHowItWorks from '../components/PartnerHowItWorks';
 import PartnerFAQ from '../components/PartnerFAQ';
+import DirectDriverContactBanner from '../components/common/DirectDriverContactBanner';
 
 const driverSchema = [
   {
@@ -43,6 +44,9 @@ export default function DriversPage() {
       
       <main className="min-h-screen bg-slate-50 font-sans">
         <PartnerHero isFleetOwner={false} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <DirectDriverContactBanner categoryName="Driver Partners & Fleet Owners" />
+        </div>
         <PartnerVehicles />
         <PartnerHowItWorks />
         <PartnerBenefits />

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { ArrowRight, CheckCircle, Truck, Bike, Package, Home } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
 import FAQ from "../components/FAQ"
+import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
 
 const schema = [
   {
@@ -103,6 +104,11 @@ export default function GoodsTransportPage() {
             Book Transport Now <ArrowRight size={20} />
           </Link>
         </div>
+      </section>
+
+      {/* Direct Driver / Partner Contact Banner */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+        <DirectDriverContactBanner categoryName="Commercial Freight Drivers & Transporters" cityName="Kolkata" />
       </section>
 
       {/* Service Cards */}

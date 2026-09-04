@@ -4,6 +4,7 @@ import { Truck, Package, Clock, Shield, Star, ArrowRight, CheckCircle, PhoneCall
 import SEOHead from "../seo/SEOHead"
 import TruckHero from "../components/truck/TruckHero"
 import FAQ from "../components/FAQ"
+import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
 
 const schema = [
   {
@@ -58,6 +59,10 @@ export default function BookTruckOnlinePage() {
 
       {/* Reuse the full TruckHero with booking form */}
       <TruckHero city={city} setCity={setCity} />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <DirectDriverContactBanner categoryName="Commercial Truck Drivers" cityName={city} />
+      </div>
 
       {/* How It Works */}
       <section className="py-20 bg-slate-50">

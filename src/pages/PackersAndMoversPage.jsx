@@ -7,6 +7,7 @@ import PackersLocalSEO from "../components/packers/PackersLocalSEO"
 import PackersFAQ from "../components/packers/PackersFAQ"
 import AppDownloadBanner from "../components/truck/AppDownloadBanner"
 import SEOHead from "../seo/SEOHead"
+import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
 
 export default function PackersAndMoversPage() {
   const [city, setCity] = useState("Kolkata")
@@ -46,6 +47,9 @@ export default function PackersAndMoversPage() {
       />
       
       <PackersHero city={city} setCity={setCity} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <DirectDriverContactBanner categoryName="Movers & Shifting Drivers" cityName={city} />
+      </div>
       <PackersValueProps />
       <PackersExtraServices />
       <PackersSEOContent city={city} />

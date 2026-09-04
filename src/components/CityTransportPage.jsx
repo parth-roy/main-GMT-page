@@ -10,6 +10,7 @@ import { MapPin, Truck, Bike, Package, Home, ArrowRight, CheckCircle, PhoneCall,
 import SEOHead from "../seo/SEOHead"
 import TrustBadgeRow from "./TrustBadgeRow"
 import { generateCityFaqs } from "../lib/locationFaqHelper"
+import DirectDriverContactBanner from "./common/DirectDriverContactBanner"
 
 export default function CityTransportPage({
   city,
@@ -136,6 +137,11 @@ export default function CityTransportPage({
       {/* Trust Badges */}
       <section className="bg-white px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto -mt-8 relative z-20">
         <TrustBadgeRow city={city} />
+      </section>
+
+      {/* Direct Driver / Partner Contact Floating Banner */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+        <DirectDriverContactBanner categoryName={`Truck Drivers & Transporters`} cityName={city} />
       </section>
 
       {/* Services */}

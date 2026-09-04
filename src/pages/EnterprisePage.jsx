@@ -6,6 +6,7 @@ import IndustriesServed from "../components/enterprise/IndustriesServed"
 import SecondaryContact from "../components/enterprise/SecondaryContact"
 import EnterpriseFAQ from "../components/enterprise/EnterpriseFAQ"
 import SEOHead from "../seo/SEOHead"
+import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
 
 const enterpriseSchema = [
   {
@@ -43,6 +44,9 @@ export default function EnterprisePage() {
         jsonLd={enterpriseSchema}
       />
       <EnterpriseHero />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <DirectDriverContactBanner categoryName="Corporate Fleet & Transporters" />
+      </div>
       <KeyFeatures />
       <CityCoverage />
       <IndustriesServed />

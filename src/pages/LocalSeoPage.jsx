@@ -3,6 +3,7 @@ import { Link, Navigate } from "react-router-dom"
 import { ArrowRight, CheckCircle2, MapPin, Phone, BadgePercent, MessageCircleQuestion } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
 import { generateCityFaqs, generateRouteFaqs } from "../lib/locationFaqHelper"
+import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
 
 const pages = {
   kolkata: {
@@ -630,6 +631,13 @@ export default function LocalSeoPage({ pageKey }) {
       )}
 
       <main>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          <DirectDriverContactBanner
+            categoryName="Truck Drivers & Transporters"
+            cityName={page.h1 && page.h1.includes("in ") ? page.h1.split("in ")[1] : "your area"}
+          />
+        </div>
+
         <section className="py-16">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[1.4fr_1fr] gap-10">
             <div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import DirectDriverContactBanner from '../../components/common/DirectDriverContactBanner';
 
 export default function RoleLocationPage() {
   const { role, location } = useParams();
@@ -14,7 +15,10 @@ export default function RoleLocationPage() {
         <p className="text-xl">Your guide to finding {roleName.toLowerCase()} opportunities locally.</p>
       </section>
 
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-12">
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-10">
+        {/* Floating Direct Driver & Partner Contact Card */}
+        <DirectDriverContactBanner categoryName={`${roleName} & Transporters`} cityName={cityName} />
+
         {/* Local context */}
         <section className="bg-white p-8 rounded-lg shadow">
           <h2 className="text-2xl font-bold mb-4">Working as a {roleName} in {cityName}</h2>

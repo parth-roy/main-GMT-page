@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle, Package, Truck } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
 import TruckHero from "../components/truck/TruckHero"
 import TruckFAQ from "../components/truck/TruckFAQ"
+import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
 
 const schema = [
   {
@@ -69,6 +70,10 @@ export default function MiniTruckBookingPage() {
 
       {/* Reuse booking form */}
       <TruckHero city={city} setCity={setCity} />
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <DirectDriverContactBanner categoryName="Mini Truck & Tata Ace Drivers" cityName={city} />
+      </div>
 
       {/* Vehicle showcase */}
       <section className="py-20 bg-slate-50">

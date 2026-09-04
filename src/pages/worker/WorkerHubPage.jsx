@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import DirectDriverContactBanner from '../../components/common/DirectDriverContactBanner';
 
 export default function WorkerHubPage() {
   return (
@@ -10,6 +11,11 @@ export default function WorkerHubPage() {
         <p className="text-xl mb-8">Join the largest network of verified workers and start earning daily.</p>
         <Link to="/worker/jobs" className="bg-white text-green-600 px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-100 transition">Find Work</Link>
       </section>
+
+      {/* Floating Direct Driver & Partner Contact Card */}
+      <div className="max-w-7xl mx-auto px-4 -mt-8 relative z-20">
+        <DirectDriverContactBanner categoryName="Logistics Workforce & Drivers" />
+      </div>
 
       {/* Popular Roles */}
       <section className="max-w-7xl mx-auto px-4 py-16">

@@ -142,7 +142,12 @@ export function generateCityFaqs(cityConfig, serviceType = "hub", customAreas = 
     {
       question: `Can I book intercity and outstation goods transport from ${cityName}?`,
       answer: `Yes. In addition to local intra-city transport in ${cityName}, GoMyTruck provides dedicated Full Truck Load (FTL) and Part Load (PTL) intercity logistics connecting ${cityName} directly to major industrial corridors across ${stateName} and national highways. Real-time GPS tracking and digital proof of delivery (POD) are included for all outstation trips.`
+    },
+    {
+      question: `Can I get direct phone numbers of truck drivers in ${cityName} without broker commission?`,
+      answer: `Yes. GoMyTruck provides a Direct Driver / Partner Contact feature. For a flat one-time fee of ₹49, you can instantly unlock direct mobile phone numbers of 10 commercial-licensed truck drivers and fleet owners in ${cityName} (${fleetOptions}). There are zero middleman commissions and zero broker markups—allowing you to negotiate trip rates directly with vehicle owners.`
     }
+
   ];
 
   const jsonLdSchema = {

@@ -54,6 +54,7 @@ const FreightRateIndexPage = lazy(() => import("./pages/FreightRateIndexPage"))
 const BlogPostPage = lazy(() => import("./pages/BlogPostPage"))
 const DriverOnboardingPage = lazy(() => import("./pages/DriverOnboardingPage"))
 const DirectoryPage = lazy(() => import("./pages/DirectoryPage"))
+const DirectContactPage = lazy(() => import("./pages/DirectContactPage"))
 
 // A simple premium spinner for Suspense fallback
 const PageLoader = () => (
@@ -143,6 +144,8 @@ export default function App() {
             <Route path="/goods-transport-services" element={<GoodsTransportPage />} />
             <Route path="/fleet-partner-registration" element={<FleetPartnerPage />} />
             <Route path="/gomytruck-verified" element={<GoMyTruckVerifiedPage />} />
+            <Route path="/direct-driver-contact" element={<DirectContactPage />} />
+            <Route path="/direct-contact" element={<Navigate to="/direct-driver-contact" replace />} />
             <Route path="/transport-services-kolkata" element={<Navigate to="/kolkata/truck-booking" replace />} />
             <Route path="/transport-services-barrackpore" element={<Navigate to="/barrackpore/truck-booking" replace />} />
             <Route path="/contact" element={<ContactPage />} />

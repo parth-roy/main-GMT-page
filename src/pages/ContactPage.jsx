@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import SEOHead from '../seo/SEOHead';
 import { trackLead, trackWhatsAppClick } from '../utils/analytics';
+import DirectDriverContactBanner from '../components/common/DirectDriverContactBanner';
 
 /* ─── JSON-LD schemas ─────────────────────────────────────── */
 const localBusinessSchema = {
@@ -166,6 +167,10 @@ export default function ContactPage() {
 
         {/* ── Three CTA Cards ───────────────────────────────── */}
         <section className="max-w-5xl mx-auto px-4 -mt-10 z-20 relative">
+          <div className="mb-6">
+            <DirectDriverContactBanner categoryName="Drivers & Transporters" />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
             {/* WhatsApp — most prominent */}

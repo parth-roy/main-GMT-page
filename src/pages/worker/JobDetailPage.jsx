@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import DirectDriverContactBanner from '../../components/common/DirectDriverContactBanner';
 
 export default function JobDetailPage() {
   const { jobId } = useParams();
@@ -72,6 +73,11 @@ export default function JobDetailPage() {
             </Link>
           </div>
         </section>
+
+        {/* Floating Direct Driver & Partner Contact Card */}
+        <div className="mb-10">
+          <DirectDriverContactBanner categoryName="Logistics Workforce & Drivers" />
+        </div>
       </div>
     </main>
   );

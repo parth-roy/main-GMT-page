@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import DirectDriverContactBanner from '../../components/common/DirectDriverContactBanner';
 
 export default function RolePage() {
   const { role } = useParams();
@@ -13,7 +14,10 @@ export default function RolePage() {
         <p className="text-xl">Everything you need to know about being a {title}.</p>
       </section>
 
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-12">
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-10">
+        {/* Floating Direct Driver & Partner Contact Card */}
+        <DirectDriverContactBanner categoryName={`${title} & Transporters`} />
+
         {/* Definition */}
         <section className="bg-white p-8 rounded-lg shadow">
           <h2 className="text-2xl font-bold mb-4">What is a {title}?</h2>

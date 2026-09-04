@@ -18,6 +18,7 @@ export const INDEXABLE_ROUTES = [
   "/goods-transport-services",
   "/fleet-partner-registration",
   "/gomytruck-verified",
+  "/direct-driver-contact",
   "/kolkata",
   "/barrackpore",
   "/howrah",

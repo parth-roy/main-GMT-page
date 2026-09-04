@@ -9,6 +9,7 @@ import BikeSEOContent from "../components/bike/BikeSEOContent"
 import InternalLinks from "../components/truck/InternalLinks"
 import BikeFAQ from "../components/bike/BikeFAQ"
 import SEOHead from "../seo/SEOHead"
+import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
 
 export default function BikePage() {
   const [city, setCity] = useState("Kolkata")
@@ -25,6 +26,9 @@ export default function BikePage() {
         canonical="/bike"
       />
       <BikeHero city={city} setCity={setCity} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <DirectDriverContactBanner categoryName="Delivery Partners & Riders" cityName={city} />
+      </div>
       <BikeVehicleSelection city={city} />
       <BikePopularRoutes city={city} />
       <AreasWeServe city={city} />

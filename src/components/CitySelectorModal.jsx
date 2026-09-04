@@ -41,8 +41,18 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
   if (!isOpen) return null;
 
   const handleCitySelect = (citySlug, cityName) => {
+    const finalName = cityName || citySlug.charAt(0).toUpperCase() + citySlug.slice(1).replace(/-/g, " ");
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("gomytruck_selected_city", JSON.stringify({ name: finalName, slug: citySlug }));
+        window.dispatchEvent(new CustomEvent("gomytruck:city_change", { detail: { name: finalName, slug: citySlug } }));
+      } catch (e) {
+        // ignore
+      }
+    }
+
     if (onCitySelect) {
-      onCitySelect(cityName || citySlug);
+      onCitySelect(finalName, citySlug);
       onClose();
       return;
     }

@@ -10,6 +10,7 @@ import InternalLinks from "../components/truck/InternalLinks"
 import TruckFAQ from "../components/truck/TruckFAQ"
 import SEOHead from "../seo/SEOHead"
 import { CITY_HERO_IMAGES } from "../api/pricingApi"
+import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
 
 export default function TruckPage() {
   const [city, setCity] = useState("Kolkata")
@@ -69,6 +70,9 @@ export default function TruckPage() {
         preloadImage={CITY_HERO_IMAGES[city] || "/hero-bg.webp"}
       />
       <TruckHero city={city} setCity={setCity} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <DirectDriverContactBanner categoryName="Truck Drivers & Transporters" cityName={city} />
+      </div>
       <VehicleSelection city={city} />
       <PopularRoutes city={city} />
       <AreasWeServe city={city} />

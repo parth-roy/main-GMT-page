@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { MapPin, ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp, Loader2 } from "lucide-react"
+import { MapPin, ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp, Loader2, Star } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import CitySelectorModal from "./CitySelectorModal"
 import { detectCurrentCity } from "../api/pricingApi"
@@ -28,16 +28,45 @@ export default function Hero({
   }, [])
 
   useEffect(() => {
+    const handleCityChange = (e) => {
+      if (e?.detail?.name) {
+        setDetectedCity(e.detail.name);
+        setCityDetecting(false);
+      }
+    };
+    window.addEventListener("gomytruck:city_change", handleCityChange);
+
     if (slug) {
-      setDetectedCity(slug.charAt(0).toUpperCase() + slug.slice(1).replace("-", " "))
-      setCityDetecting(false)
+      const formatted = slug.charAt(0).toUpperCase() + slug.slice(1).replace("-", " ");
+      setDetectedCity(formatted);
+      setCityDetecting(false);
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("gomytruck_selected_city", JSON.stringify({ name: formatted, slug }));
+        } catch {}
+      }
     } else {
+      if (typeof window !== "undefined") {
+        try {
+          const cached = localStorage.getItem("gomytruck_selected_city");
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed?.name) {
+              setDetectedCity(parsed.name);
+              setCityDetecting(false);
+              return () => window.removeEventListener("gomytruck:city_change", handleCityChange);
+            }
+          }
+        } catch {}
+      }
       detectCurrentCity().then((detected) => {
-        setDetectedCity(detected)
-        setCityDetecting(false)
-      })
+        setDetectedCity(detected);
+        setCityDetecting(false);
+      });
     }
-  }, [slug])
+
+    return () => window.removeEventListener("gomytruck:city_change", handleCityChange);
+  }, [slug]);
 
   const currentCity = detectedCity
 
@@ -136,11 +165,19 @@ export default function Hero({
         {/* Floating Services Bar */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-full px-4 z-20 flex justify-center">
           <div className="bg-brand-50 rounded-xl shadow-2xl p-6 sm:p-8 sm:px-12 flex flex-col gap-6 border border-slate-100 w-full sm:w-fit">
+          {/* Top Bar: Left (City Selector + Dot + Rating) + Right (Direct Driver / Partner Contact Button) */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-200/60 pb-3.5">
+            {/* Left side: City Selector Trigger + Dot + Ratings */}
+            <div className="flex items-center gap-2 sm:gap-2.5 text-slate-900 font-bold text-xs sm:text-sm px-1 sm:px-2 w-full sm:w-fit justify-between sm:justify-start">
               <div 
-                className="flex items-center gap-2 text-slate-900 font-bold text-sm px-2 w-fit cursor-pointer hover:text-brand-600 transition-colors"
+                className="flex items-center gap-2 cursor-pointer hover:text-brand-600 transition-colors"
                 onClick={() => setCityOpen(true)}
               >
-                <MapPin size={20} className="text-brand-600" />
+                <span className="relative flex h-2.5 w-2.5 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <MapPin size={18} className="text-brand-600 shrink-0" />
                 {cityDetecting ? (
                   <span className="flex items-center gap-1.5 text-slate-400 font-normal">
                     <Loader2 size={13} className="animate-spin" />
@@ -148,11 +185,58 @@ export default function Hero({
                   </span>
                 ) : (
                   <>
-                    <span>City: {currentCity}</span>
-                    <span className="text-xs text-brand-500 font-normal ml-1 underline underline-offset-2">Change</span>
+                    <span>City: <strong className="text-brand-700">{currentCity}</strong></span>
+                    <span className="text-xs text-brand-500 font-medium ml-1 underline underline-offset-2">Change</span>
                   </>
                 )}
               </div>
+
+              <span className="text-slate-300 font-normal select-none">·</span>
+
+              <div className="flex items-center gap-1 text-amber-500 font-extrabold text-xs sm:text-sm shrink-0">
+                <Star size={14} className="fill-amber-400 text-amber-400" />
+                <span>4.8</span>
+                <span className="text-slate-400 font-medium text-[11px] sm:text-xs">(15k+)</span>
+              </div>
+            </div>
+
+            {/* Right side: Rectangular animated Direct Driver / Partner Contact Button */}
+            <div className="relative group/unlock">
+              <Link
+                to="/direct-driver-contact"
+                aria-label="Direct Driver & Partner Contact — Unlock 10 verified numbers for ₹49"
+                className={[
+                  "inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl font-bold text-xs sm:text-sm",
+                  "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white",
+                  "bg-[length:200%_auto] animate-[gradientShift_2.5s_linear_infinite]",
+                  "shadow-[0_0_18px_rgba(245,158,11,0.45)]",
+                  "hover:shadow-[0_0_28px_rgba(245,158,11,0.7)] transition-all duration-300",
+                  "border border-amber-400/60 cursor-pointer relative overflow-hidden"
+                ].join(" ")}
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover/unlock:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none" />
+                <Zap className="w-3.5 h-3.5 shrink-0 animate-pulse text-amber-100" />
+                <span className="relative z-10 leading-tight">
+                  Direct Driver / Partner Contact · <span className="line-through opacity-70">₹500</span> ₹49
+                </span>
+              </Link>
+
+              {/* Tooltip */}
+              <div className="absolute bottom-full right-0 sm:left-1/2 sm:-translate-x-1/2 mb-2.5 w-64 opacity-0 group-hover/unlock:opacity-100 transition-all duration-300 pointer-events-none z-50">
+                <div className="bg-slate-900 text-white text-xs rounded-xl px-4 py-3 shadow-2xl border border-slate-700 space-y-1.5 text-left">
+                  <p className="font-bold text-amber-400 text-center text-sm mb-1.5">Direct Driver / Partner Contact</p>
+                  <p className="flex items-center gap-2"><span>🚫</span><span><strong>Zero transport broker charges</strong></span></p>
+                  <p className="flex items-center gap-2"><span>📞</span><span>Get <strong>10 direct driver numbers</strong> instantly</span></p>
+                  <p className="flex items-center gap-2"><span>✅</span><span><strong>Commercial DL &amp; RC verified</strong></span></p>
+                  <p className="flex items-center gap-2"><span>💰</span><span>Save <strong>₹500–₹2000</strong> broker cut</span></p>
+                  <p className="flex items-center gap-2"><span>📍</span><span>Available in <strong>{currentCity}</strong></span></p>
+                </div>
+                <div className="flex justify-end sm:justify-center pr-6 sm:pr-0">
+                  <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-slate-900" />
+                </div>
+              </div>
+            </div>
+          </div>
 
             <div className="flex flex-col sm:flex-row justify-center items-center gap-10 lg:gap-16">
               {/* Service Tabs */}
@@ -290,6 +374,7 @@ export default function Hero({
       <CitySelectorModal
         isOpen={cityOpen}
         onClose={() => setCityOpen(false)}
+        onCitySelect={(name) => setDetectedCity(name)}
       />
     </>
   )

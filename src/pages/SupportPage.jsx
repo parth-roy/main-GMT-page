@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import SEOHead from '../seo/SEOHead';
 import FAQ from '../components/FAQ';
 import { Mail, PhoneCall, LifeBuoy, Clock } from 'lucide-react';
+import DirectDriverContactBanner from '../components/common/DirectDriverContactBanner';
 
 export default function SupportPage() {
   useEffect(() => {
@@ -84,6 +85,11 @@ export default function SupportPage() {
               );
             })}
           </div>
+        </section>
+
+        {/* Direct Driver / Partner Contact Banner */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+          <DirectDriverContactBanner categoryName="Drivers & Transporters" />
         </section>
 
         {/* General FAQs */}

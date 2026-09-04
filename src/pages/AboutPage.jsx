@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import SEOHead from '../seo/SEOHead';
 import WhyChooseUs from '../components/WhyChooseUs';
 import { Target, Shield, Zap, MapPin } from 'lucide-react';
+import DirectDriverContactBanner from '../components/common/DirectDriverContactBanner';
 
 export default function AboutPage() {
   useEffect(() => {
@@ -57,6 +58,11 @@ export default function AboutPage() {
               GoMyTruck is a logistics marketplace operated by <strong>Parther Technologies Private Limited</strong>. It connects declared customer transport requirements with eligible driver, fleet, and workforce workflows.
             </p>
           </div>
+        </section>
+
+        {/* Direct Driver / Partner Contact Banner */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
+          <DirectDriverContactBanner categoryName="Commercial Truck Drivers & Fleet Partners" />
         </section>
 
         {/* Mission & Vision */}

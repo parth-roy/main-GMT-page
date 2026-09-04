@@ -1,6 +1,7 @@
 import React from 'react';
 import Services from '../components/Services';
 import SEOHead from '../seo/SEOHead';
+import DirectDriverContactBanner from '../components/common/DirectDriverContactBanner';
 
 export default function ServicesPage({ onSelectVehicle }) {
   return (
@@ -19,7 +20,13 @@ export default function ServicesPage({ onSelectVehicle }) {
           Compare practical load capacities, then enter your route and goods details for a current estimate.
         </p>
       </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <DirectDriverContactBanner categoryName="Commercial Truck Drivers" />
+      </div>
+
       <Services onSelectVehicle={onSelectVehicle} />
     </>
   );
 }
+
