@@ -1,4 +1,4 @@
-/**
+﻿/**
  * src/lib/locationFaqHelper.js
  * 
  * Centralized Dynamic FAQ & Schema Generator for GoMyTruck Location, PSEO, Route, and State Pages.
@@ -145,7 +145,7 @@ export function generateCityFaqs(cityConfig, serviceType = "hub", customAreas = 
     },
     {
       question: `Can I get direct phone numbers of truck drivers in ${cityName} without broker commission?`,
-      answer: `Yes. GoMyTruck provides a Direct Driver / Partner Contact feature. For a flat one-time fee of ₹49, you can instantly unlock direct mobile phone numbers of 10 commercial-licensed truck drivers and fleet owners in ${cityName} (${fleetOptions}). There are zero middleman commissions and zero broker markups—allowing you to negotiate trip rates directly with vehicle owners.`
+      answer: `Yes. GoMyTruck provides a Direct Driver / Partner Contact feature. For a flat one-time fee of ₹99, you can instantly unlock direct mobile phone numbers of 10 commercial-licensed truck drivers and fleet owners in ${cityName} (${fleetOptions}). There are zero middleman commissions and zero broker markups—allowing you to negotiate trip rates directly with vehicle owners.`
     }
 
   ];

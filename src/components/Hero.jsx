@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+﻿import React, { useState, useEffect } from "react"
 import { MapPin, ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp, Loader2, Star } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import CitySelectorModal from "./CitySelectorModal"
@@ -204,7 +204,7 @@ export default function Hero({
             <div className="relative group/unlock">
               <Link
                 to="/direct-driver-contact"
-                aria-label="Direct Driver & Partner Contact — Unlock 10 verified numbers for ₹49"
+                aria-label="Direct Driver & Partner Contact — Unlock 10 verified numbers for ₹99"
                 className={[
                   "inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl font-bold text-xs sm:text-sm",
                   "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white",
@@ -217,7 +217,7 @@ export default function Hero({
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover/unlock:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none" />
                 <Zap className="w-3.5 h-3.5 shrink-0 animate-pulse text-amber-100" />
                 <span className="relative z-10 leading-tight">
-                  Direct Driver / Partner Contact · <span className="line-through opacity-70">₹500</span> ₹49
+                  Direct Driver / Partner Contact · <span className="line-through opacity-70">₹500</span> ₹99
                 </span>
               </Link>
 

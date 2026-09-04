@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+﻿import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   Zap, Phone, Shield, ChevronRight, MapPin, CheckCircle, CheckCircle2,
@@ -140,7 +140,7 @@ const VEHICLE_CATEGORIES = [
 const TRUST_ITEMS = [
   { icon: BadgeCheck, text: "Commercial DL & RC Verified" },
   { icon: Phone,      text: "10 Direct Numbers Instantly" },
-  { icon: Lock,       text: "Secure ₹49 One-Time Payment" },
+  { icon: Lock,       text: "Secure ₹99 One-Time Payment" },
   { icon: Banknote,   text: "Save ₹500 to ₹2,000 in Broker Cut" },
   { icon: Shield,     text: "Zero Commission. Direct Negotiation." },
   { icon: Star,       text: "Location-Specific Drivers & Transporters" },
@@ -148,7 +148,7 @@ const TRUST_ITEMS = [
 
 const HOW_IT_WORKS = [
   { step: "01", title: "Choose Vehicle & City", desc: "Select your commercial vehicle class and city from our 60+ operational freight hubs across India." },
-  { step: "02", title: "Pay Flat ₹49 via Razorpay", desc: "One-time flat fee via official Razorpay (UPI, Google Pay, PhonePe, Cards, NetBanking). Zero broker margin." },
+  { step: "02", title: "Pay Flat ₹99 via Razorpay", desc: "One-time flat fee via official Razorpay (UPI, Google Pay, PhonePe, Cards, NetBanking). Zero broker margin." },
   { step: "03", title: "Direct WhatsApp & Call",  desc: "Instantly view all 10 unmasked driver phone numbers. Call or message on WhatsApp directly with 0% trip cut." },
 ];
 
@@ -671,7 +671,7 @@ export default function DirectContactPage() {
   const shareToWhatsApp = () => {
     const lines = [
       `*GoMyTruck — 10 Verified ${selectedCategory.label} Contacts in ${selectedCity.name}*`,
-      `_Zero Broker Commission · Flat ₹49 Unlocked_`,
+      `_Zero Broker Commission · Flat ₹99 Unlocked_`,
       ``,
       ...driversList.map((d, idx) => {
         const num = unmaskedNumbers[d.id] || d.phoneRaw || "9331488999";
@@ -700,7 +700,7 @@ export default function DirectContactPage() {
     if (user?.email) setCustomerEmail(user.email);
   };
 
-  // Process Official Razorpay Checkout Payment (₹49)
+  // Process Official Razorpay Checkout Payment (₹99)
   const handlePayWithRazorpay = async (e) => {
     if (e) e.preventDefault();
     setRazorpayError(null);
@@ -737,7 +737,7 @@ export default function DirectContactPage() {
           customerEmail: customerEmail?.trim() || undefined,
           workerIds: driversList.map((d) => d.id),
           platform: "VAHAN_WEB",
-          amount: 1, // Live test ₹1 (100 paise)
+          amount: 99, // Live production ₹99 (9900 paise)
         }),
       });
 
@@ -749,10 +749,10 @@ export default function DirectContactPage() {
       const { orderId, amount, currency, keyId } = orderData.data;
       const liveKey = keyId || import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_TXq11IOe0ZKrQH";
 
-      // 2. Open standard Razorpay Checkout Modal (Charges ₹1 for live test)
+      // 2. Open standard Razorpay Checkout Modal (Charges ₹99)
       const options = {
         key: liveKey,
-        amount: amount || 100, // 100 paise = ₹1.00
+        amount: amount || 9900, // 9900 paise = ₹99.00
         currency: currency || "INR",
         name: "GoMyTruck",
         description: `Unlock 10 ${selectedCategory.label} Drivers in ${selectedCity.name}`,
@@ -887,13 +887,13 @@ export default function DirectContactPage() {
       "@context": "https://schema.org",
       "@type": "Product",
       "name": `Direct Truck Driver & Partner Contact Directory — ${selectedCity.name}`,
-      "description": `Unlock direct mobile phone numbers of 10 verified commercial truck drivers (${selectedCategory.vehicle}) in ${selectedCity.name} for flat ₹49 with zero broker commission.`,
+      "description": `Unlock direct mobile phone numbers of 10 verified commercial truck drivers (${selectedCategory.vehicle}) in ${selectedCity.name} for flat ₹99 with zero broker commission.`,
       "image": "https://gomytruck.com/navy_truck-256.webp",
       "brand": { "@type": "Brand", "name": "GoMyTruck" },
       "offers": {
         "@type": "Offer",
         "priceCurrency": "INR",
-        "price": "49",
+        "price": "99",
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
         "url": "https://gomytruck.com/direct-driver-contact"
@@ -912,7 +912,7 @@ export default function DirectContactPage() {
       "@context": "https://schema.org",
       "@type": "HowTo",
       "name": "How to Get Direct Truck Driver Phone Numbers Without Broker Commission",
-      "description": "Step-by-step guide to unlocking 10 verified truck driver contacts for flat ₹49.",
+      "description": "Step-by-step guide to unlocking 10 verified truck driver contacts for flat ₹99.",
       "step": [
         {
           "@type": "HowToStep",
@@ -923,8 +923,8 @@ export default function DirectContactPage() {
         {
           "@type": "HowToStep",
           "position": 2,
-          "name": "Complete ₹49 One-Time Payment",
-          "text": "Pay the flat ₹49 unlock fee securely via Razorpay (UPI, Cards, NetBanking)."
+          "name": "Complete ₹99 One-Time Payment",
+          "text": "Pay the flat ₹99 unlock fee securely via Razorpay (UPI, Cards, NetBanking)."
         },
         {
           "@type": "HowToStep",
@@ -943,7 +943,7 @@ export default function DirectContactPage() {
           "name": `What is a truck mating number in logistics?`,
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "In Indian logistics, a truck mating number is the direct contact reference used to match an available commercial truck with a cargo consignment. GoMyTruck simplifies this by letting shippers unlock 10 direct driver mobile numbers in their city for a flat ₹49 fee."
+            "text": "In Indian logistics, a truck mating number is the direct contact reference used to match an available commercial truck with a cargo consignment. GoMyTruck simplifies this by letting shippers unlock 10 direct driver mobile numbers in their city for a flat ₹99 fee."
           }
         },
         {
@@ -951,7 +951,7 @@ export default function DirectContactPage() {
           "name": `How can I get direct phone numbers of truck drivers in ${selectedCity.name}?`,
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": `GoMyTruck allows you to unlock direct phone numbers of 10 verified commercial truck drivers and fleet owners in ${selectedCity.name} for a flat one-time fee of ₹49. You receive their real mobile numbers to call or WhatsApp directly without middlemen.`
+            "text": `GoMyTruck allows you to unlock direct phone numbers of 10 verified commercial truck drivers and fleet owners in ${selectedCity.name} for a flat one-time fee of ₹99. You receive their real mobile numbers to call or WhatsApp directly without middlemen.`
           }
         },
         {
@@ -959,7 +959,7 @@ export default function DirectContactPage() {
           "name": "Is there any broker commission or middleman fee with GoMyTruck Direct Driver Connect?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. GoMyTruck is a 100% zero-broker direct contact system. You pay a one-time unlock fee of ₹49 and deal directly with the truck drivers with zero commission."
+            "text": "No. GoMyTruck is a 100% zero-broker direct contact system. You pay a one-time unlock fee of ₹99 and deal directly with the truck drivers with zero commission."
           }
         },
         {
@@ -975,7 +975,7 @@ export default function DirectContactPage() {
           "name": "How much do traditional transport brokers charge compared to GoMyTruck?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Traditional transport brokers charge ₹500 to ₹2,000 per trip or deduct 10% to 25% commission from the freight. GoMyTruck Direct Connect replaces broker commissions entirely with a flat ₹49 one-time direct access fee."
+            "text": "Traditional transport brokers charge ₹500 to ₹2,000 per trip or deduct 10% to 25% commission from the freight. GoMyTruck Direct Connect replaces broker commissions entirely with a flat ₹99 one-time direct access fee."
           }
         }
       ]
@@ -986,7 +986,7 @@ export default function DirectContactPage() {
     <>
       <SEOHead
         title={`Direct Driver & Partner Contact in ${selectedCity.name} | Zero Broker Commission | GoMyTruck`}
-        description={`Unlock direct phone numbers of 10 verified commercial truck drivers in ${selectedCity.name} for just flat ₹49. Zero broker cuts, direct freight negotiation.`}
+        description={`Unlock direct phone numbers of 10 verified commercial truck drivers in ${selectedCity.name} for just flat ₹99. Zero broker cuts, direct freight negotiation.`}
         canonical="/direct-driver-contact"
         keywords={`direct truck driver phone number, hire truck driver without broker, truck mating number, lorry mating contact number, transporter contact number ${selectedCity.name}, tata ace driver phone number, bolero pickup driver contact number, truck driver mobile number list`}
         jsonLd={directContactSchemas}
@@ -1001,10 +1001,10 @@ export default function DirectContactPage() {
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight mb-3">
             Get <span className="text-amber-500">10 Verified Driver</span> Phone Numbers for{" "}
-            <span className="text-emerald-600">₹49</span>
+            <span className="text-emerald-600">₹99</span>
           </h1>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
-            Browse verified commercial drivers and fleet partners below in <strong>{selectedCity.name}</strong>. Pay a one-time flat fee of <strong>₹49</strong> to instantly reveal their direct contact numbers.
+            Browse verified commercial drivers and fleet partners below in <strong>{selectedCity.name}</strong>. Pay a one-time flat fee of <strong>₹99</strong> to instantly reveal their direct contact numbers.
             Call and negotiate directly with <strong>zero broker commissions</strong>.
           </p>
         </section>
@@ -1101,7 +1101,7 @@ export default function DirectContactPage() {
                     </div>
                     <div className="text-right">
                       <span className="text-xs line-through text-slate-400 mr-2">₹500</span>
-                      <span className="text-2xl font-black text-emerald-600">₹49</span>
+                      <span className="text-2xl font-black text-emerald-600">₹99</span>
                     </div>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">
@@ -1132,7 +1132,7 @@ export default function DirectContactPage() {
                       className="w-full py-4 px-6 rounded-2xl font-black text-base flex items-center justify-center gap-2 text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-lg shadow-amber-200 hover:shadow-amber-300 transition-all active:scale-98 cursor-pointer"
                     >
                       <Zap className="w-5 h-5 fill-current animate-bounce" />
-                      <span>{isProcessing ? "Processing..." : "Unlock 10 Driver Numbers — ₹49"}</span>
+                      <span>{isProcessing ? "Processing..." : "Unlock 10 Driver Numbers — ₹99"}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -1402,7 +1402,7 @@ export default function DirectContactPage() {
                                 onClick={handleRazorpayPayment}
                                 className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-[11px] sm:text-xs font-black px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer shrink-0"
                               >
-                                <span>Unlock (₹49)</span>
+                                <span>Unlock (₹99)</span>
                                 <ChevronRight className="w-3 h-3" />
                               </button>
                             </div>
@@ -1451,7 +1451,7 @@ export default function DirectContactPage() {
                   {[
                     ["Direct driver phone number",  "Yes (10 Numbers)", "No (Gated behind middleman)"],
                     ["Commercial DL & RC verified", "Yes (100% checked)", "Unverified / Unknown driver"],
-                    ["Total fee",                   "₹49 one-time flat", "₹500 to ₹2,000 commission"],
+                    ["Total fee",                   "₹99 one-time flat", "₹500 to ₹2,000 commission"],
                     ["Broker freight markup",       "0% Zero Brokerage", "10% to 25% per load"],
                     ["Instant phone reveal",        "Yes · Instant Access", "Hours of broker phone tag"],
                     ["Direct freight negotiation",  "Yes · Negotiate Directly", "Inflated middleman rate"],
@@ -1473,11 +1473,11 @@ export default function DirectContactPage() {
           <h2 className="text-2xl font-black text-slate-900 text-center mb-6">Frequently Asked Questions</h2>
           <div className="space-y-3">
             {[
-              { q: `What is a truck mating number in logistics?`, a: `In Indian transport logistics, a truck mating number refers to matching an available truck driver to a cargo consignment. GoMyTruck simplifies this process by providing direct phone numbers of 10 verified commercial drivers for a flat ₹49 fee.` },
-              { q: `How can I get direct phone numbers of truck drivers in ${selectedCity.name}?`, a: `GoMyTruck's Direct Connect unlocks 10 verified commercial truck driver phone numbers in ${selectedCity.name} for a flat ₹49 — zero broker commission, zero middleman charges. You contact the vehicle owner directly.` },
-              { q: `What is the ₹49 driver contact unlock?`, a: `For ₹49 you receive direct mobile numbers of 10 commercial DL and vehicle RC verified truck drivers in your chosen vehicle category and city. No broker fee, no trip percentage cut.` },
+              { q: `What is a truck mating number in logistics?`, a: `In Indian transport logistics, a truck mating number refers to matching an available truck driver to a cargo consignment. GoMyTruck simplifies this process by providing direct phone numbers of 10 verified commercial drivers for a flat ₹99 fee.` },
+              { q: `How can I get direct phone numbers of truck drivers in ${selectedCity.name}?`, a: `GoMyTruck's Direct Connect unlocks 10 verified commercial truck driver phone numbers in ${selectedCity.name} for a flat ₹99 — zero broker commission, zero middleman charges. You contact the vehicle owner directly.` },
+              { q: `What is the ₹99 driver contact unlock?`, a: `For ₹99 you receive direct mobile numbers of 10 commercial DL and vehicle RC verified truck drivers in your chosen vehicle category and city. No broker fee, no trip percentage cut.` },
               { q: `What if I refresh the page or lose the numbers?`, a: `All unlocked numbers are automatically preserved in your device storage and can be downloaded as a text file, shared directly to your WhatsApp, or accessed anytime.` },
-              { q: `How much do transport brokers charge vs GoMyTruck?`, a: `Traditional freight brokers charge ₹500 to ₹2,000 as middleman commission or add 10% to 25% ongoing margin. GoMyTruck replaces this with a flat ₹49 one-time unlock fee.` },
+              { q: `How much do transport brokers charge vs GoMyTruck?`, a: `Traditional freight brokers charge ₹500 to ₹2,000 as middleman commission or add 10% to 25% ongoing margin. GoMyTruck replaces this with a flat ₹99 one-time unlock fee.` },
               { q: `Which cities are covered?`, a: `Kolkata, Howrah, Barrackpore, Mumbai, Bengaluru, Delhi NCR, Pune, Ahmedabad, Surat, Hyderabad, Chennai, Jaipur, Lucknow, and 60+ cities across India.` },
             ].map(({ q, a }) => (
               <details key={q} className="bg-white border border-slate-200 rounded-2xl shadow-2xs group">
@@ -1521,7 +1521,7 @@ export default function DirectContactPage() {
 
               <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-xs mb-1.5 animate-pulse">
                 <Zap className="w-3.5 h-3.5 fill-current animate-bounce" />
-                <span>Direct Driver / Partner Contact · Zero Broker Fee · Flat ₹49</span>
+                <span>Direct Driver / Partner Contact · Zero Broker Fee · Flat ₹99</span>
               </div>
 
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
@@ -1712,7 +1712,7 @@ export default function DirectContactPage() {
                               onClick={handleRazorpayPayment}
                               className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-[11px] sm:text-xs font-black px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer shrink-0"
                             >
-                              <span>Unlock (₹49)</span>
+                              <span>Unlock (₹99)</span>
                               <ChevronRight className="w-3 h-3" />
                             </button>
                           </div>
@@ -1730,7 +1730,7 @@ export default function DirectContactPage() {
                 <div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-xs text-slate-400 line-through font-semibold">₹500</span>
-                    <span className="text-2xl sm:text-3xl font-black text-emerald-600">₹49</span>
+                    <span className="text-2xl sm:text-3xl font-black text-emerald-600">₹99</span>
                     <span className="text-[10px] sm:text-[11px] font-black text-amber-900 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full uppercase tracking-wider">
                       Flat Fee
                     </span>
@@ -1755,7 +1755,7 @@ export default function DirectContactPage() {
                   className="w-full py-3.5 sm:py-4 px-6 rounded-2xl font-black text-base sm:text-lg flex items-center justify-center gap-2.5 text-white bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 shadow-xl shadow-amber-300/80 hover:shadow-2xl transition-all active:scale-98 cursor-pointer text-center"
                 >
                   <Zap className="w-5 h-5 fill-current animate-bounce shrink-0" />
-                  <span>{isProcessing ? "Processing..." : "Unlock 10 Driver Numbers — ₹49"}</span>
+                  <span>{isProcessing ? "Processing..." : "Unlock 10 Driver Numbers — ₹99"}</span>
                   <ArrowRight className="w-5 h-5 shrink-0" />
                 </button>
               ) : (
@@ -1804,7 +1804,7 @@ export default function DirectContactPage() {
                 Unlock 10 Driver Numbers
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Verified <strong>{selectedCategory.label}</strong> Drivers in <strong>{selectedCity.name}</strong> · Flat ₹49
+                Verified <strong>{selectedCategory.label}</strong> Drivers in <strong>{selectedCity.name}</strong> · Flat ₹99
               </p>
               <button
                 type="button"
@@ -1822,7 +1822,7 @@ export default function DirectContactPage() {
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5">
                 <div className="flex justify-between items-center text-slate-900 font-black text-sm">
                   <span>Direct Driver Contact Fee</span>
-                  <span className="text-emerald-700 text-base font-black">₹49.00</span>
+                  <span className="text-emerald-700 text-base font-black">₹99.00</span>
                 </div>
                 <div className="flex justify-between items-center text-xs text-slate-500 mt-1">
                   <span>Traditional Broker Commission</span>
@@ -1830,7 +1830,7 @@ export default function DirectContactPage() {
                 </div>
                 <div className="border-t border-slate-200/80 mt-2.5 pt-2 flex justify-between items-center text-xs">
                   <span className="text-slate-600 font-semibold">Total Payable (One-Time)</span>
-                  <span className="text-slate-900 font-black text-sm">₹49.00</span>
+                  <span className="text-slate-900 font-black text-sm">₹99.00</span>
                 </div>
               </div>
 
@@ -1921,7 +1921,7 @@ export default function DirectContactPage() {
                   ) : (
                     <>
                       <Zap className="w-5 h-5 fill-current animate-bounce shrink-0" />
-                      <span>Proceed to Pay ₹49</span>
+                      <span>Proceed to Pay ₹99</span>
                       <ArrowRight className="w-4 h-4 shrink-0" />
                     </>
                   )}
@@ -1992,7 +1992,7 @@ export default function DirectContactPage() {
             </h3>
 
             <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-              To verify your identity as the genuine user and ensure your ₹49 unlocked driver contacts are permanently attached to your personal account, please log in with your mobile number first.
+              To verify your identity as the genuine user and ensure your ₹99 unlocked driver contacts are permanently attached to your personal account, please log in with your mobile number first.
             </p>
 
             {/* Key benefits / Verification points */}

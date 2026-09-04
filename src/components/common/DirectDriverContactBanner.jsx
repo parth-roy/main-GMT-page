@@ -1,11 +1,11 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import { Zap, Phone, BadgeCheck, ShieldCheck, ArrowRight, Truck } from "lucide-react";
 
 /**
  * DirectDriverContactBanner
  * ─────────────────────────────────────────────────────────────────────────────
- * Reusable high-impact SEO/AEO/GEO promotional card for the ₹49 Direct
+ * Reusable high-impact SEO/AEO/GEO promotional card for the ₹99 Direct
  * Driver & Fleet Partner Contact Unlock feature.
  *
  * Props:
@@ -26,7 +26,7 @@ export default function DirectDriverContactBanner({
       <div className="my-6 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 p-0.5 shadow-md shadow-amber-200/50">
         <div className="bg-amber-50/95 rounded-[14px] px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
           <span className="sr-only">
-            Get direct phone numbers of verified {categoryName} {cityLabel} for just Rs.49. Zero broker commission. Zero middleman charges.
+            Get direct phone numbers of verified {categoryName} {cityLabel} for just Rs.99. Zero broker commission. Zero middleman charges.
             GoMyTruck Direct Driver Connect: Verified commercial truck drivers &amp; fleet owners without paying broker fees.
           </span>
           <div className="flex items-center gap-2.5">
@@ -38,7 +38,7 @@ export default function DirectDriverContactBanner({
               Direct Driver / Partner Contact:{" "}
               <span className="text-amber-800">Unlock 10 verified {categoryName} numbers {cityLabel}</span>{" "}
               <span className="text-slate-400 line-through text-xs font-normal">₹500</span>{" "}
-              <span className="text-emerald-700 font-black text-base">₹49</span>
+              <span className="text-emerald-700 font-black text-base">₹99</span>
             </p>
           </div>
           <Link
@@ -46,7 +46,7 @@ export default function DirectDriverContactBanner({
             className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black px-4 py-2 rounded-xl transition-all shadow-sm hover:scale-105 active:scale-95 whitespace-nowrap shrink-0"
           >
             <Phone className="w-3.5 h-3.5" />
-            <span>Unlock Numbers · ₹49</span>
+            <span>Unlock Numbers · ₹99</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -57,7 +57,7 @@ export default function DirectDriverContactBanner({
   /* ── DEFAULT FULL VARIANT (PROMINENT, BOLD, ANIMATING) ── */
   return (
     <section
-      aria-label="Direct Driver and Fleet Partner Contact — Rs.49 Zero Broker Commission"
+      aria-label="Direct Driver and Fleet Partner Contact — Rs.99 Zero Broker Commission"
       className="my-10 relative overflow-hidden rounded-3xl border-2 border-amber-300/90 bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100/60 p-6 sm:p-8 md:p-10 shadow-xl shadow-amber-200/40 transition-all hover:shadow-2xl hover:border-amber-400"
     >
       {/* Decorative Glow Blobs */}
@@ -66,13 +66,13 @@ export default function DirectDriverContactBanner({
 
       {/* Hidden crawler text for SEO / GEO / AEO indexing */}
       <div className="sr-only">
-        <h2>Get Direct Phone Numbers of Verified {categoryName} {cityLabel} for Just Rs.49 — Zero Broker Commission</h2>
+        <h2>Get Direct Phone Numbers of Verified {categoryName} {cityLabel} for Just Rs.99 — Zero Broker Commission</h2>
         <p>
-          GoMyTruck offers direct driver and fleet partner contact. For a flat one-time fee of Rs.49, you can unlock
+          GoMyTruck offers direct driver and fleet partner contact. For a flat one-time fee of Rs.99, you can unlock
           the direct mobile numbers of 10 commercial-licensed, verified truck drivers and fleet owners {cityLabel}.
           Zero transport broker commissions, zero middleman markups, and no hidden trip cuts. Traditional freight brokers
           charge Rs.500 to Rs.2000 or take 10 to 25 percent freight commission per load. GoMyTruck Direct Driver Connect
-          replaces this with a flat Rs.49 direct unlock fee.
+          replaces this with a flat Rs.99 direct unlock fee.
         </p>
       </div>
 
@@ -83,7 +83,7 @@ export default function DirectDriverContactBanner({
           {/* Animated Badge */}
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm mb-3.5 animate-pulse">
             <Zap className="w-3.5 h-3.5 fill-current animate-bounce" />
-            <span>Direct Driver / Partner Contact · Zero Broker Fee · Flat ₹49</span>
+            <span>Direct Driver / Partner Contact · Zero Broker Fee · Flat ₹99</span>
           </div>
 
           {/* Heading */}
@@ -96,7 +96,7 @@ export default function DirectDriverContactBanner({
 
           {/* Subtext */}
           <p className="text-slate-700 text-sm sm:text-base font-medium mb-5 leading-relaxed">
-            Pay a flat <strong className="text-emerald-700 font-black text-base sm:text-lg">₹49 one-time fee</strong> — get instant mobile numbers of 10
+            Pay a flat <strong className="text-emerald-700 font-black text-base sm:text-lg">₹99 one-time fee</strong> — get instant mobile numbers of 10
             verified commercial truck drivers &amp; fleet owners {cityLabel}.
             Zero broker commission. Zero middleman markup. Negotiate load rates with vehicle owners directly.
             Traditional brokers charge{" "}
@@ -129,7 +129,7 @@ export default function DirectDriverContactBanner({
             className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-base sm:text-lg px-8 py-4 sm:py-4.5 rounded-2xl transition-all shadow-xl shadow-amber-300/80 hover:shadow-2xl hover:scale-105 active:scale-95 group text-center"
           >
             <Zap className="w-5 h-5 fill-current animate-bounce" />
-            <span>Unlock 10 Driver Numbers — ₹49</span>
+            <span>Unlock 10 Driver Numbers — ₹99</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
           </Link>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
@@ -147,7 +147,7 @@ export default function DirectDriverContactBanner({
             Can I contact truck drivers and fleet owners directly without broker commission?
           </p>
           <p className="text-xs text-slate-600 leading-relaxed">
-            Yes. GoMyTruck charges a flat Rs.49 one-time fee to unlock 10 verified driver and fleet partner phone numbers
+            Yes. GoMyTruck charges a flat Rs.99 one-time fee to unlock 10 verified driver and fleet partner phone numbers
             {cityLabel !== "near you" ? (" " + cityLabel) : ""}. Zero broker margin. You talk directly with the vehicle driver or transporter.
           </p>
         </div>
@@ -157,7 +157,7 @@ export default function DirectDriverContactBanner({
           </p>
           <p className="text-xs text-slate-600 leading-relaxed">
             Transport brokers charge Rs.500 to Rs.2000 per trip or take 10% to 25% margin on freight.
-            GoMyTruck Direct Driver Connect gives you direct contact for a flat Rs.49 — one-time fee with no ongoing commissions.
+            GoMyTruck Direct Driver Connect gives you direct contact for a flat Rs.99 — one-time fee with no ongoing commissions.
           </p>
         </div>
       </div>
