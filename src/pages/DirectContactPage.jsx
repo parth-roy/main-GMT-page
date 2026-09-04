@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import SEOHead from "../seo/SEOHead";
 import CitySelectorModal from "../components/CitySelectorModal";
+import { useAuth } from "../context/AuthContext";
 
 const API_BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE || "https://api.gomytruck.com/api/v1";
 
@@ -32,7 +33,7 @@ const VEHICLE_CATEGORIES = [
     icon: "/vehicles/tata-ace.webp",  
     vehicle: "Tata Ace (750 kg)", 
     baseRate: "₹600 Base",
-    leadCount: "23k+ Leads",
+    leadCount: "23k+ Drivers",
     payload: "750 kg"
   },
   { 
@@ -41,7 +42,7 @@ const VEHICLE_CATEGORIES = [
     icon: "/vehicles/bolero-pickup.webp",  
     vehicle: "Mahindra Bolero Pickup (1.5 Ton)", 
     baseRate: "₹850 Base",
-    leadCount: "8k+ Leads",
+    leadCount: "8k+ Drivers",
     payload: "1.5 Ton"
   },
   { 
@@ -50,7 +51,7 @@ const VEHICLE_CATEGORIES = [
     icon: "/vehicles/ashok-leyland-dost.webp",  
     vehicle: "Ashok Leyland Dost (1.25 Ton)", 
     baseRate: "₹800 Base",
-    leadCount: "2k+ Leads",
+    leadCount: "2k+ Drivers",
     payload: "1.25 Ton"
   },
   { 
@@ -59,7 +60,7 @@ const VEHICLE_CATEGORIES = [
     icon: "/vehicles/tata-intra.webp",  
     vehicle: "Tata Intra V30/V50 (1.3 Ton)", 
     baseRate: "₹800 Base",
-    leadCount: "500+ Leads",
+    leadCount: "500+ Drivers",
     payload: "1.3 Ton"
   },
   { 
@@ -95,7 +96,7 @@ const VEHICLE_CATEGORIES = [
     icon: "/vehicles/14ft-truck.webp",  
     vehicle: "14 Feet Eicher Truck (4-5 Ton)", 
     baseRate: "₹1,800 Base",
-    leadCount: "2.7k+ Leads",
+    leadCount: "2.7k+ Drivers",
     payload: "4-5 Ton"
   },
   { 
@@ -113,7 +114,7 @@ const VEHICLE_CATEGORIES = [
     icon: "/vehicles/19ft-truck.webp",  
     vehicle: "19 Feet Multi-Axle Truck (8-9 Ton)", 
     baseRate: "₹2,800 Base",
-    leadCount: "2.5k+ Leads",
+    leadCount: "2.5k+ Drivers",
     payload: "8-9 Ton"
   },
   { 
@@ -122,7 +123,7 @@ const VEHICLE_CATEGORIES = [
     icon: "/vehicles/20ft-truck.webp",  
     vehicle: "20 Feet Multi-Axle (10 Ton)", 
     baseRate: "₹3,200 Base",
-    leadCount: "5.5k+ Leads",
+    leadCount: "5.5k+ Drivers",
     payload: "10 Ton"
   },
   { 
@@ -131,7 +132,7 @@ const VEHICLE_CATEGORIES = [
     icon: "/vehicles/32ft-container.webp",  
     vehicle: "32ft Multi-Axle Container (15-18 Ton)", 
     baseRate: "₹5,500 Base",
-    leadCount: "5k+ Leads",
+    leadCount: "5k+ Drivers",
     payload: "15-18 Ton"
   },
 ];
@@ -394,6 +395,15 @@ export default function DirectContactPage() {
   const [selectedCategory, setSelectedCategory] = useState(VEHICLE_CATEGORIES[0]);
   const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(false);
 
+  // Authentication & Logged-in User Profile
+  const { user, setIsLoginModalOpen } = useAuth();
+  const loggedInPhone = user?.phone ? String(user.phone).replace(/\D/g, "") : null;
+
+  // Login Required Alert Modal State (Demands real user auth before payment)
+  const [isLoginAlertModalOpen, setIsLoginAlertModalOpen] = useState(false);
+  const [unlockedMetadata, setUnlockedMetadata] = useState(null);
+  const [purchasedPacks, setPurchasedPacks] = useState([]);
+
   // Unlocked state & numbers map
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [unmaskedNumbers, setUnmaskedNumbers] = useState({});
@@ -403,15 +413,34 @@ export default function DirectContactPage() {
 
   // Razorpay Live Checkout Modal State
   const [isRazorpayModalOpen, setIsRazorpayModalOpen] = useState(false);
-  const [customerName, setCustomerName] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerName, setCustomerName] = useState(user?.name || "");
+  const [customerPhone, setCustomerPhone] = useState(loggedInPhone || "");
+  const [customerEmail, setCustomerEmail] = useState(user?.email || "");
   const [isPayingRazorpay, setIsPayingRazorpay] = useState(false);
   const [razorpayError, setRazorpayError] = useState(null);
 
   // Live driver leads state from database
   const [backendDrivers, setBackendDrivers] = useState(null);
   const [isLoadingDrivers, setIsLoadingDrivers] = useState(false);
+
+  // Contact numbers are ONLY unmasked if:
+  // 1. A user is currently logged in (loggedInPhone is present)
+  // 2. AND that logged-in phone matches the verified customer phone, OR has been confirmed by backend
+  const isUnlockedForUser = Boolean(
+    loggedInPhone &&
+    isUnlocked &&
+    unlockedMetadata?.customerPhone &&
+    unlockedMetadata.customerPhone.replace(/\D/g, "") === loggedInPhone
+  );
+
+  // Synchronize customer profile fields as soon as user logs in or hydrates
+  useEffect(() => {
+    if (user) {
+      if (user.phone) setCustomerPhone(String(user.phone).replace(/\D/g, ""));
+      if (user.name) setCustomerName(user.name);
+      if (user.email) setCustomerEmail(user.email);
+    }
+  }, [user]);
 
   // Listen for global city changes across the entire website
   useEffect(() => {
@@ -427,29 +456,9 @@ export default function DirectContactPage() {
     return () => window.removeEventListener("gomytruck:city_change", handleCityChange);
   }, []);
 
-  // Check local storage for unlocked status on vehicle or city change
-  useEffect(() => {
-    const storageKey = `unlocked_gmt_${selectedCategory.id}_${selectedCity.slug}`;
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem(storageKey);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed?.unmaskedNumbers) {
-            setIsUnlocked(true);
-            setUnmaskedNumbers(parsed.unmaskedNumbers);
-            return;
-          }
-        }
-      } catch {}
-    }
-    setIsUnlocked(false);
-    setUnmaskedNumbers({});
-  }, [selectedCategory.id, selectedCity.slug]);
-
   // Lock body scroll when modal is open
   useEffect(() => {
-    if (isWorkerModalOpen || showSuccessModal || isRazorpayModalOpen) {
+    if (isWorkerModalOpen || showSuccessModal || isRazorpayModalOpen || isLoginAlertModalOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -457,7 +466,7 @@ export default function DirectContactPage() {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isWorkerModalOpen, showSuccessModal, isRazorpayModalOpen]);
+  }, [isWorkerModalOpen, showSuccessModal, isRazorpayModalOpen, isLoginAlertModalOpen]);
 
   // 3-way internal validation engine
   const validatedQuery = useMemo(() => {
@@ -500,6 +509,97 @@ export default function DirectContactPage() {
 
   // Active drivers list: real database leads if available, else deterministic category-seeded fallback
   const driversList = backendDrivers && backendDrivers.length > 0 ? backendDrivers : fallbackDrivers;
+
+  // Check if current logged-in user phone has an approved/verified unlock on backend
+  const checkExistingUnlock = useCallback(async (phone) => {
+    if (!phone) return;
+    const cleanPhone = String(phone).replace(/\D/g, "");
+    if (cleanPhone.length < 10) return;
+
+    try {
+      const url = `${API_BASE}/payments/check-direct-contact-status?phone=${cleanPhone}&service=${encodeURIComponent(selectedCategory.label)}&city=${encodeURIComponent(selectedCity.name)}`;
+      const res = await fetch(url);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        if (Array.isArray(data.data?.purchasedPacks) && data.data.purchasedPacks.length > 0) {
+          setPurchasedPacks(data.data.purchasedPacks);
+        }
+        if (data.data?.isVerified) {
+          const unmaskedMap = {};
+          if (data.data.unlockedWorkers?.length > 0) {
+            data.data.unlockedWorkers.forEach((w) => {
+              unmaskedMap[w.id] = w.phone;
+            });
+          }
+          driversList.forEach((d) => {
+            if (!unmaskedMap[d.id] && d.phoneRaw) {
+              unmaskedMap[d.id] = d.phoneRaw;
+            }
+          });
+          const envelope = {
+            isUnlocked: true,
+            unmaskedNumbers: unmaskedMap,
+            customerPhone: cleanPhone,
+            paymentId: data.data.razorpayPaymentId || data.data.utr,
+            categoryId: selectedCategory.id,
+            categoryLabel: selectedCategory.label,
+            citySlug: selectedCity.slug,
+            cityName: selectedCity.name,
+            unlockedAt: data.data.verifiedAt || new Date().toISOString(),
+          };
+          setIsUnlocked(true);
+          setUnmaskedNumbers(unmaskedMap);
+          setUnlockedMetadata(envelope);
+          if (typeof window !== "undefined") {
+            try {
+              localStorage.setItem(`unlocked_gmt_${cleanPhone}_${selectedCategory.id}_${selectedCity.slug}`, JSON.stringify(envelope));
+            } catch {}
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Backend unlock status check notice:", e);
+    }
+  }, [selectedCategory.id, selectedCategory.label, selectedCity.slug, selectedCity.name, driversList]);
+
+  // Synchronize unlock state strictly with the currently logged-in user
+  useEffect(() => {
+    // If not logged in: ALWAYS lock all numbers and clear in-memory unmasked contacts
+    if (!loggedInPhone) {
+      setIsUnlocked(false);
+      setUnmaskedNumbers({});
+      setUnlockedMetadata(null);
+      setPurchasedPacks([]);
+      return;
+    }
+
+    // User is logged in: Check user-scoped local storage cache
+    const storageKey = `unlocked_gmt_${loggedInPhone}_${selectedCategory.id}_${selectedCity.slug}`;
+    let hasLocalUnlock = false;
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed?.unmaskedNumbers && parsed?.customerPhone?.replace(/\D/g, "") === loggedInPhone) {
+            setIsUnlocked(true);
+            setUnmaskedNumbers(parsed.unmaskedNumbers);
+            setUnlockedMetadata(parsed);
+            hasLocalUnlock = true;
+          }
+        }
+      } catch {}
+    }
+
+    if (!hasLocalUnlock) {
+      setIsUnlocked(false);
+      setUnmaskedNumbers({});
+      setUnlockedMetadata(null);
+    }
+
+    // Always query backend database to verify live payment status for this user
+    checkExistingUnlock(loggedInPhone);
+  }, [loggedInPhone, selectedCategory.id, selectedCity.slug, checkExistingUnlock]);
 
   // Handle city selection from CitySelectorModal
   const handleCitySelect = (cityName, citySlug) => {
@@ -584,18 +684,20 @@ export default function DirectContactPage() {
     window.open(waUrl, "_blank");
   };
 
-  // Open Razorpay Checkout Customer Input Modal
+  // Open Razorpay Checkout Customer Input Modal (Requires Login First)
   const handleRazorpayPayment = () => {
+    // 1. If user is NOT logged in, prompt login first
+    if (!loggedInPhone) {
+      setIsLoginAlertModalOpen(true);
+      return;
+    }
+
+    // 2. User is authenticated -> Open Payment Modal with phone prefilled and locked
     setIsRazorpayModalOpen(true);
     setRazorpayError(null);
-    if (typeof window !== "undefined") {
-      try {
-        const savedPhone = localStorage.getItem("gomytruck_customer_phone");
-        if (savedPhone) setCustomerPhone(savedPhone);
-        const savedName = localStorage.getItem("gomytruck_customer_name");
-        if (savedName) setCustomerName(savedName);
-      } catch {}
-    }
+    setCustomerPhone(loggedInPhone);
+    if (user?.name) setCustomerName(user.name);
+    if (user?.email) setCustomerEmail(user.email);
   };
 
   // Process Official Razorpay Checkout Payment (₹49)
@@ -603,9 +705,10 @@ export default function DirectContactPage() {
     if (e) e.preventDefault();
     setRazorpayError(null);
 
-    const cleanPhone = String(customerPhone || "").replace(/\D/g, "");
+    // Strictly enforce payment phone matches the logged-in user
+    const cleanPhone = loggedInPhone || String(customerPhone || "").replace(/\D/g, "");
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
-      setRazorpayError("Please enter a valid 10-digit Indian mobile number (starting with 6, 7, 8, or 9).");
+      setRazorpayError("Please log in with a valid 10-digit Indian mobile number before making payment.");
       return;
     }
 
@@ -717,12 +820,13 @@ export default function DirectContactPage() {
 
             setIsUnlocked(true);
             setUnmaskedNumbers(unmaskedMap);
+            setUnlockedMetadata(envelope);
             setIsRazorpayModalOpen(false);
             setShowSuccessModal(true);
 
             if (typeof window !== "undefined") {
               try {
-                localStorage.setItem(`unlocked_gmt_${selectedCategory.id}_${selectedCity.slug}`, JSON.stringify(envelope));
+                localStorage.setItem(`unlocked_gmt_${cleanPhone}_${selectedCategory.id}_${selectedCity.slug}`, JSON.stringify(envelope));
                 localStorage.setItem("gomytruck_customer_phone", cleanPhone);
                 localStorage.setItem("gomytruck_customer_name", customerName.trim());
               } catch {}
@@ -733,10 +837,29 @@ export default function DirectContactPage() {
               driversList.forEach((d) => {
                 if (d.phoneRaw) fallbackMap[d.id] = d.phoneRaw;
               });
+              const fallbackEnvelope = {
+                isUnlocked: true,
+                unmaskedNumbers: fallbackMap,
+                customerPhone: cleanPhone,
+                customerName: customerName.trim(),
+                customerEmail: customerEmail?.trim() || null,
+                categoryId: selectedCategory.id,
+                categoryLabel: selectedCategory.label,
+                citySlug: selectedCity.slug,
+                cityName: selectedCity.name,
+                unlockedAt: new Date().toISOString(),
+                paymentId: response.razorpay_payment_id,
+              };
               setIsUnlocked(true);
               setUnmaskedNumbers(fallbackMap);
+              setUnlockedMetadata(fallbackEnvelope);
               setIsRazorpayModalOpen(false);
               setShowSuccessModal(true);
+              if (typeof window !== "undefined") {
+                try {
+                  localStorage.setItem(`unlocked_gmt_${cleanPhone}_${selectedCategory.id}_${selectedCity.slug}`, JSON.stringify(fallbackEnvelope));
+                } catch {}
+              }
             } else {
               setRazorpayError(verifyErr.message || "Payment verification failed. Please contact support.");
             }
@@ -1000,7 +1123,7 @@ export default function DirectContactPage() {
                 </div>
 
                 {/* Unlock Button / State Panel */}
-                {!isUnlocked ? (
+                {!isUnlockedForUser ? (
                   <div className="space-y-3">
                     <button
                       type="button"
@@ -1067,6 +1190,43 @@ export default function DirectContactPage() {
 
             {/* ── RIGHT COLUMN: 10 DRIVERS LIST (DESKTOP MODE) ── */}
             <div className="hidden lg:block lg:col-span-7 space-y-4">
+
+              {/* Quick Switcher for Authenticated User's Unlocked Truck Packs */}
+              {purchasedPacks.length > 0 && (
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100/60 border border-emerald-300 text-left space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                    <span className="text-xs font-black text-emerald-950 uppercase tracking-wider">
+                      Your Unlocked Truck Packs ({purchasedPacks.length})
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                    {purchasedPacks.map((pack) => (
+                      <button
+                        key={pack.id}
+                        type="button"
+                        onClick={() => {
+                          const matched = VEHICLE_CATEGORIES.find(
+                            (c) => c.label.toLowerCase() === pack.serviceCategory.toLowerCase() ||
+                                   c.id.toLowerCase() === pack.serviceCategory.toLowerCase()
+                          ) || VEHICLE_CATEGORIES[0];
+                          setSelectedCategory(matched);
+                          if (pack.city && pack.city !== "All") {
+                            setSelectedCity({
+                              name: pack.city,
+                              slug: pack.city.toLowerCase().replace(/[\s_]+/g, "-"),
+                            });
+                          }
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-900 font-bold text-xs hover:bg-emerald-600 hover:text-white transition-all shrink-0 cursor-pointer shadow-2xs flex items-center gap-1.5"
+                      >
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>{pack.serviceCategory} ({pack.city})</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               {/* Header Box */}
               <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -1084,7 +1244,7 @@ export default function DirectContactPage() {
                   </p>
                 </div>
 
-                {isUnlocked && (
+                {isUnlockedForUser && (
                   <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
                     <button
                       onClick={downloadContactsTxt}
@@ -1108,7 +1268,7 @@ export default function DirectContactPage() {
               {/* Drivers List Display */}
               <div className="space-y-3">
                 {driversList.map((driver, index) => {
-                  const fullNumber = isUnlocked
+                  const fullNumber = isUnlockedForUser
                     ? (unmaskedNumbers[driver.id] || driver.phoneRaw)
                     : null;
                   const isDriverUnlocked = Boolean(fullNumber);
@@ -1418,7 +1578,7 @@ export default function DirectContactPage() {
             {/* Slidable/Scrollable List of 10 Driver Cards */}
             <div className="flex-1 overflow-y-auto px-4 py-3 sm:px-6 space-y-3 z-10 custom-scrollbar text-left">
               {driversList.map((driver, index) => {
-                const fullNumber = isUnlocked
+                const fullNumber = isUnlockedForUser
                   ? (unmaskedNumbers[driver.id] || driver.phoneRaw)
                   : null;
                 const isDriverUnlocked = Boolean(fullNumber);
@@ -1587,7 +1747,7 @@ export default function DirectContactPage() {
               </div>
 
               {/* Action Button */}
-              {!isUnlocked ? (
+              {!isUnlockedForUser ? (
                 <button
                   type="button"
                   disabled={isProcessing}
@@ -1697,10 +1857,10 @@ export default function DirectContactPage() {
                 />
               </div>
 
-              {/* Mobile Number Input */}
+              {/* Mobile Number Input (Permanently Locked to Authenticated Account) */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Mobile Number (for Order &amp; WhatsApp Receipt) <span className="text-rose-500">*</span>
+                  Mobile Number (Verified Account Number) <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative flex items-center">
                   <span className="absolute left-3.5 text-xs font-bold text-slate-500 select-none">
@@ -1708,19 +1868,18 @@ export default function DirectContactPage() {
                   </span>
                   <input
                     type="tel"
-                    required
-                    maxLength={10}
-                    placeholder="9876543210"
-                    value={customerPhone}
-                    onChange={(e) => {
-                      const clean = e.target.value.replace(/\D/g, '').slice(0, 10);
-                      setCustomerPhone(clean);
-                    }}
-                    className="w-full pl-12 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm font-semibold tracking-wider focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all placeholder:text-slate-400 placeholder:font-normal placeholder:tracking-normal"
+                    readOnly
+                    disabled
+                    value={loggedInPhone || customerPhone}
+                    className="w-full pl-12 pr-28 py-2.5 rounded-xl border border-slate-200 bg-slate-100/90 text-slate-800 text-sm font-bold tracking-wider cursor-not-allowed select-none"
                   />
+                  <span className="absolute right-3 inline-flex items-center gap-1 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                    Verified
+                  </span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  We prefill your UPI &amp; Cards on Razorpay with this number.
+                <p className="text-[11px] text-emerald-700 font-semibold mt-1 flex items-center gap-1">
+                  <span>Attached to your logged-in account (+91 {loggedInPhone || customerPhone})</span>
                 </p>
               </div>
 
@@ -1803,6 +1962,77 @@ export default function DirectContactPage() {
             >
               View Unlocked Numbers
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── LOGIN REQUIRED ALERT MODAL (VERIFIES REAL USER BEFORE PAYMENT) ── */}
+      {isLoginAlertModalOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden p-6 text-left relative animate-in zoom-in-95 duration-200">
+            {/* Close */}
+            <button
+              type="button"
+              onClick={() => setIsLoginAlertModalOpen(false)}
+              className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header Badge */}
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase bg-amber-100 text-amber-900 border border-amber-300">
+                <Shield className="w-3.5 h-3.5 text-amber-700" />
+                Login Required First
+              </span>
+            </div>
+
+            <h3 className="text-xl font-black text-slate-900 mb-2 leading-tight">
+              Please Log In Before Making Payment
+            </h3>
+
+            <p className="text-xs text-slate-600 mb-4 leading-relaxed">
+              To verify your identity as the genuine user and ensure your ₹49 unlocked driver contacts are permanently attached to your personal account, please log in with your mobile number first.
+            </p>
+
+            {/* Key benefits / Verification points */}
+            <div className="space-y-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 mb-5 text-xs text-slate-700">
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <span><strong>Real User Identity:</strong> Verifies you are the genuine user making payment.</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <span><strong>Permanent Access:</strong> Unlocked driver contacts stay linked to your mobile number across all devices.</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <span><strong>Privacy Protection:</strong> Only your account has permission to view the unmasked driver contacts for your payment.</span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLoginAlertModalOpen(false);
+                  setIsLoginModalOpen(true);
+                }}
+                className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm shadow-md shadow-emerald-200 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+              >
+                <Lock className="w-4 h-4" />
+                <span>Log In / Register with Mobile OTP</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsLoginAlertModalOpen(false)}
+                className="w-full py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors text-center cursor-pointer"
+              >
+                Cancel / Return to Page
+              </button>
+            </div>
           </div>
         </div>
       )}

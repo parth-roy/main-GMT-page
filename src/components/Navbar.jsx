@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react"
-import { Menu, X, ChevronRight, ChevronDown, PhoneCall, LogIn, Truck, Package, Building2, Users, MapPin, ArrowRight, Zap } from "lucide-react"
+import { Menu, X, ChevronRight, ChevronDown, PhoneCall, LogIn, LogOut, Truck, Package, Building2, Users, MapPin, ArrowRight, Zap } from "lucide-react"
 import { useLocation, Link } from "react-router-dom"
 import AppDownloadModal from "./AppDownloadModal"
 import { useAuth } from "../context/AuthContext"
@@ -88,21 +88,17 @@ function DropdownMenu({ sections, onClose }) {
 export default function Navbar({ onOpenEstimate, onScrollToSection }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null) // "shippers" | "transporters" | null
 
-  const { setIsLoginModalOpen } = useAuth()
+  const { user, accessToken, logout, setIsLoginModalOpen } = useAuth()
   const location = useLocation()
   const dropdownRef = useRef(null)
 
   const isDarkTheme = location.pathname === "/plans"
+  const isLoggedIn = Boolean(accessToken || user || (typeof window !== "undefined" && localStorage.getItem("vahan_access_token")))
 
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem("vahan_access_token"))
-    const handleStorageChange = () => setIsLoggedIn(!!localStorage.getItem("vahan_access_token"))
-    window.addEventListener("storage", handleStorageChange)
-    window.addEventListener("auth_changed", handleStorageChange)
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener("scroll", handleScroll)
 
@@ -115,16 +111,13 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
-      window.removeEventListener("storage", handleStorageChange)
-      window.removeEventListener("auth_changed", handleStorageChange)
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem("vahan_access_token")
-    setIsLoggedIn(false)
-    window.location.reload()
+    logout()
+    setIsOpen(false)
   }
 
   const simpleNavItems = [
@@ -262,12 +255,17 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               </a>
 
               {isLoggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  className={`font-bold text-sm transition-colors px-2 ${isDarkTheme ? "text-gray-200 hover:text-rose-400" : "text-slate-600 hover:text-rose-600"}`}
-                >
-                  Logout
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-600 hidden xl:inline">
+                    {user?.name || (user?.phone ? `+91 ${user.phone}` : "Account")}
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className={`font-bold text-sm transition-colors px-2 cursor-pointer ${isDarkTheme ? "text-gray-200 hover:text-rose-400" : "text-slate-600 hover:text-rose-600"}`}
+                  >
+                    Logout
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
@@ -352,10 +350,17 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
             <button onClick={() => { setIsOpen(false); onOpenEstimate() }} className="btn-ripple bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm py-3 px-4 rounded-lg shadow-md shadow-brand-500/20 active:scale-98 transition-all">
               <span className="relative z-10">Get Estimate</span>
             </button>
-            <button onClick={() => { setIsOpen(false); setIsLoginModalOpen(true) }} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-800 font-bold py-3 rounded-lg text-sm hover:bg-slate-50 active:scale-98 transition-all cursor-pointer">
-              <LogIn size={16} />
-              <span>Login</span>
-            </button>
+            {isLoggedIn ? (
+              <button onClick={handleLogout} className="flex items-center justify-center gap-2 border border-rose-200 bg-rose-50 text-rose-600 font-bold py-3 rounded-lg text-sm hover:bg-rose-100 active:scale-98 transition-all cursor-pointer">
+                <LogOut size={16} />
+                <span>Logout</span>
+              </button>
+            ) : (
+              <button onClick={() => { setIsOpen(false); setIsLoginModalOpen(true) }} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-800 font-bold py-3 rounded-lg text-sm hover:bg-slate-50 active:scale-98 transition-all cursor-pointer">
+                <LogIn size={16} />
+                <span>Login</span>
+              </button>
+            )}
             <button onClick={() => { setIsOpen(false); setIsDownloadModalOpen(true) }} className="flex items-center justify-center gap-2 border border-slate-300 bg-slate-50 text-slate-800 font-bold py-3 rounded-lg text-sm hover:bg-slate-100 active:scale-98 transition-all">
               <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4.093 2.05A2.32 2.32 0 003 4.155v15.69c0 .878.47 1.674 1.223 2.08l10.364-10.426L4.093 2.05z" fill="#00C1FF" />
@@ -366,13 +371,6 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               <span>Download App</span>
             </button>
           </div>
-          {isLoggedIn && (
-            <div className="px-2 mt-3">
-              <button onClick={handleLogout} className="w-full border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-sm py-3 px-4 rounded-lg active:scale-98 transition-all">
-                Logout
-              </button>
-            </div>
-          )}
         </div>
       </div>
 

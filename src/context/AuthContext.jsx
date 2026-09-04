@@ -4,7 +4,17 @@ import { setupApiClient, apiClient } from '../api/apiClient';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('vahan_user');
+        return saved ? JSON.parse(saved) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
   const [accessToken, setAccessToken] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('vahan_access_token') : null);
   
   // A queue of callbacks waiting for authentication
@@ -17,44 +27,38 @@ export function AuthProvider({ children }) {
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
-          setUser(json.data);
+          setUser((prev) => {
+            const merged = {
+              ...(prev || {}),
+              ...json.data,
+              name: json.data.name || prev?.name,
+              email: json.data.email || prev?.email,
+            };
+            if (typeof window !== 'undefined') {
+              try {
+                localStorage.setItem('vahan_user', JSON.stringify(merged));
+              } catch (e) {}
+            }
+            return merged;
+          });
           return json.data;
         }
       }
     } catch (error) {
-      console.error('Failed to fetch user:', error);
+      console.warn('Notice: Background user profile refresh skipped:', error?.message);
     }
     return null;
   }, []);
 
   useEffect(() => {
-    // If we have a token, we might want to decode it or fetch the user profile later.
-    // For now, if the token is present, we consider them logged in.
-    const handleAuthChange = () => {
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('vahan_access_token');
-        setAccessToken(token);
-        if (token && !user) {
-          fetchUser(token);
-        } else if (!token) {
-          setUser(null);
-        }
-      }
-    };
-
-    window.addEventListener("auth_changed", handleAuthChange);
-    window.addEventListener("storage", handleAuthChange);
-    
-    // Initial fetch
-    handleAuthChange();
-    
-    // Inject getter and setter into apiClient
+    // Inject getter and setter into apiClient first
     setupApiClient(
       () => typeof window !== 'undefined' ? localStorage.getItem('vahan_access_token') : null,
       (token) => {
         if (typeof window !== 'undefined') {
           if (!token) {
             localStorage.removeItem('vahan_access_token');
+            localStorage.removeItem('vahan_user');
             setAccessToken(null);
             setUser(null);
           } else {
@@ -67,49 +71,93 @@ export function AuthProvider({ children }) {
       }
     );
 
+    const handleAuthChange = () => {
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('vahan_access_token');
+        const savedUser = localStorage.getItem('vahan_user');
+        setAccessToken(token);
+        if (savedUser) {
+          try {
+            setUser(JSON.parse(savedUser));
+          } catch (e) {}
+        } else if (!token) {
+          setUser(null);
+        }
+        if (token) {
+          fetchUser(token);
+        }
+      }
+    };
+
+    window.addEventListener("auth_changed", handleAuthChange);
+    window.addEventListener("storage", handleAuthChange);
+    
+    // Background validation if token exists
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('vahan_access_token');
+      if (token) {
+        fetchUser(token);
+      }
+    }
+
     return () => {
       window.removeEventListener("auth_changed", handleAuthChange);
       window.removeEventListener("storage", handleAuthChange);
     };
-  }, [fetchUser, user]);
+  }, [fetchUser]);
 
   const login = async (token, userData) => {
+    setAccessToken(token);
+    setUser(userData);
     if (typeof window !== 'undefined') {
       localStorage.setItem('vahan_access_token', token);
+      if (userData) {
+        try {
+          localStorage.setItem('vahan_user', JSON.stringify(userData));
+        } catch (e) {}
+      }
       window.dispatchEvent(new Event("auth_changed"));
     }
-    setAccessToken(token);
     
-    // Always fetch latest profile from backend to get full relations (driver, worker, etc)
-    let finalUser = userData;
+    // Attempt background sync with /auth/me to refresh profile relations
     try {
       const res = await apiClient('/auth/me');
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
-          finalUser = json.data;
+          const finalUser = {
+            ...(userData || {}),
+            ...json.data,
+            name: json.data.name || userData?.name,
+            email: json.data.email || userData?.email,
+          };
+          setUser(finalUser);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem('vahan_user', JSON.stringify(finalUser));
+            } catch (e) {}
+          }
         }
       }
     } catch (e) {
-      // fallback to passed user
+      // Keep userData
     }
-    
-    setUser(finalUser);
     
     // Resume execution of pending action
     if (authCallback) {
-      authCallback(token, finalUser);
+      authCallback(token, userData);
       setAuthCallback(null);
     }
   };
 
   const logout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('vahan_access_token');
-      window.dispatchEvent(new Event("auth_changed"));
-    }
     setAccessToken(null);
     setUser(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('vahan_access_token');
+      localStorage.removeItem('vahan_user');
+      window.dispatchEvent(new Event("auth_changed"));
+    }
   };
 
   /**

@@ -10,7 +10,8 @@ export const setupApiClient = (getTokenFn, setTokenFn) => {
 };
 
 export const apiClient = async (endpoint, options = {}) => {
-  const token = getAuthToken ? getAuthToken() : null;
+  // Always retrieve token directly from getter or fallback to localStorage immediately
+  const token = (getAuthToken && getAuthToken()) || (typeof window !== 'undefined' ? localStorage.getItem('vahan_access_token') : null);
 
   const headers = {
     "Content-Type": "application/json",
@@ -30,14 +31,16 @@ export const apiClient = async (endpoint, options = {}) => {
 
   let response = await fetch(url, config);
 
-  // If 401 Unauthorized, we could attempt a token refresh here if we had a refresh token in cookies
-  // Currently, the backend expects the access token in Bearer header.
-  if (response.status === 401) {
-    // Optionally trigger a re-auth or logout here
+  // If 401 Unauthorized when a token was sent, clear corrupted/expired session
+  if (response.status === 401 && token) {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('vahan_access_token');
+      localStorage.removeItem('vahan_user');
+      window.dispatchEvent(new Event("auth_changed"));
+    }
     if (setAuthToken) {
       setAuthToken(null);
     }
-    // We could emit a custom event to force the LoginModal to open if needed
     window.dispatchEvent(new Event("auth:unauthorized"));
   }
 

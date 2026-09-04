@@ -95,8 +95,16 @@ export default function LoginModal() {
     const otpCode = otp.join("")
     try {
       const data = await verifyOtp(phone, otpCode)
-      if (data.accessToken) {
-        login(data.accessToken, data.user || { name, phone, email, whatsapp })
+      const token = data?.accessToken || data?.tokens?.access?.token || data?.token
+      if (token) {
+        const userData = {
+          ...(data?.user || {}),
+          name: (data?.user?.name && data.user.name.trim()) || name?.trim() || "Customer",
+          phone: data?.user?.phone || phone,
+          email: data?.user?.email || email?.trim() || undefined,
+          whatsappOptIn: whatsapp,
+        }
+        await login(token, userData)
       }
       closeLoginModal()
     } catch (err) {
