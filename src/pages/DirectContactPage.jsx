@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   Zap, Phone, Shield, ChevronRight, MapPin, CheckCircle, CheckCircle2,
   Star, ArrowRight, BadgeCheck, Lock, Banknote, Unlock, Copy, Check, MessageSquare, AlertCircle,
-  X, Download, Share2, Truck, ShieldCheck
+  X, Download, Share2, Truck, ShieldCheck, CreditCard, Loader2
 } from "lucide-react";
 import SEOHead from "../seo/SEOHead";
 import CitySelectorModal from "../components/CitySelectorModal";
@@ -401,6 +401,14 @@ export default function DirectContactPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  // Razorpay Live Checkout Modal State
+  const [isRazorpayModalOpen, setIsRazorpayModalOpen] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [isPayingRazorpay, setIsPayingRazorpay] = useState(false);
+  const [razorpayError, setRazorpayError] = useState(null);
+
   // Live driver leads state from database
   const [backendDrivers, setBackendDrivers] = useState(null);
   const [isLoadingDrivers, setIsLoadingDrivers] = useState(false);
@@ -439,9 +447,9 @@ export default function DirectContactPage() {
     setUnmaskedNumbers({});
   }, [selectedCategory.id, selectedCity.slug]);
 
-  // Lock body scroll when mobile modal is open
+  // Lock body scroll when modal is open
   useEffect(() => {
-    if (isWorkerModalOpen || showSuccessModal) {
+    if (isWorkerModalOpen || showSuccessModal || isRazorpayModalOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -449,7 +457,7 @@ export default function DirectContactPage() {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isWorkerModalOpen, showSuccessModal]);
+  }, [isWorkerModalOpen, showSuccessModal, isRazorpayModalOpen]);
 
   // 3-way internal validation engine
   const validatedQuery = useMemo(() => {
@@ -576,101 +584,166 @@ export default function DirectContactPage() {
     window.open(waUrl, "_blank");
   };
 
+  // Open Razorpay Checkout Customer Input Modal
+  const handleRazorpayPayment = () => {
+    setIsRazorpayModalOpen(true);
+    setRazorpayError(null);
+    if (typeof window !== "undefined") {
+      try {
+        const savedPhone = localStorage.getItem("gomytruck_customer_phone");
+        if (savedPhone) setCustomerPhone(savedPhone);
+        const savedName = localStorage.getItem("gomytruck_customer_name");
+        if (savedName) setCustomerName(savedName);
+      } catch {}
+    }
+  };
+
   // Process Official Razorpay Checkout Payment (₹49)
-  const handleRazorpayPayment = async () => {
-    setIsProcessing(true);
+  const handlePayWithRazorpay = async (e) => {
+    if (e) e.preventDefault();
+    setRazorpayError(null);
+
+    const cleanPhone = String(customerPhone || "").replace(/\D/g, "");
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setRazorpayError("Please enter a valid 10-digit Indian mobile number (starting with 6, 7, 8, or 9).");
+      return;
+    }
+
+    if (!customerName || customerName.trim().length < 2) {
+      setRazorpayError("Please enter your full name.");
+      return;
+    }
+
+    setIsPayingRazorpay(true);
+
     try {
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
         throw new Error("Could not load payment gateway. Please check internet connection.");
       }
 
-      const res = await fetch(`${API_BASE}/payments/create-order`, {
+      // 1. Create order on backend with platform & metadata
+      const res = await fetch(`${API_BASE}/payments/create-direct-contact-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: 49,
-          purpose: "DIRECT_CONTACT_UNLOCK",
+          city: selectedCity.name,
+          serviceCategory: selectedCategory.label,
+          customerName: customerName.trim(),
+          customerPhone: cleanPhone,
+          customerEmail: customerEmail?.trim() || undefined,
+          workerIds: driversList.map((d) => d.id),
           platform: "VAHAN_WEB",
-          metadata: {
-            category: selectedCategory.id,
-            vehicle: selectedCategory.vehicle,
-            city: selectedCity.name,
-            citySlug: selectedCity.slug,
-          }
-        })
+          amount: 1, // Live test ₹1 (100 paise)
+        }),
       });
 
       const orderData = await res.json();
-      const rzpKey = orderData?.data?.keyId || orderData?.keyId || "rzp_test_SttHUdu0eZT95x";
-      const orderId = orderData?.data?.id || orderData?.data?.orderId || orderData?.orderId;
+      if (!res.ok || !orderData.success || !orderData.data?.orderId) {
+        throw new Error(orderData.message || "Failed to initialize payment order with gateway. Please try again.");
+      }
 
+      const { orderId, amount, currency, keyId } = orderData.data;
+      const liveKey = keyId || import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_TXq11IOe0ZKrQH";
+
+      // 2. Open standard Razorpay Checkout Modal (Charges ₹1 for live test)
       const options = {
-        key: rzpKey,
-        amount: 4900,
-        currency: "INR",
+        key: liveKey,
+        amount: amount || 100, // 100 paise = ₹1.00
+        currency: currency || "INR",
         name: "GoMyTruck",
         description: `Unlock 10 ${selectedCategory.label} Drivers in ${selectedCity.name}`,
-        order_id: orderId,
         image: "/go-my-truck-logo.png",
-        handler: function () {
-          const unmaskedMap = {};
-          driversList.forEach(d => {
-            unmaskedMap[d.id] = d.phoneRaw;
-          });
-          const envelope = {
-            isUnlocked: true,
-            unmaskedNumbers: unmaskedMap,
-            categoryId: selectedCategory.id,
-            categoryLabel: selectedCategory.label,
-            citySlug: selectedCity.slug,
-            cityName: selectedCity.name,
-            unlockedAt: new Date().toISOString(),
-          };
-          setIsUnlocked(true);
-          setUnmaskedNumbers(unmaskedMap);
-          setShowSuccessModal(true);
-          setIsProcessing(false);
-          if (typeof window !== "undefined") {
-            try {
-              localStorage.setItem(`unlocked_gmt_${selectedCategory.id}_${selectedCity.slug}`, JSON.stringify(envelope));
-            } catch {}
-          }
+        order_id: orderId,
+        prefill: {
+          name: customerName.trim(),
+          contact: cleanPhone,
+          email: customerEmail?.trim() || "",
         },
         theme: { color: "#001f3f" },
         modal: {
-          ondismiss: () => setIsProcessing(false)
-        }
+          ondismiss: () => setIsPayingRazorpay(false),
+        },
+        handler: async function (response) {
+          try {
+            // 3. Verify Razorpay payment on backend with cryptographic HMAC
+            const verifyRes = await fetch(`${API_BASE}/payments/verify-direct-contact`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                customerPhone: cleanPhone,
+                customerName: customerName.trim(),
+                customerEmail: customerEmail?.trim() || undefined,
+                workerIds: driversList.map((d) => d.id),
+                serviceCategory: selectedCategory.label,
+                city: selectedCity.name,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (!verifyRes.ok || !verifyData.success) {
+              throw new Error(verifyData.message || "Payment verification failed. Please contact support.");
+            }
+
+            // 4. Unmask driver contacts immediately in UI
+            const unmaskedMap = {};
+            if (verifyData.data?.unlockedWorkers?.length > 0) {
+              verifyData.data.unlockedWorkers.forEach((w) => {
+                unmaskedMap[w.id] = w.phone;
+              });
+            }
+            driversList.forEach((d) => {
+              if (!unmaskedMap[d.id] && d.phoneRaw) {
+                unmaskedMap[d.id] = d.phoneRaw;
+              }
+            });
+
+            const envelope = {
+              isUnlocked: true,
+              unmaskedNumbers: unmaskedMap,
+              customerPhone: cleanPhone,
+              customerName: customerName.trim(),
+              customerEmail: customerEmail?.trim() || null,
+              categoryId: selectedCategory.id,
+              categoryLabel: selectedCategory.label,
+              citySlug: selectedCity.slug,
+              cityName: selectedCity.name,
+              unlockedAt: new Date().toISOString(),
+              paymentId: response.razorpay_payment_id,
+            };
+
+            setIsUnlocked(true);
+            setUnmaskedNumbers(unmaskedMap);
+            setIsRazorpayModalOpen(false);
+            setShowSuccessModal(true);
+
+            if (typeof window !== "undefined") {
+              try {
+                localStorage.setItem(`unlocked_gmt_${selectedCategory.id}_${selectedCity.slug}`, JSON.stringify(envelope));
+                localStorage.setItem("gomytruck_customer_phone", cleanPhone);
+                localStorage.setItem("gomytruck_customer_name", customerName.trim());
+              } catch {}
+            }
+          } catch (verifyErr) {
+            setRazorpayError(verifyErr.message || "Payment verification failed. Please contact support.");
+          } finally {
+            setIsPayingRazorpay(false);
+          }
+        },
       };
 
       const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (resp) {
+        setRazorpayError(resp.error?.description || "Payment was declined or cancelled.");
+        setIsPayingRazorpay(false);
+      });
       rzp.open();
-    } catch (e) {
-      // Fallback demo unlock for offline / staging
-      setTimeout(() => {
-        const unmaskedMap = {};
-        driversList.forEach(d => {
-          unmaskedMap[d.id] = d.phoneRaw;
-        });
-        const envelope = {
-          isUnlocked: true,
-          unmaskedNumbers: unmaskedMap,
-          categoryId: selectedCategory.id,
-          categoryLabel: selectedCategory.label,
-          citySlug: selectedCity.slug,
-          cityName: selectedCity.name,
-          unlockedAt: new Date().toISOString(),
-        };
-        setIsUnlocked(true);
-        setUnmaskedNumbers(unmaskedMap);
-        setShowSuccessModal(true);
-        setIsProcessing(false);
-        if (typeof window !== "undefined") {
-          try {
-            localStorage.setItem(`unlocked_gmt_${selectedCategory.id}_${selectedCity.slug}`, JSON.stringify(envelope));
-          } catch {}
-        }
-      }, 800);
+    } catch (err) {
+      setRazorpayError(err.message || "Unable to open payment gateway.");
+      setIsPayingRazorpay(false);
     }
   };
 
@@ -1542,6 +1615,159 @@ export default function DirectContactPage() {
               )}
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* ── RAZORPAY SECURE CHECKOUT MODAL ── */}
+      {isRazorpayModalOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/85 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md sm:max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="pt-6 px-6 pb-4 border-b border-slate-100 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 text-left relative">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-black tracking-wide uppercase text-amber-900 bg-amber-200/80 px-3 py-1 rounded-full mb-1.5 shadow-2xs">
+                <CreditCard className="w-3.5 h-3.5 text-amber-700" />
+                <span>Razorpay Live Secure Checkout</span>
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+                Unlock 10 Driver Numbers
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Verified <strong>{selectedCategory.label}</strong> Drivers in <strong>{selectedCity.name}</strong> · Flat ₹49
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsRazorpayModalOpen(false)}
+                className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+                title="Close Checkout"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body Form */}
+            <form onSubmit={handlePayWithRazorpay} className="p-5 sm:p-6 overflow-y-auto space-y-4 max-h-[75vh] custom-scrollbar text-left">
+              {/* Pricing & Value Summary Card */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5">
+                <div className="flex justify-between items-center text-slate-900 font-black text-sm">
+                  <span>Direct Driver Contact Fee</span>
+                  <span className="text-emerald-700 text-base font-black">₹49.00</span>
+                </div>
+                <div className="flex justify-between items-center text-xs text-slate-500 mt-1">
+                  <span>Traditional Broker Commission</span>
+                  <span className="line-through text-rose-500 font-bold">₹500 – ₹2,000</span>
+                </div>
+                <div className="border-t border-slate-200/80 mt-2.5 pt-2 flex justify-between items-center text-xs">
+                  <span className="text-slate-600 font-semibold">Total Payable (One-Time)</span>
+                  <span className="text-slate-900 font-black text-sm">₹49.00</span>
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {razorpayError && (
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                  <span>{razorpayError}</span>
+                </div>
+              )}
+
+              {/* Full Name Input */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Your Full Name <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Ramesh Kumar"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all placeholder:text-slate-400"
+                />
+              </div>
+
+              {/* Mobile Number Input */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Mobile Number (for Order &amp; WhatsApp Receipt) <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3.5 text-xs font-bold text-slate-500 select-none">
+                    +91
+                  </span>
+                  <input
+                    type="tel"
+                    required
+                    maxLength={10}
+                    placeholder="9876543210"
+                    value={customerPhone}
+                    onChange={(e) => {
+                      const clean = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      setCustomerPhone(clean);
+                    }}
+                    className="w-full pl-12 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm font-semibold tracking-wider focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all placeholder:text-slate-400 placeholder:font-normal placeholder:tracking-normal"
+                  />
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  We prefill your UPI &amp; Cards on Razorpay with this number.
+                </p>
+              </div>
+
+              {/* Email Address (Optional) */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Email Address <span className="text-slate-400 font-normal">(Optional for GST invoice)</span>
+                </label>
+                <input
+                  type="email"
+                  placeholder="ramesh@example.com"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all placeholder:text-slate-400"
+                />
+              </div>
+
+              {/* Security & Gateways Indicator */}
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <span className="flex items-center gap-1.5 font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>256-Bit Bank-Grade Encryption</span>
+                </span>
+                <span className="font-bold text-slate-700">UPI · Cards · Netbanking</span>
+              </div>
+
+              {/* Submit CTA */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isPayingRazorpay}
+                  className="w-full py-3.5 px-6 rounded-2xl font-black text-base flex items-center justify-center gap-2 text-white bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 shadow-xl shadow-amber-300/80 hover:shadow-2xl transition-all active:scale-98 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed text-center"
+                >
+                  {isPayingRazorpay ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Opening Secure Razorpay...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-5 h-5 fill-current animate-bounce shrink-0" />
+                      <span>Proceed to Pay ₹49</span>
+                      <ArrowRight className="w-4 h-4 shrink-0" />
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="text-center pt-1">
+                <button
+                  type="button"
+                  onClick={() => setIsRazorpayModalOpen(false)}
+                  className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                >
+                  Cancel / Close
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
