@@ -657,8 +657,8 @@ export default function DriverOnboardingPage() {
                 { label: "Insurance", name: "insurance" }
               ].map((field) => (
                 <div key={field.name} className="col-span-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{field.label} *</label>
-                  <input required type="file" name={field.name} onChange={handleFileChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 border border-gray-300 rounded-md p-1" accept="image/*,.pdf" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{field.label}</label>
+                  <input type="file" name={field.name} onChange={handleFileChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 border border-gray-300 rounded-md p-1" accept="image/*,.pdf" />
                 </div>
               ))}
             </div>
