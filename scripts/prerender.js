@@ -32,8 +32,15 @@ async function writeRoute(route, outputFile) {
   await fs.writeFile(destination, document)
 }
 
-for (const route of PRERENDER_ROUTES) {
-  await writeRoute(route)
+const BATCH_SIZE = 16
+let completed = 0
+for (let i = 0; i < PRERENDER_ROUTES.length; i += BATCH_SIZE) {
+  const chunk = PRERENDER_ROUTES.slice(i, i + BATCH_SIZE)
+  await Promise.all(chunk.map((route) => writeRoute(route)))
+  completed += chunk.length
+  if (completed % 200 === 0 || completed === PRERENDER_ROUTES.length) {
+    console.log(`Prerendered ${completed} / ${PRERENDER_ROUTES.length} routes...`)
+  }
 }
 
 // We use a deep path to ensure it bypasses dynamic /:city routes and hits the catch-all

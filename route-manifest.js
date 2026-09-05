@@ -65,7 +65,8 @@ export const INDEXABLE_ROUTES = [
   "/freight-rate-index",
   "/blog/kolkata-northeast-freight-market-report",
   "/resources/hsn-codes-for-logistics",
-  "/resources/section-9-5-vs-52-gta"
+  "/resources/section-9-5-vs-52-gta",
+  "/directory"
 ]
 
 // Dynamically generate PSEO routes

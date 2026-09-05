@@ -155,24 +155,35 @@ export default function Footer({ onScrollToSection }) {
               </div>
             </div>
 
-            {/* Domestic Cities Grid */}
-            <div className="space-y-5">
-              <h4 className="text-white font-bold text-sm tracking-wide">Service Areas &amp; Route Guides</h4>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-y-4 gap-x-4">
-                {cities.map((city, index) => (
-                  <Link
-                    key={index}
-                    to={city.to}
-                    title={`Truck booking in ${city.name} — mini truck & goods transport`}
-                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                    className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium"
-                  >
-                    {city.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
+          </div>
+        </div>
 
+        {/* Pan-India 500+ Cities & Industrial Corridors Grid */}
+        <div className="pt-8 pb-10 border-t border-[#1a1a1a] space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h4 className="text-white font-bold text-xs uppercase tracking-wider">
+              Pan-India Service Coverage ({cities.length} Cities, Industrial Corridors &amp; Port Hubs)
+            </h4>
+            <Link
+              to="/directory"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="text-orange-400 hover:text-orange-300 text-[11px] font-semibold transition-colors"
+            >
+              Explore Full State Directory →
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-x-2.5 gap-y-1.5 text-left">
+            {cities.map((city, index) => (
+              <Link
+                key={index}
+                to={city.to}
+                title={`Truck booking & transport in ${city.name}`}
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="text-gray-400 hover:text-white transition-colors text-[10px] sm:text-[11px] leading-tight truncate"
+              >
+                {city.name}
+              </Link>
+            ))}
           </div>
         </div>
 

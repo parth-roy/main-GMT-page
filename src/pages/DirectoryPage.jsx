@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SEO_CITIES } from '../lib/cities';
+import SEOHead from '../seo/SEOHead';
 
 const DirectoryPage = () => {
   // Group cities by state
@@ -16,9 +17,16 @@ const DirectoryPage = () => {
   const sortedStates = Object.keys(citiesByState).sort();
 
   return (
-    <div className="bg-slate-50 min-h-screen py-12">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="text-center mb-12">
+    <>
+      <SEOHead
+        title="All India City Logistics & Truck Booking Directory | GoMyTruck"
+        description="Explore GoMyTruck's pan-India truck booking and goods transport directory covering 500+ cities, industrial estates, logistics corridors, and seaports."
+        canonical="/directory"
+        keywords="truck booking directory, transport service areas, goods transport cities india, pan india logistics network"
+      />
+      <div className="bg-slate-50 min-h-screen py-12">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
             GoMyTruck Service Directory
           </h1>
@@ -53,7 +61,8 @@ const DirectoryPage = () => {
         </div>
       </div>
     </div>
-  );
+  </>
+);
 };
 
 export default DirectoryPage;
