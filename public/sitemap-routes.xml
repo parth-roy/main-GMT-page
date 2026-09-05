@@ -2,82 +2,82 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://gomytruck.com/intercity/kolkata</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/local-transport/kolkata</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-asansol</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-guwahati</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-patna</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-bhubaneswar</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-siliguri</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-cuttack</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-ranchi</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-dhanbad</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-haldia</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-durgapur</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-delhi</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-mumbai</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-hyderabad</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-bangalore</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-chennai</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/kolkata-to-paradeep</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/guwahati-to-kolkata</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/routes/cuttack-to-kolkata</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
 </urlset>

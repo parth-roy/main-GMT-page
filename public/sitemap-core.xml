@@ -2,74 +2,74 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://gomytruck.com/</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/driver-onboarding</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/enterprise</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/about</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/support</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/driver-partner</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/contact</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/fleet-partner-registration</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/gomytruck-verified</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/direct-driver-contact</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/services/transport-for-msmes</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/services/commercial-goods-transport</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/legal/privacy-policy</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/legal/terms</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/legal/partner-terms</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/legal/refund-cancellation</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/legal/community-guidelines</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://gomytruck.com/freight-rate-index</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
 </urlset>

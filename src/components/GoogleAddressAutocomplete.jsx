@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from "react"
 import { MapPin, Loader2 } from "lucide-react"
-// Mapbox API commented out as requested for testing Google Maps
-// import { fetchAutocomplete, fetchPlaceDetails } from "../api/pricingApi"
+// API key read from env var — set VITE_GOOGLE_MAPS_KEY in .env
 import { trackBeginBooking } from "../utils/analytics"
 
-// --- GOOGLE MAPS INTEGRATION ---
-const GOOGLE_MAPS_KEY = 'AIzaSyDd_ernLIpHcBlFmVf-x4n3l8mtjjOL90c';
+const GOOGLE_MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY || 'AIzaSyDd_ernLIpHcBlFmVf-x4n3l8mtjjOL90c';
 let googleMapsScriptPromise = null;
 
 function getGoogleMaps() {
@@ -59,6 +57,8 @@ export default function GoogleAddressAutocomplete({
   const wrapperRef = useRef(null)
   const debounceRef = useRef(null)
   const hasTrackedFocusRef = useRef(false)
+  // Session token groups all keystrokes + final selection into ONE billing unit
+  const sessionTokenRef = useRef(null)
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -92,20 +92,32 @@ export default function GoogleAddressAutocomplete({
       try {
         const maps = await getGoogleMaps();
         const service = new maps.places.AutocompleteService();
+
+        // Create session token on first keystroke of each new search
+        if (!sessionTokenRef.current) {
+          sessionTokenRef.current = new maps.places.AutocompleteSessionToken();
+        }
         
-        service.getPlacePredictions({ input: val, componentRestrictions: { country: "in" } }, (results, status) => {
-          if (status === maps.places.PlacesServiceStatus.OK && results) {
-            setPredictions(results.map(p => ({
-              placeId: p.place_id,
-              description: p.description,
-              mainText: p.structured_formatting?.main_text || p.description,
-              secondaryText: p.structured_formatting?.secondary_text || ""
-            })));
-          } else {
-            setPredictions([]);
+        service.getPlacePredictions(
+          {
+            input: val,
+            sessionToken: sessionTokenRef.current,
+            componentRestrictions: { country: "in" },
+          },
+          (results, status) => {
+            if (status === maps.places.PlacesServiceStatus.OK && results) {
+              setPredictions(results.map(p => ({
+                placeId: p.place_id,
+                description: p.description,
+                mainText: p.structured_formatting?.main_text || p.description,
+                secondaryText: p.structured_formatting?.secondary_text || ""
+              })));
+            } else {
+              setPredictions([]);
+            }
+            setLoading(false);
           }
-          setLoading(false);
-        });
+        );
       } catch (err) {
         console.error("Autocomplete error:", err)
         setPredictions([])
@@ -121,30 +133,34 @@ export default function GoogleAddressAutocomplete({
 
     try {
       const maps = await getGoogleMaps();
-      const geocoder = new maps.Geocoder();
-      
-      geocoder.geocode({ placeId: prediction.placeId }, (results, status) => {
-        if (status === "OK" && results[0]) {
-          onAddressSelect({
-            address: prediction.description,
-            lat: results[0].geometry.location.lat(),
-            lng: results[0].geometry.location.lng()
-          });
-        } else {
-          onAddressSelect({
-            address: prediction.description,
-            lat: null,
-            lng: null
-          });
+      // Use PlacesService.getDetails with the session token to terminate the billing
+      // session — groups all keystrokes into ONE billed session unit (not per-keystroke).
+      const placesService = new maps.places.PlacesService(document.createElement('div'));
+
+      placesService.getDetails(
+        {
+          placeId: prediction.placeId,
+          fields: ['geometry', 'formatted_address'],
+          sessionToken: sessionTokenRef.current,
+        },
+        (place, status) => {
+          // Reset after terminating the session — next search starts fresh
+          sessionTokenRef.current = null;
+          if (status === maps.places.PlacesServiceStatus.OK && place) {
+            onAddressSelect({
+              address: place.formatted_address || prediction.description,
+              lat: place.geometry?.location?.lat() || null,
+              lng: place.geometry?.location?.lng() || null,
+            });
+          } else {
+            onAddressSelect({ address: prediction.description, lat: null, lng: null });
+          }
         }
-      });
+      );
     } catch (err) {
       console.error("Place details error:", err)
-      onAddressSelect({
-        address: prediction.description,
-        lat: null,
-        lng: null
-      })
+      sessionTokenRef.current = null;
+      onAddressSelect({ address: prediction.description, lat: null, lng: null })
     }
   }
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useLocation } from "react-router-dom"
 import { MapPin, ChevronDown, ArrowRight, Loader2, AlertCircle, Shield, CheckCircle, BadgePercent } from "lucide-react"
-import { fetchEstimate, SERVICE_TO_VEHICLE_TYPE, detectCurrentCity, SERVED_CITIES, CITY_HERO_IMAGES } from "../../api/pricingApi"
+import { fetchEstimate, SERVICE_TO_VEHICLE_TYPE, detectCurrentCity, getPersistedCity, SERVED_CITIES, CITY_HERO_IMAGES } from "../../api/pricingApi"
 import EstimateResultModal from "../EstimateResultModal"
 import GoogleAddressAutocomplete, { geocodeGoogleAddress } from "../GoogleAddressAutocomplete"
 import CitySelectorModal from "../CitySelectorModal"
@@ -33,18 +33,34 @@ export default function TruckHero({ city, setCity }) {
   const [cityOpen, setCityOpen] = useState(false)
   const cityRef = useRef(null)
 
-  // Auto-detect city on mount via geolocation + reverse-geocode, unless overridden via state
+  // Auto-detect city on mount — check localStorage first, geolocation only as last resort
   useEffect(() => {
     if (location.state?.selectedCity) {
       setCity(location.state.selectedCity)
       setCityDetecting(false)
     } else {
-      detectCurrentCity().then((detected) => {
-        setCity(detected)
+      // Use stored preference first (instantaneous, no prompt)
+      const persisted = getPersistedCity()
+      if (persisted?.name) {
+        setCity(persisted.name)
         setCityDetecting(false)
-      })
+      } else {
+        detectCurrentCity().then((detected) => {
+          setCity(detected)
+          setCityDetecting(false)
+        })
+      }
     }
   }, [setCity, location.state?.selectedCity])
+
+  // Stay in sync when any other component changes the global city
+  useEffect(() => {
+    const handler = (e) => {
+      if (e?.detail?.name) setCity(e.detail.name)
+    }
+    window.addEventListener('gomytruck:city_change', handler)
+    return () => window.removeEventListener('gomytruck:city_change', handler)
+  }, [setCity])
 
   // Close city dropdown on outside click
   useEffect(() => {

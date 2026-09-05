@@ -41,7 +41,7 @@ export default function LoginModal() {
       return setError("Please enter a valid 10-digit Indian mobile number.")
     }
     
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       return setError("Please enter a valid email address.")
     }
 
@@ -115,7 +115,7 @@ export default function LoginModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6 md:p-10">
+    <div className="fixed inset-0 z-[350] flex items-center justify-center p-4 sm:p-6 md:p-10">
       <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={closeLoginModal}></div>
 
       <div className="relative bg-white rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden z-10 flex flex-col md:flex-row min-h-[500px] md:h-[600px]">
@@ -185,8 +185,7 @@ export default function LoginModal() {
                   </div>
                   <input
                     type="email"
-                    placeholder="Enter your email"
-                    required
+                    placeholder="Enter your email (optional)"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"

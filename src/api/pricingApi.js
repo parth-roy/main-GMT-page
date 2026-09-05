@@ -128,29 +128,92 @@ export const SERVED_CITIES = [
   'New Town',
 ];
 
+// ─── CITY PERSISTENCE HELPERS ────────────────────────────────────────────────
+
+const CITY_STORAGE_KEY = 'gomytruck_selected_city';
+
 /**
- * Detects the user's current city via:
- *   1. Browser Geolocation API → lat/lng
- *   2. Backend reverse-geocode → address string
- *   3. Extract city from Mapbox place_name format: "area, City, State, India"
+ * Read the user's persisted city from localStorage.
+ * Returns { name: string, slug: string } or null.
+ */
+export function getPersistedCity() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(CITY_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed?.name) return parsed;
+  } catch {}
+  return null;
+}
+
+/**
+ * Persist the user's city to localStorage and broadcast it to all
+ * mounted components via the global custom event.
+ */
+export function setPersistedCity(name, slug) {
+  if (typeof window === 'undefined' || !name) return;
+  const city = {
+    name,
+    slug: slug || name.toLowerCase().replace(/[\s_]+/g, '-'),
+  };
+  try {
+    localStorage.setItem(CITY_STORAGE_KEY, JSON.stringify(city));
+    window.dispatchEvent(new CustomEvent('gomytruck:city_change', { detail: city }));
+  } catch {}
+  return city;
+}
+
+// ─── IP-BASED CITY DETECTION FALLBACK ────────────────────────────────────────
+
+/**
+ * Detect approximate city from the user's IP address via ipapi.co (free, 30k/month).
+ * Only called when geolocation fails AND no city is stored.
+ */
+async function detectCityFromIP() {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    const r = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    clearTimeout(timer);
+    if (!r.ok) return null;
+    const data = await r.json();
+    return data.city || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Detects the user's current city via (in order):
+ *   1. Existing localStorage cache → return immediately, no API call
+ *   2. Browser Geolocation API → backend reverse-geocode → city name
+ *   3. IP-based detection via ipapi.co (free fallback)
+ *   4. Final fallback: "Kolkata"
  *
- * Falls back to "Kolkata" if permission denied or any step fails.
+ * After detection, persists the result to localStorage so future calls
+ * are instant (no repeated geolocation prompts).
  *
- * @returns {Promise<string>} City name (matched against SERVED_CITIES if possible)
+ * @returns {Promise<string>} City name
  */
 export async function detectCurrentCity() {
-  const timeoutPromise = new Promise((resolve) => {
-    setTimeout(() => resolve('Kolkata'), 3000); // Strict 3s timeout
-  });
+  // 1. Always prefer stored city — never override user's choice
+  const persisted = getPersistedCity();
+  if (persisted?.name) return persisted.name;
 
-  const geoPromise = new Promise((resolve) => {
+  // 2. Try browser geolocation → backend reverse-geocode (strict 4s timeout)
+  const geoCity = await new Promise((resolve) => {
+    const fallbackTimer = setTimeout(() => resolve(null), 4000);
+
     if (!navigator.geolocation) {
-      resolve('Kolkata');
+      clearTimeout(fallbackTimer);
+      resolve(null);
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
+        clearTimeout(fallbackTimer);
         try {
           const res = await fetch(
             `${BASE_URL}/maps/reverse-geocode?lat=${coords.latitude}&lng=${coords.longitude}`
@@ -159,26 +222,34 @@ export async function detectCurrentCity() {
           const json = await res.json();
           if (!json.success || !json.data?.address) throw new Error('no address');
 
-          // Mapbox place_name: "Neighbourhood, City, State, India"
+          // Address format: "Neighbourhood, City, State, India"
           const parts = json.data.address.split(',').map((s) => s.trim());
+          // Try exact match against known cities first
           const matched = parts.find((p) =>
             SERVED_CITIES.some((c) => c.toLowerCase() === p.toLowerCase())
           );
-          if (matched) {
-            resolve(matched);
-            return;
-          }
-          
-          const fallbackCity = parts[1];
-          resolve(fallbackCity ? fallbackCity : 'Kolkata');
+          resolve(matched || parts[1] || parts[0] || null);
         } catch {
-          resolve('Kolkata');
+          resolve(null);
         }
       },
-      () => resolve('Kolkata'),
-      { timeout: 3000, maximumAge: 300_000 }
+      () => { clearTimeout(fallbackTimer); resolve(null); },
+      { timeout: 4000, maximumAge: 300_000 }
     );
   });
 
-  return Promise.race([geoPromise, timeoutPromise]);
+  if (geoCity) {
+    setPersistedCity(geoCity);
+    return geoCity;
+  }
+
+  // 3. IP-based fallback
+  const ipCity = await detectCityFromIP();
+  if (ipCity) {
+    setPersistedCity(ipCity);
+    return ipCity;
+  }
+
+  // 4. Last resort — do NOT persist, so next session tries again
+  return 'Kolkata';
 }

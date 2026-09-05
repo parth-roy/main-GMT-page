@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   Zap, Phone, Shield, ChevronRight, MapPin, CheckCircle, CheckCircle2,
@@ -8,6 +8,7 @@ import {
 import SEOHead from "../seo/SEOHead";
 import CitySelectorModal from "../components/CitySelectorModal";
 import { useAuth } from "../context/AuthContext";
+import { getPersistedCity, setPersistedCity, detectCurrentCity } from "../api/pricingApi";
 
 const API_BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE || "https://api.gomytruck.com/api/v1";
 
@@ -372,23 +373,10 @@ function getPhoneDisplayParts(phoneRaw, phoneMasked) {
 }
 
 export default function DirectContactPage() {
-  // Global persisted city state
+  // Global persisted city state — seeded from localStorage via helper
   const [selectedCity, setSelectedCity] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem("gomytruck_selected_city");
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed?.name) {
-            return {
-              name: parsed.name,
-              slug: parsed.slug || parsed.name.toLowerCase().replace(/[\s_]+/g, "-")
-            };
-          }
-        }
-      } catch {}
-    }
-    return { name: "Kolkata", slug: "kolkata" };
+    const persisted = getPersistedCity();
+    return persisted || { name: "Kolkata", slug: "kolkata" };
   });
 
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
@@ -441,6 +429,19 @@ export default function DirectContactPage() {
       if (user.email) setCustomerEmail(user.email);
     }
   }, [user]);
+
+  // Auto-detect city if none stored (first-time visitors)
+  useEffect(() => {
+    if (!getPersistedCity()) {
+      detectCurrentCity().then((detected) => {
+        if (detected) {
+          const slug = detected.toLowerCase().replace(/[\s_]+/g, "-");
+          setSelectedCity({ name: detected, slug });
+          // setPersistedCity is already called inside detectCurrentCity on success
+        }
+      });
+    }
+  }, []);
 
   // Listen for global city changes across the entire website
   useEffect(() => {
@@ -606,12 +607,7 @@ export default function DirectContactPage() {
     const slug = citySlug || cityName.toLowerCase().replace(/[\s_]+/g, "-");
     const newCity = { name: cityName, slug };
     setSelectedCity(newCity);
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("gomytruck_selected_city", JSON.stringify(newCity));
-        window.dispatchEvent(new CustomEvent("gomytruck:city_change", { detail: newCity }));
-      } catch {}
-    }
+    setPersistedCity(cityName, slug); // persists + fires global event
   };
 
   // Copy single number
@@ -686,8 +682,10 @@ export default function DirectContactPage() {
 
   // Open Razorpay Checkout Customer Input Modal (Requires Login First)
   const handleRazorpayPayment = () => {
-    // 1. If user is NOT logged in, prompt login first
+    // 1. If user is NOT logged in, prompt login first.
+    //    Close the worker modal first so the login modal is never blocked behind it.
     if (!loggedInPhone) {
+      setIsWorkerModalOpen(false); // ← close worker modal so login modal has full focus
       setIsLoginAlertModalOpen(true);
       return;
     }
@@ -761,7 +759,8 @@ export default function DirectContactPage() {
         prefill: {
           name: customerName.trim(),
           contact: cleanPhone,
-          email: customerEmail?.trim() || "",
+          // Razorpay requires a non-empty email — use placeholder if user didn't provide one
+          email: customerEmail?.trim() || `${cleanPhone}@gomytruck.com`,
         },
         theme: { color: "#001f3f" },
         modal: {
@@ -1212,10 +1211,9 @@ export default function DirectContactPage() {
                           ) || VEHICLE_CATEGORIES[0];
                           setSelectedCategory(matched);
                           if (pack.city && pack.city !== "All") {
-                            setSelectedCity({
-                              name: pack.city,
-                              slug: pack.city.toLowerCase().replace(/[\s_]+/g, "-"),
-                            });
+                            const packSlug = pack.city.toLowerCase().replace(/[\s_]+/g, "-");
+                            setSelectedCity({ name: pack.city, slug: packSlug });
+                            setPersistedCity(pack.city, packSlug); // persist so it survives refresh
                           }
                         }}
                         className="px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-900 font-bold text-xs hover:bg-emerald-600 hover:text-white transition-all shrink-0 cursor-pointer shadow-2xs flex items-center gap-1.5"
@@ -1227,7 +1225,26 @@ export default function DirectContactPage() {
                   </div>
                 </div>
               )}
-              
+
+              {/* ── City Confirmation Banner ─────────────────────────────────── */}
+              {/* Prominent city indicator so users never pay for the wrong city */}
+              <div className="flex items-center justify-between gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 mb-1">
+                <div className="flex items-center gap-2 min-w-0">
+                  <MapPin size={16} className="text-blue-600 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs text-blue-500 font-semibold uppercase tracking-wider">Showing drivers in</p>
+                    <p className="text-sm font-black text-blue-900 truncate">{selectedCity.name}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsCityModalOpen(true)}
+                  className="shrink-0 text-xs font-bold text-blue-700 bg-white border border-blue-300 rounded-xl px-3 py-1.5 hover:bg-blue-600 hover:text-white transition-all cursor-pointer whitespace-nowrap"
+                >
+                  Change City
+                </button>
+              </div>
+
               {/* Header Box */}
               <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
@@ -1834,6 +1851,24 @@ export default function DirectContactPage() {
                 </div>
               </div>
 
+              {/* City Confirmation — show clearly before payment */}
+              <div className="flex items-center justify-between gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3.5 py-2.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <MapPin size={14} className="text-blue-600 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-blue-500 font-bold uppercase tracking-wider">Unlocking drivers in</p>
+                    <p className="text-sm font-black text-blue-900 truncate">{selectedCity.name}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setIsRazorpayModalOpen(false); setIsCityModalOpen(true); }}
+                  className="shrink-0 text-[11px] font-bold text-blue-700 underline underline-offset-2 hover:text-blue-900 transition-colors cursor-pointer"
+                >
+                  Change
+                </button>
+              </div>
+
               {/* Error Message */}
               {razorpayError && (
                 <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2">
@@ -1886,11 +1921,11 @@ export default function DirectContactPage() {
               {/* Email Address (Optional) */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Email Address <span className="text-slate-400 font-normal">(Optional for GST invoice)</span>
+                  Email Address <span className="text-slate-400 font-normal">(Optional — skip if not needed)</span>
                 </label>
                 <input
                   type="email"
-                  placeholder="ramesh@example.com"
+                  placeholder="ramesh@example.com  (leave blank to skip)"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all placeholder:text-slate-400"
@@ -1968,7 +2003,7 @@ export default function DirectContactPage() {
 
       {/* ── LOGIN REQUIRED ALERT MODAL (VERIFIES REAL USER BEFORE PAYMENT) ── */}
       {isLoginAlertModalOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden p-6 text-left relative animate-in zoom-in-95 duration-200">
             {/* Close */}
             <button

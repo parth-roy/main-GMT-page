@@ -51,6 +51,9 @@ function generateSitemaps() {
 
   const sitemapFiles = [];
 
+  // W3C date format (YYYY-MM-DD) — required by Google/Bing for valid <lastmod>
+  const today = new Date().toISOString().split('T')[0];
+
   for (const [category, routes] of Object.entries(categories)) {
     if (routes.length === 0) continue;
 
@@ -63,7 +66,7 @@ function generateSitemaps() {
     routes.forEach(route => {
       xml += `  <url>\n`;
       xml += `    <loc>${BASE_URL}${route}</loc>\n`;
-      xml += `    <lastmod>\${new Date().toISOString()}</lastmod>\n`;
+      xml += `    <lastmod>${today}</lastmod>\n`;
       xml += `  </url>\n`;
     });
 
@@ -82,6 +85,7 @@ function generateSitemaps() {
   sitemapFiles.forEach(file => {
     indexXml += `  <sitemap>\n`;
     indexXml += `    <loc>${BASE_URL}/${file}</loc>\n`;
+    indexXml += `    <lastmod>${today}</lastmod>\n`;
     indexXml += `  </sitemap>\n`;
   });
   

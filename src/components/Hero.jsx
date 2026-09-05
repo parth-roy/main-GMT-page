@@ -1,8 +1,8 @@
-﻿import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { MapPin, ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp, Loader2, Star } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import CitySelectorModal from "./CitySelectorModal"
-import { detectCurrentCity } from "../api/pricingApi"
+import { detectCurrentCity, getPersistedCity, setPersistedCity } from "../api/pricingApi"
 
 export default function Hero({ 
   selectedService, 
@@ -37,28 +37,17 @@ export default function Hero({
     window.addEventListener("gomytruck:city_change", handleCityChange);
 
     if (slug) {
-      const formatted = slug.charAt(0).toUpperCase() + slug.slice(1).replace("-", " ");
+      // We are on a city SEO page (e.g. /kolkata). Display that city on THIS page.
+      const formatted = slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " ");
       setDetectedCity(formatted);
       setCityDetecting(false);
-      if (typeof window !== "undefined") {
-        try {
-          localStorage.setItem("gomytruck_selected_city", JSON.stringify({ name: formatted, slug }));
-        } catch {}
+      // Only persist to localStorage if user has NO stored city preference yet.
+      // Never overwrite a user's existing choice just because they navigated to a city URL.
+      if (!getPersistedCity()) {
+        setPersistedCity(formatted, slug);
       }
     } else {
-      if (typeof window !== "undefined") {
-        try {
-          const cached = localStorage.getItem("gomytruck_selected_city");
-          if (cached) {
-            const parsed = JSON.parse(cached);
-            if (parsed?.name) {
-              setDetectedCity(parsed.name);
-              setCityDetecting(false);
-              return () => window.removeEventListener("gomytruck:city_change", handleCityChange);
-            }
-          }
-        } catch {}
-      }
+      // Not a city slug page — use stored preference or auto-detect
       detectCurrentCity().then((detected) => {
         setDetectedCity(detected);
         setCityDetecting(false);
