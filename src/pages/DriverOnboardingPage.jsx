@@ -120,8 +120,8 @@ export default function DriverOnboardingPage() {
   // Generate UPI QR Code on demand
   useEffect(() => {
     if (isPaymentModalOpen) {
-      const upiUrl = `upi://pay?pa=rzppay@icici&pn=GoMyTruck&am=1&cu=INR&tn=${encodeURIComponent(
-        "Driver Onboarding Fee 1"
+      const upiUrl = `upi://pay?pa=rzppay@icici&pn=GoMyTruck&am=99&cu=INR&tn=${encodeURIComponent(
+        "Driver Onboarding Fee 99"
       )}`;
       QRCode.toDataURL(upiUrl, {
         width: 320,
@@ -264,7 +264,7 @@ export default function DriverOnboardingPage() {
 
       const options = {
         key: liveKey,
-        amount: amount || 100,
+        amount: amount || 9900,
         currency: currency || "INR",
         name: "GoMyTruck",
         description: "Driver Onboarding Fee & 90-Day Premium Membership",
@@ -707,7 +707,7 @@ export default function DriverOnboardingPage() {
                 <span>Driver Partner Verification & Membership</span>
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
-                Complete ₹1 Onboarding
+                Complete ₹99 Onboarding
               </h3>
               <p className="text-xs text-slate-600 mt-0.5">
                 For <strong>{formData.name || "Driver"}</strong> · +91 {formData.phone}
@@ -766,7 +766,7 @@ export default function DriverOnboardingPage() {
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
                 <div className="flex justify-between items-center text-slate-900 font-black text-sm">
                   <span>90-Day Premium Driver Membership</span>
-                  <span className="text-emerald-700 text-base font-black">₹1.00</span>
+                  <span className="text-emerald-700 text-base font-black">₹99.00</span>
                 </div>
                 <div className="flex justify-between items-center text-xs text-slate-500">
                   <span>Operating District / Hub</span>
@@ -780,7 +780,7 @@ export default function DriverOnboardingPage() {
                 </div>
                 <div className="border-t border-slate-200 pt-2 flex justify-between items-center text-xs">
                   <span className="text-slate-700 font-bold">Total Amount Payable</span>
-                  <span className="text-slate-900 font-black text-base">₹1.00</span>
+                  <span className="text-slate-900 font-black text-base">₹99.00</span>
                 </div>
               </div>
 
@@ -817,7 +817,7 @@ export default function DriverOnboardingPage() {
                     ) : (
                       <>
                         <Zap className="w-5 h-5 fill-current animate-bounce shrink-0" />
-                        <span>Pay ₹1 via Razorpay Checkout</span>
+                        <span>Pay ₹99 via Razorpay Checkout</span>
                         <ArrowRight className="w-4 h-4 shrink-0" />
                       </>
                     )}
@@ -838,7 +838,7 @@ export default function DriverOnboardingPage() {
                       {qrCodeUrl ? (
                         <img
                           src={qrCodeUrl}
-                          alt="₹1 Onboarding UPI QR Code"
+                          alt="₹99 Onboarding UPI QR Code"
                           className="w-full h-full object-contain"
                         />
                       ) : (
