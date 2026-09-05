@@ -100,7 +100,7 @@ export default function PartnerHero({ isFleetOwner = false }) {
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[92%] max-w-lg sm:max-w-xl md:max-w-2xl cursor-pointer group"
           onClick={() => navigate('/driver-onboarding')}
           role="button"
-          aria-label={isFleetOwner ? "Attach your fleet to GoMyTruck" : "Attach your vehicle to GoMyTruck"}
+          aria-label={isFleetOwner ? "Attach your truck to GoMyTruck" : "Attach your vehicle to GoMyTruck"}
         >
           {/* Ambient Breathing Warm Glow Halo */}
           <div className="absolute -inset-1 sm:-inset-1.5 rounded-3xl bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 opacity-70 blur-md group-hover:opacity-100 group-hover:blur-lg transition-all duration-500" />
@@ -115,14 +115,14 @@ export default function PartnerHero({ isFleetOwner = false }) {
             {/* Top Category Badge */}
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm mb-3 sm:mb-3.5 animate-pulse">
               <Zap className="w-3.5 h-3.5 fill-current animate-bounce" />
-              <span>{isFleetOwner ? "Fleet Partner Network · Attach & Grow" : "Driver Partner Program · Zero Commission"}</span>
+              <span>{isFleetOwner ? "Truck Partner Network · Attach & Grow" : "Driver Partner Program · Zero Commission"}</span>
             </div>
 
             {/* Main Headline */}
             <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-black text-slate-900 tracking-tight leading-snug">
               {isFleetOwner ? (
                 <>
-                  Attach Your Fleet &{" "}
+                  Attach Your Truck &{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700">
                     Grow Your Transport Business
                   </span>
@@ -166,7 +166,7 @@ export default function PartnerHero({ isFleetOwner = false }) {
                   </span>
                   <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-amber-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-2xs">
                     <Truck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                    24/7 Fleet Support
+                    24/7 Truck Support
                   </span>
                 </>
               ) : (
@@ -191,7 +191,7 @@ export default function PartnerHero({ isFleetOwner = false }) {
             <div className="mt-5 sm:mt-6 flex flex-col items-center gap-2.5">
               <span className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm sm:text-base md:text-lg px-8 py-3.5 sm:py-4 rounded-2xl transition-all shadow-xl shadow-amber-300/80 hover:shadow-2xl hover:scale-105 active:scale-95 text-center">
                 <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-current animate-bounce" />
-                <span>{isFleetOwner ? "Attach Fleet Now" : "Attach Vehicle & Join Now"}</span>
+                <span>{isFleetOwner ? "Attach Truck Now" : "Attach Vehicle & Join Now"}</span>
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1.5 transition-transform" />
               </span>
               <div className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-500">
