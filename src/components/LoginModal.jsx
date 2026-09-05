@@ -49,8 +49,11 @@ export default function LoginModal() {
     try {
       const res = await sendOtp(phone)
       
-      // Temporary SMS bypass: Auto-fill OTP with 123456 if SMS gateway is not active
-      const receivedDevOtp = (res.data && res.data._devOtp) ? res.data._devOtp : "123456"
+      // Auto-fill OTP with received random dev OTP
+      const fallbackOtp = Math.floor(100000 + Math.random() * 900000).toString()
+      const receivedDevOtp = (res?.data && (res.data._devOtp || res.data.otp)) 
+        ? String(res.data._devOtp || res.data.otp) 
+        : fallbackOtp
       
       setDevOtp(receivedDevOtp)
       // Auto-fill OTP

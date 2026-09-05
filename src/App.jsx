@@ -5,6 +5,7 @@ import Footer from "./components/Footer"
 import GlobalFABs from "./components/GlobalFABs"
 import RouteAnalytics from "./components/RouteAnalytics"
 import LoginModal from "./components/LoginModal"
+import DriverPremiumWelcomeModal from "./components/driver/DriverPremiumWelcomeModal"
 
 import Home from "./pages/Home"
 
@@ -337,6 +338,9 @@ export default function App() {
       
       {/* Global Authentication Modal */}
       <LoginModal />
+
+      {/* Driver 90-Day Premium Membership Welcome Alert */}
+      <DriverPremiumWelcomeModal />
     </div>
   )
 }
