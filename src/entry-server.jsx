@@ -5,6 +5,7 @@ import { StaticRouter } from "react-router-dom"
 import { HelmetProvider } from "react-helmet-async"
 import App from "./App.jsx"
 import { AuthProvider } from "./context/AuthContext.jsx"
+import { CityProvider } from "./context/CityContext.jsx"
 
 export function render(url) {
   return new Promise((resolve, reject) => {
@@ -18,7 +19,9 @@ export function render(url) {
         <HelmetProvider context={helmetContext}>
           <StaticRouter location={url}>
             <AuthProvider>
-              <App />
+              <CityProvider>
+                <App />
+              </CityProvider>
             </AuthProvider>
           </StaticRouter>
         </HelmetProvider>

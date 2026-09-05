@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Plus, Minus, MessageCircleQuestion } from 'lucide-react';
+import { useCity } from '../context/CityContext';
+import { generateCityFaqs } from '../lib/locationFaqHelper';
 
-const faqs = [
+// Base fallback FAQs for Kolkata/Eastern India
+const defaultFaqs = [
   {
     question: "How do I book a truck online with GoMyTruck?",
     answer: "Enter the pickup and drop addresses, select a suitable vehicle, declare the goods and any workforce requirement, and review the current estimate. When you confirm, GoMyTruck creates the booking and begins looking for an eligible partner. Assignment and arrival times depend on route, vehicle, and partner availability."
@@ -13,7 +16,7 @@ const faqs = [
   },
   {
     question: "Does GoMyTruck offer mini truck booking near me?",
-    answer: "GoMyTruck currently publishes service information for Kolkata, Barrackpore, Howrah, Salt Lake, New Town, and supported routes from West Bengal. Submit the exact addresses to check route serviceability; a listed area does not guarantee that a particular vehicle is immediately available."
+    answer: "GoMyTruck currently publishes service information for major Indian logistics corridors and supported routes. Submit the exact addresses to check route serviceability; a listed area does not guarantee that a particular vehicle is immediately available."
   },
   {
     question: "What are Full Truck Load (FTL) transport services?",
@@ -40,27 +43,38 @@ const faqs = [
     answer: "You can submit a same-day requirement, but acceptance and dispatch depend on the pickup area, vehicle type, goods, partner availability, and route conditions. Confirm the assigned partner and arrival details before relying on a delivery schedule."
   },
   {
-    question: "Is GoMyTruck available for goods transport in West Bengal and Barrackpore?",
-    answer: "GoMyTruck is based in Barrackpore and publishes local service pages for Barrackpore, Kolkata, Howrah, Salt Lake, and New Town, plus selected route pages. Actual serviceability and vehicle availability are checked for the submitted pickup, destination, date, and goods."
+    question: "Is GoMyTruck available for goods transport across Indian cities?",
+    answer: "GoMyTruck operates an on-demand freight network spanning major commercial and industrial hubs across India. Actual serviceability and vehicle availability are checked for the submitted pickup, destination, date, and goods."
   }
 ];
 
-// FAQPage JSON-LD Schema for Google rich results
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqs.map(faq => ({
-    "@type": "Question",
-    "name": faq.question,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": faq.answer
-    }
-  }))
-};
-
-export default function FAQ() {
+export default function FAQ({ city: propCity }) {
   const [openIndex, setOpenIndex] = useState(null);
+  const { currentCity } = useCity();
+
+  const activeCity = propCity || currentCity || { name: "Kolkata", slug: "kolkata", state: "West Bengal" };
+
+  const dynamicData = React.useMemo(() => {
+    try {
+      const gen = generateCityFaqs(activeCity, "hub");
+      if (gen?.faqs?.length) return gen;
+    } catch {}
+    return {
+      faqs: defaultFaqs,
+      jsonLdSchema: {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: defaultFaqs.map((f) => ({
+          "@type": "Question",
+          name: f.question,
+          acceptedAnswer: { "@type": "Answer", text: f.answer },
+        })),
+      },
+    };
+  }, [activeCity?.name, activeCity?.slug]);
+
+  const activeFaqs = dynamicData.faqs;
+  const faqSchema = dynamicData.jsonLdSchema;
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -81,19 +95,19 @@ export default function FAQ() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-100/50 border border-brand-200 text-brand-700 text-xs font-bold tracking-widest uppercase mb-4">
               <MessageCircleQuestion size={14} />
-              Support &amp; FAQs
+              Support &amp; FAQs · {activeCity.name}
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-slate-900 tracking-tight mb-4">
-              Frequently Asked <span className="text-brand-600">Questions</span>
+              Frequently Asked <span className="text-brand-600">Questions in {activeCity.name}</span>
             </h2>
             <p className="text-slate-600 font-light text-lg max-w-2xl mx-auto">
-              Everything you need to know about online truck booking, mini truck hire, Tata Ace rent, FTL transport, and goods transport services with GoMyTruck.
+              Everything you need to know about online truck booking, mini truck hire, Tata Ace rent, FTL transport, and goods transport in {activeCity.name} with GoMyTruck.
             </p>
           </div>
 
           {/* FAQ Accordion */}
           <div className="space-y-0">
-            {faqs.map((faq, index) => {
+            {activeFaqs.map((faq, index) => {
               const isOpen = openIndex === index;
               
               return (

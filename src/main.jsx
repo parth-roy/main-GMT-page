@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom"
 import { HelmetProvider } from "react-helmet-async"
 import App from "./App.jsx"
 import { AuthProvider } from "./context/AuthContext.jsx"
+import { CityProvider } from "./context/CityContext.jsx"
 import "./index.css"
 
 const rootElement = document.getElementById("root")
@@ -12,7 +13,9 @@ const app = (
     <HelmetProvider>
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <CityProvider>
+            <App />
+          </CityProvider>
         </AuthProvider>
       </BrowserRouter>
     </HelmetProvider>

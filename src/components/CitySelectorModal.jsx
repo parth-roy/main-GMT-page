@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search, MapPin, X } from "lucide-react";
+import { Search, MapPin, X, Navigation, Loader2 } from "lucide-react";
 import { SEO_CITIES } from "../lib/cities";
 import { CITY_HERO_IMAGES } from "../api/pricingApi";
+import { useCity } from "../context/CityContext";
 
 const TOP_CITIES = [
   { name: "Mumbai", slug: "mumbai", image: "/cities/mumbai.webp" },
@@ -24,8 +25,10 @@ const TOP_CITIES = [
 
 export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [detectingLoc, setDetectingLoc] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentCity, setCity, detectLocation } = useCity();
 
   useEffect(() => {
     if (isOpen) {
@@ -41,44 +44,40 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
   if (!isOpen) return null;
 
   const handleCitySelect = (citySlug, cityName) => {
-    const finalName = cityName || citySlug.charAt(0).toUpperCase() + citySlug.slice(1).replace(/-/g, " ");
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("gomytruck_selected_city", JSON.stringify({ name: finalName, slug: citySlug }));
-        window.dispatchEvent(new CustomEvent("gomytruck:city_change", { detail: { name: finalName, slug: citySlug } }));
-      } catch (e) {
-        // ignore
-      }
-    }
+    const matched = SEO_CITIES.find(
+      (c) => c.slug === citySlug || c.name.toLowerCase() === (cityName || "").toLowerCase()
+    );
+    const finalName =
+      matched?.name || cityName || citySlug.charAt(0).toUpperCase() + citySlug.slice(1).replace(/-/g, " ");
+    
+    const cityObj = {
+      name: finalName,
+      slug: citySlug,
+      state: matched?.state || "India",
+      region: matched?.state || "India",
+    };
+
+    setCity(cityObj, true);
 
     if (onCitySelect) {
       onCitySelect(finalName, citySlug);
-      onClose();
-      return;
-    }
-
-    // Current pathname could be:
-    // / (home)
-    // /kolkata (city hub)
-    // /kolkata/truck-booking (city service)
-    // /driver-onboarding (global page)
-    
-    const citySlugs = SEO_CITIES.map((c) => c.slug);
-    const parts = location.pathname.split("/").filter(Boolean);
-    
-    if (parts.length === 0) {
-      // Home page -> go to city hub
-      navigate(`/${citySlug}`);
-    } else if (citySlugs.includes(parts[0])) {
-      // We are on a city page. Replace the first part (the city slug).
-      parts[0] = citySlug;
-      navigate(`/${parts.join("/")}`);
-    } else {
-      // We are on a global page (e.g. /contact, /truck). 
-      // Redirect to the city hub to ensure they see the localized view.
-      navigate(`/${citySlug}`);
     }
     onClose();
+  };
+
+  const handleAutoDetectClick = async () => {
+    setDetectingLoc(true);
+    try {
+      const detected = await detectLocation(true);
+      if (detected && onCitySelect) {
+        onCitySelect(detected.name, detected.slug);
+      }
+      onClose();
+    } catch {
+      // ignore
+    } finally {
+      setDetectingLoc(false);
+    }
   };
 
   const filteredCities = SEO_CITIES.filter((c) =>
@@ -133,6 +132,27 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Quick Auto-Detect Button */}
+          <div className="mb-4">
+            <button
+              onClick={handleAutoDetectClick}
+              disabled={detectingLoc}
+              className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl font-bold text-sm transition-all hover:shadow-sm"
+            >
+              {detectingLoc ? (
+                <>
+                  <Loader2 size={16} className="animate-spin text-emerald-600" />
+                  <span>Detecting your current location...</span>
+                </>
+              ) : (
+                <>
+                  <Navigation size={16} className="text-emerald-600" />
+                  <span>Auto-Detect Current Location (Current: <strong className="ml-1 text-emerald-900">{currentCity.name}</strong>)</span>
+                </>
+              )}
+            </button>
           </div>
 
           {/* Search Bar */}

@@ -1,7 +1,9 @@
 import React, { useState } from "react"
 import { Sparkles, Navigation, Dumbbell, ShieldAlert, BadgeCent } from "lucide-react"
+import { useCity } from "../context/CityContext"
 
 export default function Services({ onSelectVehicle }) {
+  const { currentCity } = useCity()
   const [filterWeight, setFilterWeight] = useState(500)
   const [filterDistance, setFilterDistance] = useState(15)
 
@@ -97,11 +99,11 @@ export default function Services({ onSelectVehicle }) {
             <span>Versatile Fleet</span>
           </div>
           <h2 className="text-4xl sm:text-5xl font-display font-extrabold text-slate-900 tracking-tight leading-tight">
-            Our Transport Fleet For Every Business & Shifting Need
+            Our Transport Fleet in {currentCity.name} For Every Business &amp; Shifting Need
           </h2>
           <div className="w-20 h-1.5 bg-brand-500 mx-auto rounded-full"></div>
           <p className="text-slate-600 font-medium text-lg sm:text-xl">
-            Compare indicative load capacities, then enter the route and goods declaration to check current serviceability and pricing.
+            Compare indicative load capacities across {currentCity.name} and {currentCity.state || "India"}, then enter the route and goods declaration to check current serviceability and pricing.
           </p>
         </div>
 

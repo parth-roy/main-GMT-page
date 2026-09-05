@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { MapPin, ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp, Loader2, Star } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import CitySelectorModal from "./CitySelectorModal"
-import { detectCurrentCity, getPersistedCity, setPersistedCity } from "../api/pricingApi"
+import { useCity } from "../context/CityContext"
 
 export default function Hero({ 
   selectedService, 
@@ -14,8 +14,7 @@ export default function Hero({
   const [cityOpen, setCityOpen] = useState(false)
   const { city: slug } = useParams()
   
-  const [detectedCity, setDetectedCity] = useState("Kolkata")
-  const [cityDetecting, setCityDetecting] = useState(true)
+  const { currentCity, isDetecting: cityDetecting, setCity } = useCity()
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -28,36 +27,11 @@ export default function Hero({
   }, [])
 
   useEffect(() => {
-    const handleCityChange = (e) => {
-      if (e?.detail?.name) {
-        setDetectedCity(e.detail.name);
-        setCityDetecting(false);
-      }
-    };
-    window.addEventListener("gomytruck:city_change", handleCityChange);
-
     if (slug) {
-      // We are on a city SEO page (e.g. /kolkata). Display that city on THIS page.
-      const formatted = slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " ");
-      setDetectedCity(formatted);
-      setCityDetecting(false);
-      // Only persist to localStorage if user has NO stored city preference yet.
-      // Never overwrite a user's existing choice just because they navigated to a city URL.
-      if (!getPersistedCity()) {
-        setPersistedCity(formatted, slug);
-      }
-    } else {
-      // Not a city slug page — use stored preference or auto-detect
-      detectCurrentCity().then((detected) => {
-        setDetectedCity(detected);
-        setCityDetecting(false);
-      });
+      // If on a specific city SEO URL (e.g. /kolkata), sync it without permanent manual override
+      setCity(slug, false)
     }
-
-    return () => window.removeEventListener("gomytruck:city_change", handleCityChange);
-  }, [slug]);
-
-  const currentCity = detectedCity
+  }, [slug, setCity])
 
   
   const services = [
@@ -138,11 +112,11 @@ export default function Hero({
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto drop-shadow-lg">
-            Online Truck Booking &amp; Goods Transport in Kolkata
+            Online Truck Booking &amp; Goods Transport in {currentCity.name}
           </h1>
 
           <p className="mt-5 text-xl sm:text-2xl font-bold text-slate-200 max-w-2xl mx-auto leading-relaxed">
-            Connect directly with verified trucks across Eastern India.{" "}
+            Connect directly with verified trucks across {currentCity.state || currentCity.region || "India"}.{" "}
             <span className="text-brand-300">No brokers. No surge pricing. No hidden fees.</span>
           </p>
 
@@ -174,7 +148,7 @@ export default function Hero({
                   </span>
                 ) : (
                   <>
-                    <span>City: <strong className="text-brand-700">{currentCity}</strong></span>
+                    <span>City: <strong className="text-brand-700">{currentCity.name}</strong></span>
                     <span className="text-xs text-brand-500 font-medium ml-1 underline underline-offset-2">Change</span>
                   </>
                 )}
@@ -218,7 +192,7 @@ export default function Hero({
                   <p className="flex items-center gap-2"><span>📞</span><span>Get <strong>10 direct driver numbers</strong> instantly</span></p>
                   <p className="flex items-center gap-2"><span>✅</span><span><strong>Commercial DL &amp; RC verified</strong></span></p>
                   <p className="flex items-center gap-2"><span>💰</span><span>Save <strong>₹500–₹2000</strong> broker cut</span></p>
-                  <p className="flex items-center gap-2"><span>📍</span><span>Available in <strong>{currentCity}</strong></span></p>
+                  <p className="flex items-center gap-2"><span>📍</span><span>Available in <strong>{currentCity.name}</strong></span></p>
                 </div>
                 <div className="flex justify-end sm:justify-center pr-6 sm:pr-0">
                   <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-slate-900" />
@@ -363,7 +337,7 @@ export default function Hero({
       <CitySelectorModal
         isOpen={cityOpen}
         onClose={() => setCityOpen(false)}
-        onCitySelect={(name) => setDetectedCity(name)}
+        onCitySelect={(name, slug) => setCity({ name, slug }, true)}
       />
     </>
   )

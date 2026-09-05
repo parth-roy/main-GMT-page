@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { Send, BadgeCheck, ShieldCheck, MapPin, X } from "lucide-react"
+import { Send, BadgeCheck, ShieldCheck, MapPin, X, Zap, ArrowRight, Truck } from "lucide-react"
 import { trackFleetRegistration } from "../utils/analytics"
 import { useAuth } from "../context/AuthContext"
 
@@ -95,25 +95,111 @@ export default function PartnerHero({ isFleetOwner = false }) {
           <div className="absolute inset-0 bg-slate-900/40"></div>
         </div>
 
-        {/* Bouncing Map Pin — centred perfectly in the middle */}
+        {/* Wide Glowing Interactive Join Card — Centred perfectly in the hero */}
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-1 cursor-pointer group"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[92%] max-w-lg sm:max-w-xl md:max-w-2xl cursor-pointer group"
           onClick={() => navigate('/driver-onboarding')}
           role="button"
-          aria-label="Join our driver network"
+          aria-label={isFleetOwner ? "Attach your fleet to GoMyTruck" : "Attach your vehicle to GoMyTruck"}
         >
-          {/* Pulse ring */}
-          <span className="absolute -inset-3 rounded-full bg-orange-500/20 animate-ping group-hover:bg-orange-500/30" />
+          {/* Ambient Breathing Warm Glow Halo */}
+          <div className="absolute -inset-1 sm:-inset-1.5 rounded-3xl bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 opacity-70 blur-md group-hover:opacity-100 group-hover:blur-lg transition-all duration-500" />
 
-          {/* Pin button */}
-          <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-orange-500 shadow-xl shadow-orange-500/40 flex items-center justify-center animate-bounce group-hover:scale-110 transition-transform">
-            <MapPin size={26} className="text-white" />
+          {/* Warm Amber/Orange Promotional Card Container */}
+          <div className="relative overflow-hidden rounded-3xl border-2 border-amber-300/90 bg-gradient-to-br from-amber-50/95 via-orange-50/95 to-amber-100/95 backdrop-blur-md p-6 sm:p-8 text-center shadow-2xl shadow-amber-500/25 group-hover:shadow-amber-500/40 group-hover:border-amber-400 transition-all duration-500">
+            
+            {/* Decorative Corner Glow Blobs */}
+            <div className="absolute top-0 right-0 -mt-6 -mr-6 w-36 sm:w-44 h-36 sm:h-44 rounded-full bg-gradient-to-br from-amber-300/35 to-orange-300/25 blur-2xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 -mb-6 -ml-6 w-36 sm:w-44 h-36 sm:h-44 rounded-full bg-gradient-to-tr from-yellow-300/35 to-amber-200/35 blur-2xl pointer-events-none" />
+
+            {/* Top Category Badge */}
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm mb-3 sm:mb-3.5 animate-pulse">
+              <Zap className="w-3.5 h-3.5 fill-current animate-bounce" />
+              <span>{isFleetOwner ? "Fleet Partner Network · Attach & Grow" : "Driver Partner Program · Zero Commission"}</span>
+            </div>
+
+            {/* Main Headline */}
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-black text-slate-900 tracking-tight leading-snug">
+              {isFleetOwner ? (
+                <>
+                  Attach Your Fleet &{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700">
+                    Grow Your Transport Business
+                  </span>
+                </>
+              ) : (
+                <>
+                  Attach Your Vehicle &{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700">
+                    Start Earning Daily
+                  </span>
+                </>
+              )}
+            </h2>
+
+            {/* Description */}
+            <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm md:text-base text-slate-700 leading-relaxed max-w-xl mx-auto font-medium">
+              {isFleetOwner ? (
+                <>
+                  Connect your 14ft, 20ft, 32ft container trucks, Tata Ace, or pickups directly to verified industrial consignors across India.{" "}
+                  <strong className="text-emerald-700 font-bold">0% broker cuts</strong>, high-frequency loads, and guaranteed digital settlements.
+                </>
+              ) : (
+                <>
+                  Attach your Tata Ace, Mahindra Bolero, Pickup, or Truck. Get direct verified booking leads in your local hub,{" "}
+                  <strong className="text-emerald-700 font-bold">0% commission deductions</strong>, and fast on-time payouts.
+                </>
+              )}
+            </p>
+
+            {/* Trust Badges Row */}
+            <div className="mt-4 sm:mt-5 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+              {isFleetOwner ? (
+                <>
+                  <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-amber-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-2xs">
+                    <BadgeCheck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    Pan-India Verified Loads
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-amber-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-2xs">
+                    <Zap className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    Direct Consignor Rates
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-amber-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-2xs">
+                    <Truck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    24/7 Fleet Support
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-amber-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-2xs">
+                    <BadgeCheck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    0% Commission Cut
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-amber-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-2xs">
+                    <Zap className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    Instant Trip Settlement
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-amber-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-2xs">
+                    <Truck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    Direct Customer Bookings
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Action CTA Button & Status */}
+            <div className="mt-5 sm:mt-6 flex flex-col items-center gap-2.5">
+              <span className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm sm:text-base md:text-lg px-8 py-3.5 sm:py-4 rounded-2xl transition-all shadow-xl shadow-amber-300/80 hover:shadow-2xl hover:scale-105 active:scale-95 text-center">
+                <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-current animate-bounce" />
+                <span>{isFleetOwner ? "Attach Fleet Now" : "Attach Vehicle & Join Now"}</span>
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1.5 transition-transform" />
+              </span>
+              <div className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-500">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>{isFleetOwner ? "Direct consignor loads · 0% broker fee · Instant activation" : "Instant verification · 0% commission cut · Daily payouts"}</span>
+              </div>
+            </div>
           </div>
-
-          {/* Small label below pin */}
-          <span className="mt-1 bg-white text-orange-600 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full shadow-md whitespace-nowrap transition-opacity duration-200">
-            Join Now
-          </span>
         </div>
       </section>
 
