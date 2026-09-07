@@ -3,13 +3,14 @@ import { useNavigate } from "react-router-dom"
 import { Send, BadgeCheck, ShieldCheck, MapPin, X, Zap, ArrowRight, Truck } from "lucide-react"
 import { trackFleetRegistration } from "../utils/analytics"
 import { useAuth } from "../context/AuthContext"
+import { VEHICLE_CATEGORIES } from "../constants/vehicleOptions"
 
 export default function PartnerHero({ isFleetOwner = false }) {
   const navigate = useNavigate();
   const [driverName, setDriverName] = useState("")
   const [driverPhone, setDriverPhone] = useState("")
   const [driverCity, setDriverCity] = useState("")
-  const [vehicleType, setDriverVehicle] = useState("Tata Ace")
+  const [vehicleType, setDriverVehicle] = useState("Tata Ace / Chota Hathi (750 kg)")
   const [isRegistered, setIsRegistered] = useState(false)
   const [regError, setRegError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -309,13 +310,17 @@ export default function PartnerHero({ isFleetOwner = false }) {
                       <select
                         value={vehicleType}
                         onChange={(e) => setDriverVehicle(e.target.value)}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg py-2.5 px-3 text-sm text-white focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400 transition-all cursor-pointer appearance-none"
+                        className="w-full bg-slate-800 border border-slate-700 rounded-lg py-2.5 px-3 text-sm text-white focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400 transition-all cursor-pointer"
                       >
-                        <option className="bg-slate-800" value="Two Wheeler">Bike</option>
-                        <option className="bg-slate-800" value="3-Wheeler Auto">3-Wheeler Auto</option>
-                        <option className="bg-slate-800" value="Tata Ace">Tata Ace</option>
-                        <option className="bg-slate-800" value="Bolero Pickup">Bolero Pickup</option>
-                        <option className="bg-slate-800" value="Eicher / Heavy">Heavy Truck</option>
+                        {VEHICLE_CATEGORIES.map((cat) => (
+                          <optgroup key={cat.category} label={cat.category} className="bg-slate-900 text-slate-400 font-bold">
+                            {cat.options.map((opt) => (
+                              <option key={opt.value} value={opt.label} className="bg-slate-800 text-white font-normal">
+                                {opt.label}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
                       </select>
                     </div>
                   </div>

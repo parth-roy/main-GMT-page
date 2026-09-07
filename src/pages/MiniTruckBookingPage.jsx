@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { Link } from "react-router-dom"
 import { ArrowRight, CheckCircle, Package, Truck } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
 import TruckHero from "../components/truck/TruckHero"
 import TruckFAQ from "../components/truck/TruckFAQ"
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
+import { useCity } from "../context/CityContext"
 
 const schema = [
   {
@@ -12,9 +13,9 @@ const schema = [
     "@type": "Service",
     "name": "Mini Truck Booking — GoMyTruck",
     "provider": { "@type": "Organization", "name": "GoMyTruck", "url": "https://gomytruck.com" },
-    "areaServed": "Kolkata, India",
+    "areaServed": "India",
     "serviceType": "Mini Truck Booking, 3-Wheeler Rental, Tata Ace on Rent",
-    "description": "Request a mini truck, Tata Ace, or 3-wheeler in Kolkata. Declare the load and review a route-based estimate and current availability before confirming."
+    "description": "Request a mini truck, Tata Ace, or 3-wheeler. Declare the load and review a route-based estimate and current availability before confirming."
   },
   {
     "@context": "https://schema.org",
@@ -43,7 +44,7 @@ const vehicles = [
 ]
 
 const useCases = [
-  "House shifting within Kolkata",
+  "House shifting and apartment moves",
   "Furniture & appliance delivery",
   "Shop/store stock transport",
   "E-commerce last-mile delivery",
@@ -52,16 +53,19 @@ const useCases = [
 ]
 
 export default function MiniTruckBookingPage() {
-  const [city, setCity] = useState("Kolkata")
+  const { currentCity, setCity: setGlobalCity } = useCity()
+  const city = currentCity.name
+  const setCity = (c) => setGlobalCity(c)
+
   useEffect(() => { window.scrollTo(0, 0) }, [])
 
   return (
     <div className="bg-white min-h-screen font-sans">
       <SEOHead
-        title="Mini Truck Booking Near Me in Kolkata | 3-Wheeler & Tata Ace on Rent"
-        description="Request a mini truck in Kolkata for eligible small goods, furniture, or business deliveries. Check load fit, route-based pricing, and current availability before confirming."
+        title={`Mini Truck Booking Near Me in ${city} | 3-Wheeler & Tata Ace on Rent`}
+        description={`Request a mini truck in ${city} for eligible small goods, furniture, or business deliveries. Check load fit, route-based pricing, and current availability before confirming.`}
         canonical="/mini-truck-booking"
-        keywords="mini truck booking near me, mini truck booking Kolkata, tata ace on rent, tata ace booking near me, chhota hathi booking, 3 wheeler tempo booking, small truck for rent, tempo booking near me, mini truck rent per km, light commercial vehicle booking, small goods vehicle booking Kolkata"
+        keywords={`mini truck booking near me, mini truck booking ${city}, tata ace on rent, tata ace booking near me, chhota hathi booking, 3 wheeler tempo booking, small truck for rent, tempo booking near me, mini truck rent per km, light commercial vehicle booking, small goods vehicle booking ${city}`}
         jsonLd={schema}
       />
 
@@ -86,7 +90,7 @@ export default function MiniTruckBookingPage() {
               Our <span className="text-brand-600">Mini Trucks</span> Available Near You
             </h2>
             <p className="text-slate-600 text-lg max-w-xl mx-auto">
-              Perfect for light to medium loads within Kolkata and nearby areas.
+              Perfect for light to medium loads within {city} and nearby areas.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
@@ -149,7 +153,7 @@ export default function MiniTruckBookingPage() {
         </div>
       </section>
 
-      <TruckFAQ city="Kolkata" />
+      <TruckFAQ city={city} />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect } from "react"
 import TruckHero from "../components/truck/TruckHero"
 import VehicleSelection from "../components/truck/VehicleSelection"
 import PopularRoutes from "../components/truck/PopularRoutes"
@@ -11,9 +11,12 @@ import TruckFAQ from "../components/truck/TruckFAQ"
 import SEOHead from "../seo/SEOHead"
 import { CITY_HERO_IMAGES } from "../api/pricingApi"
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
+import { useCity } from "../context/CityContext"
 
 export default function TruckPage() {
-  const [city, setCity] = useState("Kolkata")
+  const { currentCity, setCity: setGlobalCity } = useCity()
+  const city = currentCity.name
+  const setCity = (c) => setGlobalCity(c)
 
   useEffect(() => {
     window.scrollTo(0, 0)

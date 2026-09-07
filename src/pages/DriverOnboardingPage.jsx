@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import SEOHead from "../seo/SEOHead";
 import LocationPicker from "../components/LocationPicker";
+import { VEHICLE_CATEGORIES, getVehicleLabel } from "../constants/vehicleOptions";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -461,7 +462,7 @@ export default function DriverOnboardingPage() {
             </div>
             <p className="text-xs text-amber-900 font-medium leading-relaxed">
               Priority load allocation is now active for your vehicle (
-              <strong>{formData.vehicleType}</strong>) across your registered
+              <strong>{getVehicleLabel(formData.vehicleType)}</strong>) across your registered
               operating location.
             </p>
             <div className="flex items-center justify-between text-xs pt-1 border-t border-amber-200/60 text-amber-900 font-bold">
@@ -617,14 +618,23 @@ export default function DriverOnboardingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle Type *</label>
-                <select required name="vehicleType" value={formData.vehicleType} onChange={handleInputChange} className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 py-2 px-3 border">
+                <select
+                  required
+                  name="vehicleType"
+                  value={formData.vehicleType}
+                  onChange={handleInputChange}
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 py-2 px-3 border bg-white cursor-pointer"
+                >
                   <option value="">Select vehicle type...</option>
-                  <option value="TATA_ACE">Tata Ace / Chota Hathi</option>
-                  <option value="BOLERO_PICKUP">Pickup 8ft (Bolero etc.)</option>
-                  <option value="TRUCK_14FT">14ft Truck</option>
-                  <option value="TRUCK_17FT">17ft Truck</option>
-                  <option value="TRUCK_20FT">20ft Truck</option>
-                  <option value="CONTAINER_32FT">32ft Container</option>
+                  {VEHICLE_CATEGORIES.map((cat) => (
+                    <optgroup key={cat.category} label={cat.category}>
+                      {cat.options.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
                 </select>
               </div>
               <div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect } from "react"
 import BikeHero from "../components/bike/BikeHero"
 import BikeVehicleSelection from "../components/bike/BikeVehicleSelection"
 import BikePopularRoutes from "../components/bike/BikePopularRoutes"
@@ -10,9 +10,12 @@ import InternalLinks from "../components/truck/InternalLinks"
 import BikeFAQ from "../components/bike/BikeFAQ"
 import SEOHead from "../seo/SEOHead"
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
+import { useCity } from "../context/CityContext"
 
 export default function BikePage() {
-  const [city, setCity] = useState("Kolkata")
+  const { currentCity, setCity: setGlobalCity } = useCity()
+  const city = currentCity.name
+  const setCity = (c) => setGlobalCity(c)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -21,8 +24,8 @@ export default function BikePage() {
   return (
     <div className="bg-slate-50 min-h-screen font-sans w-full">
       <SEOHead
-        title="Bike Delivery Service in Kolkata"
-        description="Request two-wheeler delivery for eligible documents and small parcels in Kolkata. Review route availability and the current estimate before confirming."
+        title={`Bike Delivery Service in ${city}`}
+        description={`Request two-wheeler delivery for eligible documents and small parcels in ${city}. Review route availability and the current estimate before confirming.`}
         canonical="/bike"
       />
       <BikeHero city={city} setCity={setCity} />

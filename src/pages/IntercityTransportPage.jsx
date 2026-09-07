@@ -1,25 +1,43 @@
 import React, { useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { Truck, ArrowRight, CheckCircle, X, Globe, Package, Shield } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
+import { useCity } from "../context/CityContext"
+import { SEO_CITIES } from "../lib/cities"
 
 export default function IntercityTransportPage() {
+  const { city: routeCity } = useParams()
+  const { currentCity, setCity } = useCity()
+
+  // Match URL city parameter or fallback to active selected city
+  const matchedCity = routeCity ? SEO_CITIES.find(c => c.slug === routeCity) : null
+  const cityName = matchedCity ? matchedCity.name : currentCity.name
+  const citySlug = matchedCity ? matchedCity.slug : currentCity.slug
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" })
-  }, [])
+    if (matchedCity && currentCity.slug !== matchedCity.slug) {
+      setCity({
+        name: matchedCity.name,
+        slug: matchedCity.slug,
+        state: matchedCity.state || "India",
+        region: matchedCity.state || "India",
+      }, false)
+    }
+  }, [matchedCity, currentCity.slug, setCity])
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "Service",
-        "name": "Intercity Transport Services",
+        "name": `Intercity Transport Services from ${cityName}`,
         "provider": {
           "@type": "Organization",
           "name": "GoMyTruck",
           "url": "https://gomytruck.com"
         },
-        "description": "Book intercity transport from Kolkata to any city in India. Full truck load (FTL), part load (PTL) and mini truck available for city-to-city freight.",
+        "description": `Book intercity transport from ${cityName} to any city in India. Full truck load (FTL), part load (PTL) and mini truck available for city-to-city freight.`,
         "areaServed": "India",
         "serviceType": "Intercity Goods Transport"
       },
@@ -35,26 +53,23 @@ export default function IntercityTransportPage() {
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "Intercity Transport Services",
-            "item": "https://gomytruck.com/intercity/kolkata"
+            "name": `Intercity Transport Services - ${cityName}`,
+            "item": `https://gomytruck.com/intercity/${citySlug}`
           }
         ]
       }
     ]
   }
 
-  const routes = [
-    { from: "Kolkata", to: "Delhi" },
-    { from: "Kolkata", to: "Mumbai" },
-    { from: "Kolkata", to: "Bangalore" },
-    { from: "Kolkata", to: "Hyderabad" },
-    { from: "Kolkata", to: "Chennai" },
-    { from: "Kolkata", to: "Durgapur" },
-    { from: "Kolkata", to: "Siliguri" },
-    { from: "Kolkata", to: "Bhubaneswar" },
-    { from: "Kolkata", to: "Patna" },
-    { from: "Kolkata", to: "Guwahati" },
+  // Major commercial destinations across India
+  const majorDestinations = [
+    "Delhi NCR", "Mumbai", "Bengaluru", "Hyderabad", "Chennai",
+    "Ahmedabad", "Pune", "Jaipur", "Lucknow", "Kolkata", "Patna", "Guwahati"
   ]
+  const routes = majorDestinations
+    .filter(dest => !dest.toLowerCase().includes(cityName.toLowerCase()) && !cityName.toLowerCase().includes(dest.toLowerCase()))
+    .slice(0, 10)
+    .map(dest => ({ from: cityName, to: dest }))
 
   const serviceTypes = [
     {
@@ -85,10 +100,10 @@ export default function IntercityTransportPage() {
   return (
     <div className="min-h-screen bg-gray-50 pt-[72px] sm:pt-[88px] font-sans">
       <SEOHead 
-        title="Intercity Transport Services | City-to-City Truck Booking & Freight"
-        description="Book intercity transport from Kolkata to any city in India. Full truck load (FTL), part load (PTL) and mini truck available for city-to-city freight. Transparent rates, door-to-door delivery."
-        canonical="/intercity/kolkata"
-        keywords="intercity transport, city to city transport, outstation truck booking, Kolkata to Delhi truck, FTL transport services, PTL logistics, intercity freight, outstation goods transport, long distance truck booking, door to door delivery India"
+        title={`Intercity Transport Services from ${cityName} | City-to-City Truck Booking & Freight`}
+        description={`Book intercity transport from ${cityName} to any city in India. Full truck load (FTL), part load (PTL) and mini truck available for city-to-city freight. Transparent rates, door-to-door delivery.`}
+        canonical={`/intercity/${citySlug}`}
+        keywords={`intercity transport ${cityName}, city to city transport ${cityName}, outstation truck booking, FTL transport services, PTL logistics, intercity freight, outstation goods transport, long distance truck booking, door to door delivery India`}
         jsonLd={jsonLd}
       />
 
@@ -105,7 +120,7 @@ export default function IntercityTransportPage() {
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">
             Intercity Transport — <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-200">From Kolkata</span> on supported routes
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-200">From {cityName}</span> on supported routes
           </h1>
           <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
             Full truck load (FTL), part load (PTL), and mini truck booking for city-to-city freight. Transparent rates and door-to-door delivery.
@@ -125,8 +140,8 @@ export default function IntercityTransportPage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Popular Intercity Routes</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">Ask for route and vehicle availability before relying on an intercity pickup. These are example corridors from Kolkata.</p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Popular Intercity Routes from {cityName}</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">Ask for route and vehicle availability before relying on an intercity pickup. These are example corridors from {cityName}.</p>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">

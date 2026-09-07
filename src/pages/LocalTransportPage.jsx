@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
   Truck,
   MapPin,
@@ -9,54 +9,9 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import SEOHead from '../seo/SEOHead';
+import { useCity } from '../context/CityContext';
+import { SEO_CITIES } from '../lib/cities';
 
-/* ─── JSON-LD schemas ─────────────────────────────────────────── */
-const serviceSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Local Transport Services in Kolkata',
-  description:
-    'Request local goods transport in Kolkata by mini truck, Tata Ace, tempo, or eligible bike delivery. Check route serviceability and partner availability before confirming.',
-  provider: {
-    '@type': 'Organization',
-    name: 'GoMyTruck – GoMyTruck',
-    telephone: '+919331488999',
-    email: 'hello@parthertech.com',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Chiriyamore, Barrackpore',
-      addressLocality: 'North 24 Parganas',
-      addressRegion: 'West Bengal',
-      postalCode: '700120',
-      addressCountry: 'IN',
-    },
-  },
-  areaServed: {
-    '@type': 'City',
-    name: 'Kolkata',
-  },
-  serviceType: 'Intracity Goods Transport',
-  url: 'https://gomytruck.com/local-transport/kolkata',
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    {
-      '@type': 'ListItem',
-      position: 1,
-      name: 'Home',
-      item: 'https://gomytruck.com/',
-    },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: 'Local Transport Services',
-      item: 'https://gomytruck.com/local-transport/kolkata',
-    },
-  ],
-};
 
 /* ─── Data ────────────────────────────────────────────────────── */
 const reasons = [
@@ -126,17 +81,85 @@ const stats = [
 
 /* ─── Component ───────────────────────────────────────────────── */
 export default function LocalTransportPage() {
+  const { city: routeCity } = useParams();
+  const { currentCity, setCity } = useCity();
+
+  // Match URL city parameter or fallback to active selected city
+  const matchedCity = routeCity ? SEO_CITIES.find((c) => c.slug === routeCity) : null;
+  const cityName = matchedCity ? matchedCity.name : currentCity.name;
+  const citySlug = matchedCity ? matchedCity.slug : currentCity.slug;
+
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (matchedCity && currentCity.slug !== matchedCity.slug) {
+      setCity({
+        name: matchedCity.name,
+        slug: matchedCity.slug,
+        state: matchedCity.state || 'India',
+        region: matchedCity.state || 'India',
+      }, false);
+    }
+  }, [matchedCity, currentCity.slug, setCity]);
+
+  const serviceSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: `Local Transport Services in ${cityName}`,
+    description: `Request local goods transport in ${cityName} by mini truck, Tata Ace, tempo, or eligible bike delivery. Check route serviceability and partner availability before confirming.`,
+    provider: {
+      '@type': 'Organization',
+      name: 'GoMyTruck – GoMyTruck',
+      telephone: '+919331488999',
+      email: 'hello@parthertech.com',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Chiriyamore, Barrackpore',
+        addressLocality: 'North 24 Parganas',
+        addressRegion: 'West Bengal',
+        postalCode: '700120',
+        addressCountry: 'IN',
+      },
+    },
+    areaServed: {
+      '@type': 'City',
+      name: cityName,
+    },
+    serviceType: 'Intracity Goods Transport',
+    url: `https://gomytruck.com/local-transport/${citySlug}`,
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://gomytruck.com/',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: `Local Transport Services - ${cityName}`,
+        item: `https://gomytruck.com/local-transport/${citySlug}`,
+      },
+    ],
+  };
+
+  const stats = [
+    { icon: <Clock className="w-7 h-7 text-brand-400" />, value: '~20 min', label: 'Avg. Pickup Time' },
+    { icon: <MapPin className="w-7 h-7 text-brand-400" />, value: 'All Areas', label: `Coverage across ${cityName}` },
+    { icon: <Zap className="w-7 h-7 text-brand-400" />, value: 'Online', label: 'Request submission' },
+  ];
 
   return (
     <>
       <SEOHead
-        title="Local Transport Services in Kolkata | Truck and Goods Requests"
-        description="Request local transport in Kolkata by mini truck, Tata Ace, tempo, or eligible bike delivery. Review the route estimate and current partner availability before confirming."
-        canonical="/local-transport/kolkata"
-        keywords="local transport services, local goods transport Kolkata, same day delivery Kolkata, local truck booking, local tempo service, local mini truck, goods delivery Kolkata, intracity transport, local lorry booking, same day truck Kolkata"
+        title={`Local Transport Services in ${cityName} | Truck and Goods Requests`}
+        description={`Request local transport in ${cityName} by mini truck, Tata Ace, tempo, or eligible bike delivery. Review the route estimate and current partner availability before confirming.`}
+        canonical={`/local-transport/${citySlug}`}
+        keywords={`local transport services, local goods transport ${cityName}, same day delivery ${cityName}, local truck booking, local tempo service, local mini truck, goods delivery ${cityName}, intracity transport, local lorry booking, same day truck ${cityName}`}
         jsonLd={[serviceSchema, breadcrumbSchema]}
       />
 
@@ -160,11 +183,11 @@ export default function LocalTransportPage() {
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight max-w-3xl">
             Local Transport Services{' '}
-            <span className="text-brand-400">in Kolkata</span>
+            <span className="text-brand-400">in {cityName}</span>
           </h1>
 
           <p className="text-slate-300 text-lg sm:text-xl max-w-2xl leading-relaxed">
-            Request a mini truck, tempo, or Tata Ace for a declared Kolkata route and load.
+            Request a mini truck, tempo, or Tata Ace for a declared {cityName} route and load.
             Review the estimate, current availability, and assignment status before relying on a schedule.
           </p>
 

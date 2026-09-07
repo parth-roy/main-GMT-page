@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect } from "react"
 import PackersHero from "../components/packers/PackersHero"
 import PackersValueProps from "../components/packers/PackersValueProps"
 import PackersExtraServices from "../components/packers/PackersExtraServices"
@@ -8,9 +8,12 @@ import PackersFAQ from "../components/packers/PackersFAQ"
 import AppDownloadBanner from "../components/truck/AppDownloadBanner"
 import SEOHead from "../seo/SEOHead"
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
+import { useCity } from "../context/CityContext"
 
 export default function PackersAndMoversPage() {
-  const [city, setCity] = useState("Kolkata")
+  const { currentCity, setCity: setGlobalCity } = useCity()
+  const city = currentCity.name
+  const setCity = (c) => setGlobalCity(c)
 
   useEffect(() => {
     window.scrollTo(0, 0)

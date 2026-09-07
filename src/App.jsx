@@ -264,8 +264,10 @@ export default function App() {
             <Route path="/services/commercial-goods-transport" element={<CommercialGoodsTransportPage />} />
             <Route path="/services/fleet-partner-registration-india" element={<Navigate to="/fleet-partner-registration" replace />} />
             
-            <Route path="/intercity/kolkata" element={<IntercityTransportPage />} />
-            <Route path="/local-transport/kolkata" element={<LocalTransportPage />} />
+            <Route path="/intercity/:city" element={<IntercityTransportPage />} />
+            <Route path="/intercity" element={<IntercityTransportPage />} />
+            <Route path="/local-transport/:city" element={<LocalTransportPage />} />
+            <Route path="/local-transport" element={<LocalTransportPage />} />
 
             {/* REDIRECTS FROM OLD FLAT ARCHITECTURE TO NEW SILOS */}
             <Route path="/truck-booking-kolkata" element={<Navigate to="/kolkata/truck-booking" replace />} />
@@ -309,10 +311,14 @@ export default function App() {
             
             <Route path="/delete-account" element={<DeleteAccountPage />} />
 
-            {/* DYNAMIC PSEO ROUTES FOR 70+ CITIES */}
+            {/* DYNAMIC PSEO ROUTES FOR ALL CITIES */}
             <Route path="/:city" element={<DynamicSeoPage serviceType="hub" />} />
             <Route path="/:city/truck-booking" element={<DynamicSeoPage serviceType="truck-booking" />} />
+            <Route path="/:city/mini-truck-booking" element={<DynamicSeoPage serviceType="mini-truck" />} />
             <Route path="/:city/pickup-truck-for-rent" element={<DynamicSeoPage serviceType="pickup-rent" />} />
+            <Route path="/:city/pickup-truck-booking" element={<DynamicSeoPage serviceType="pickup-rent" />} />
+            <Route path="/:city/tata-ace-booking" element={<DynamicSeoPage serviceType="tata-ace" />} />
+            <Route path="/:city/14-feet-truck-rental" element={<DynamicSeoPage serviceType="14ft-truck" />} />
             <Route path="/:city/moving-truck-hire" element={<DynamicSeoPage serviceType="moving-truck" />} />
 
             {/* Catch-all 404 Route */}

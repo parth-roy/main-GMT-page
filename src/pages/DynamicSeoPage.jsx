@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import CityTransportPage from "../components/CityTransportPage";
 import { SEO_CITIES } from "../lib/cities";
+import { useCity } from "../context/CityContext";
 
 export default function DynamicSeoPage({ serviceType }) {
   const { city } = useParams();
+  const { currentCity, setCity } = useCity();
   
   const [seoData, setSeoData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,6 +17,16 @@ export default function DynamicSeoPage({ serviceType }) {
   useEffect(() => {
     if (!cityConfig) return;
     
+    // Sync global CityContext if user directly navigated to a city URL
+    if (currentCity?.slug !== cityConfig.slug) {
+      setCity({
+        name: cityConfig.name,
+        slug: cityConfig.slug,
+        state: cityConfig.state || "India",
+        region: cityConfig.state || "India",
+      }, false);
+    }
+
     setLoading(true);
     fetch('https://api-test.gomytruck.com/api/v1/seo/hub/' + city)
       .then(res => res.json())
@@ -26,7 +38,7 @@ export default function DynamicSeoPage({ serviceType }) {
         console.error(err);
         setLoading(false);
       });
-  }, [city, cityConfig]);
+  }, [city, cityConfig, currentCity?.slug, setCity]);
 
   if (!cityConfig) {
     return <Navigate to="/not-found" replace />;
@@ -44,6 +56,21 @@ export default function DynamicSeoPage({ serviceType }) {
     serviceHeadline = `Online Truck Booking in ${cityName}`;
     serviceBanner = `Book mini trucks, Tata Ace, and commercial transport in ${cityName}`;
     serviceDesc = `Hire trucks online in ${cityName}. Fast dispatch for Tata Ace, 14ft, 20ft, and 32ft commercial freight at transparent per-km rates with zero broker margin.`;
+  } else if (serviceType === "mini-truck") {
+    urlSegment = "mini-truck-booking";
+    serviceHeadline = `Mini Truck Booking in ${cityName}`;
+    serviceBanner = `Book Tata Ace, 407, and mini trucks for quick local transport in ${cityName}`;
+    serviceDesc = `Rent mini trucks online in ${cityName}. Ideal for house shifting, shop stock delivery, and commercial logistics at transparent per-km fares with verified drivers.`;
+  } else if (serviceType === "14ft-truck") {
+    urlSegment = "14-feet-truck-rental";
+    serviceHeadline = `14 Feet Truck Rental in ${cityName}`;
+    serviceBanner = `Hire 14ft Eicher and intermediate commercial trucks in ${cityName}`;
+    serviceDesc = `Book 14 feet trucks in ${cityName} for up to 3.5–5 ton commercial loads, factory dispatches, wholesale distribution, and intercity freight with 5% commission.`;
+  } else if (serviceType === "tata-ace") {
+    urlSegment = "tata-ace-booking";
+    serviceHeadline = `Tata Ace / Chota Hathi Booking in ${cityName}`;
+    serviceBanner = `Rent Tata Ace / Chota Hathi (750 kg) in ${cityName}`;
+    serviceDesc = `Hire Tata Ace in ${cityName} for fast city delivery, retail goods, and small household shifting. Instant booking with zero broker commission.`;
   } else if (serviceType === "pickup-rent") {
     urlSegment = "pickup-truck-for-rent";
     serviceHeadline = `Pickup Truck for Rent in ${cityName}`;

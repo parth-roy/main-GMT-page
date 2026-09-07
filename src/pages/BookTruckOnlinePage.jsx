@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { Link } from "react-router-dom"
 import { Truck, Package, Clock, Shield, Star, ArrowRight, CheckCircle, PhoneCall } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
 import TruckHero from "../components/truck/TruckHero"
 import FAQ from "../components/FAQ"
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
+import { useCity } from "../context/CityContext"
 
 const schema = [
   {
@@ -44,16 +45,19 @@ const benefits = [
 ]
 
 export default function BookTruckOnlinePage() {
-  const [city, setCity] = useState("Kolkata")
+  const { currentCity, setCity: setGlobalCity } = useCity()
+  const city = currentCity.name
+  const setCity = (c) => setGlobalCity(c)
+
   useEffect(() => { window.scrollTo(0, 0) }, [])
 
   return (
     <div className="bg-white min-h-screen font-sans">
       <SEOHead
-        title="Book Truck Online in Kolkata | Instant Mini Truck & Goods Transport Booking"
-        description="Request a truck online in Kolkata. Choose a vehicle, declare the goods, review a route-based estimate, and check current partner availability before confirming."
+        title={`Book Truck Online in ${city} | Instant Mini Truck & Goods Transport Booking`}
+        description={`Request a truck online in ${city}. Choose a vehicle, declare the goods, review a route-based estimate, and check current partner availability before confirming.`}
         canonical="/book-truck-online"
-        keywords="book truck online, book mini truck online, online truck booking Kolkata, instant truck booking, truck booking app, book goods vehicle online, online transport booking, hire truck online Kolkata, lorry booking online, book tempo online"
+        keywords={`book truck online, book mini truck online, online truck booking ${city}, instant truck booking, truck booking app, book goods vehicle online, online transport booking, hire truck online ${city}, lorry booking online, book tempo online`}
         jsonLd={schema}
       />
 

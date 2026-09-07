@@ -1,44 +1,13 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useMemo } from "react"
 import { Menu, X, ChevronRight, ChevronDown, PhoneCall, LogIn, LogOut, Truck, Package, Building2, Users, MapPin, ArrowRight, Zap } from "lucide-react"
 import { useLocation, Link } from "react-router-dom"
 import AppDownloadModal from "./AppDownloadModal"
+import CitySelectorModal from "./CitySelectorModal"
 import { useAuth } from "../context/AuthContext"
+import { useCity } from "../context/CityContext"
 
 // Dropdown data
-const shippersMenu = [
-  {
-    heading: "Book by Service",
-    items: [
-      { label: "Mini Truck Booking", to: "/kolkata/mini-truck-booking", desc: "Tata Ace, 407" },
-      { label: "Full Truck Load (FTL)", to: "/goods-transport-services", desc: "32ft container, flatbed" },
-      { label: "Part Load (PTL)", to: "/goods-transport-services", desc: "Share truck space" },
-      { label: "Intercity Transport", to: "/intercity/kolkata", desc: "Pan-India routes" },
-      { label: "Enterprise Logistics", to: "/enterprise", desc: "B2B contracts" },
-      { label: "Book Truck Online", to: "/book-truck-online", desc: "Instant booking" },
-    ],
-  },
-  {
-    heading: "Book by Vehicle",
-    items: [
-      { label: "Tata Ace / 3-Wheeler", to: "/kolkata/tata-ace-booking", desc: "Up to 750 kg" },
-      { label: "Pickup / Bolero", to: "/kolkata/pickup-truck-booking", desc: "Up to 1.5 ton" },
-      { label: "Mini Truck (407)", to: "/kolkata/mini-truck-booking", desc: "Up to 3 ton" },
-      { label: "14 Feet Truck", to: "/kolkata/14-feet-truck-rental", desc: "Up to 5 ton" },
-      { label: "Packers & Movers", to: "/packers-and-movers", desc: "Home & office moves" },
-    ],
-  },
-  {
-    heading: "Cities & Routes",
-    items: [
-      { label: "Kolkata", to: "/kolkata", desc: "Local & intercity" },
-      { label: "Dankuni Hub", to: "/dankuni", desc: "Freight corridor" },
-      { label: "Howrah", to: "/howrah", desc: "Industrial routes" },
-      { label: "Durgapur / Asansol", to: "/durgapur", desc: "Steel belt" },
-      { label: "Kolkata → Guwahati", to: "/routes/kolkata-to-guwahati", desc: "~1000 km" },
-      { label: "Kolkata → Patna", to: "/routes/kolkata-to-patna", desc: "~600 km" },
-    ],
-  },
-]
+
 
 const transportersMenu = [
   {
@@ -89,11 +58,61 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
+  const [isCityModalOpen, setIsCityModalOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null) // "shippers" | "transporters" | null
 
+  const { currentCity } = useCity()
   const { user, accessToken, logout, setIsLoginModalOpen } = useAuth()
   const location = useLocation()
   const dropdownRef = useRef(null)
+
+  const shippersMenu = useMemo(() => {
+    const isKolkata = currentCity?.slug === "kolkata"
+    const citySlug = currentCity?.slug || "kolkata"
+    const cityName = currentCity?.name || "Kolkata"
+
+    return [
+      {
+        heading: "Book by Service",
+        items: [
+          { label: "Mini Truck Booking", to: isKolkata ? "/kolkata/mini-truck-booking" : `/${citySlug}/mini-truck-booking`, desc: "Tata Ace, 407" },
+          { label: "Full Truck Load (FTL)", to: "/goods-transport-services", desc: "32ft container, flatbed" },
+          { label: "Part Load (PTL)", to: "/goods-transport-services", desc: "Share truck space" },
+          { label: "Intercity Transport", to: `/intercity/${citySlug}`, desc: "Pan-India routes" },
+          { label: "Enterprise Logistics", to: "/enterprise", desc: "B2B contracts" },
+          { label: "Book Truck Online", to: "/book-truck-online", desc: "Instant booking" },
+        ],
+      },
+      {
+        heading: "Book by Vehicle",
+        items: [
+          { label: "Tata Ace / 3-Wheeler", to: isKolkata ? "/kolkata/tata-ace-booking" : `/${citySlug}/tata-ace-booking`, desc: "Up to 750 kg" },
+          { label: "Pickup / Bolero", to: isKolkata ? "/kolkata/pickup-truck-booking" : `/${citySlug}/pickup-truck-for-rent`, desc: "Up to 1.5 ton" },
+          { label: "Mini Truck (407)", to: isKolkata ? "/kolkata/mini-truck-booking" : `/${citySlug}/mini-truck-booking`, desc: "Up to 3 ton" },
+          { label: "14 Feet Truck", to: isKolkata ? "/kolkata/14-feet-truck-rental" : `/${citySlug}/14-feet-truck-rental`, desc: "Up to 5 ton" },
+          { label: "Packers & Movers", to: "/packers-and-movers", desc: "Home & office moves" },
+        ],
+      },
+      {
+        heading: "Cities & Routes",
+        items: isKolkata ? [
+          { label: "Kolkata Hub", to: "/kolkata", desc: "Local & intercity" },
+          { label: "Dankuni Hub", to: "/dankuni", desc: "Freight corridor" },
+          { label: "Howrah", to: "/howrah", desc: "Industrial routes" },
+          { label: "Durgapur / Asansol", to: "/durgapur", desc: "Steel belt" },
+          { label: "Kolkata → Guwahati", to: "/routes/kolkata-to-guwahati", desc: "~1000 km" },
+          { label: "Kolkata → Patna", to: "/routes/kolkata-to-patna", desc: "~600 km" },
+        ] : [
+          { label: `${cityName} Hub`, to: `/${citySlug}`, desc: "City operations" },
+          { label: `${cityName} Truck Booking`, to: `/${citySlug}/truck-booking`, desc: "Local fleet" },
+          { label: `Intercity from ${cityName}`, to: `/intercity/${citySlug}`, desc: "Pan-India routes" },
+          { label: "Kolkata Hub", to: "/kolkata", desc: "Headquarters" },
+          { label: "Mumbai Hub", to: "/mumbai", desc: "Western corridor" },
+          { label: "Delhi NCR Hub", to: "/new-delhi", desc: "Northern corridor" },
+        ],
+      },
+    ]
+  }, [currentCity])
 
   const isDarkTheme = location.pathname === "/plans"
   const isLoggedIn = Boolean(accessToken || user || (typeof window !== "undefined" && localStorage.getItem("vahan_access_token")))
@@ -150,22 +169,40 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-0.5" ref={dropdownRef}>
-          {/* Logo */}
-          <div
-            className="flex-shrink-0 flex items-center gap-2 sm:gap-3 cursor-pointer"
-            onClick={() => onScrollToSection("home")}
-          >
-            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 shrink-0">
-              <img src="/go-my-truck-logo.png" alt="GoMyTruck Logo" className="w-full h-full object-cover rounded-xl shadow-sm" />
+          {/* Logo & City Selector Pill */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div
+              className="flex-shrink-0 flex items-center gap-2 sm:gap-3 cursor-pointer"
+              onClick={() => onScrollToSection("home")}
+            >
+              <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 shrink-0">
+                <img src="/go-my-truck-logo.png" alt="GoMyTruck Logo" className="w-full h-full object-cover rounded-xl shadow-sm" />
+              </div>
+              <div className="flex flex-col justify-center items-start">
+                <span className={`font-sans font-bold text-[18px] sm:text-[22px] tracking-tight leading-none ${isDarkTheme ? "text-white" : "text-slate-900"}`}>
+                  Go<span className="text-orange-500">My</span>Truck
+                </span>
+                <span className={`text-[7px] sm:text-[8.5px] font-bold tracking-[0.15em] uppercase mt-0.5 leading-none whitespace-nowrap ${isDarkTheme ? "text-gray-400" : "text-slate-500"}`}>
+                  ASAN JARIYA TRANSPORT KA
+                </span>
+              </div>
             </div>
-            <div className="flex flex-col justify-center items-start">
-              <span className={`font-sans font-bold text-[18px] sm:text-[22px] tracking-tight leading-none ${isDarkTheme ? "text-white" : "text-slate-900"}`}>
-                Go<span className="text-orange-500">My</span>Truck
-              </span>
-              <span className={`text-[7px] sm:text-[8.5px] font-bold tracking-[0.15em] uppercase mt-0.5 leading-none whitespace-nowrap ${isDarkTheme ? "text-gray-400" : "text-slate-500"}`}>
-                ASAN JARIYA TRANSPORT KA
-              </span>
-            </div>
+
+            {/* City Selector Badge Button */}
+            <button
+              type="button"
+              onClick={() => setIsCityModalOpen(true)}
+              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border transition-all hover:scale-105 active:scale-95 cursor-pointer ml-1 ${
+                isDarkTheme
+                  ? "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  : "bg-brand-100/80 border-brand-200 text-brand-900 hover:bg-brand-200/80 shadow-xs"
+              }`}
+              title="Change City"
+            >
+              <MapPin size={12} className="text-brand-600 shrink-0" />
+              <span className="max-w-[90px] truncate">{currentCity?.name || "Kolkata"}</span>
+              <ChevronDown size={11} className="text-slate-400" />
+            </button>
           </div>
 
           {/* Desktop Navigation */}
@@ -301,8 +338,18 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
             </div>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="lg:hidden flex items-center gap-3">
+          {/* Mobile menu button & quick city select */}
+          <div className="lg:hidden flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsCityModalOpen(true)}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-100 border border-brand-200 text-brand-800 text-xs font-bold"
+              title="Change City"
+            >
+              <MapPin size={12} className="text-brand-600 shrink-0" />
+              <span className="max-w-[80px] truncate">{currentCity?.name || "Kolkata"}</span>
+              <ChevronDown size={11} className="text-slate-400" />
+            </button>
             <a href="tel:9331488999" className="p-2 rounded-lg text-slate-700 hover:bg-slate-100" title="Call Support">
               <PhoneCall size={18} />
             </a>
@@ -317,11 +364,44 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
       <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-screen border-t border-slate-200" : "max-h-0 pointer-events-none"}`}>
         <div className="bg-brand-50/95 backdrop-blur-xl px-4 pt-4 pb-6 space-y-1 shadow-2xl">
           {/* Book a Truck section */}
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 pt-2 pb-1">Book a Truck</p>
-          <Link to="/book-truck-online" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">Mini Truck / FTL / PTL</Link>
-          <Link to="/intercity/kolkata" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">Intercity Transport</Link>
-          <Link to="/enterprise" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">Enterprise Logistics</Link>
-          <Link to="/kolkata" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">All Cities & Routes</Link>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 pt-2 pb-1">
+            Book a Truck ({currentCity?.name || "Kolkata"})
+          </p>
+          <Link
+            to={currentCity?.slug === "kolkata" ? "/kolkata/mini-truck-booking" : `/${currentCity?.slug || "kolkata"}/mini-truck-booking`}
+            onClick={() => setIsOpen(false)}
+            className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg"
+          >
+            Mini Truck Booking ({currentCity?.name || "Local"})
+          </Link>
+          <Link
+            to={currentCity?.slug === "kolkata" ? "/kolkata/14-feet-truck-rental" : `/${currentCity?.slug || "kolkata"}/14-feet-truck-rental`}
+            onClick={() => setIsOpen(false)}
+            className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg"
+          >
+            14 Feet Truck Rental
+          </Link>
+          <Link
+            to={`/intercity/${currentCity?.slug || "kolkata"}`}
+            onClick={() => setIsOpen(false)}
+            className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg"
+          >
+            Intercity Transport from {currentCity?.name || "City"}
+          </Link>
+          <Link
+            to="/enterprise"
+            onClick={() => setIsOpen(false)}
+            className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg"
+          >
+            Enterprise Logistics
+          </Link>
+          <Link
+            to={currentCity?.slug === "kolkata" ? "/kolkata" : `/${currentCity?.slug || "kolkata"}`}
+            onClick={() => setIsOpen(false)}
+            className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg"
+          >
+            {currentCity?.name || "All"} Hub & Network
+          </Link>
 
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 pt-3 pb-1">Attach Your Truck</p>
           <Link to="/fleet-partner-registration" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">Fleet Partner Registration</Link>
@@ -375,6 +455,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
       </div>
 
       <AppDownloadModal isOpen={isDownloadModalOpen} onClose={() => setIsDownloadModalOpen(false)} />
+      <CitySelectorModal isOpen={isCityModalOpen} onClose={() => setIsCityModalOpen(false)} />
     </nav>
   )
 }
