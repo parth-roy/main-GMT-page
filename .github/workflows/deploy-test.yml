@@ -16,6 +16,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          command_timeout: 45m
           script: |
             set -e
             export NVM_DIR="$HOME/.nvm"

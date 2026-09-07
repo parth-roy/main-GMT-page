@@ -107,6 +107,15 @@ function generateSitemaps() {
   
   fs.writeFileSync(indexPath, indexXml);
   console.log(`✅ sitemap.xml (index) successfully generated at ${indexPath}`);
+
+  // Copy to dist/ if it exists so validate:seo and web server find them immediately
+  const distDir = path.join(__dirname, 'dist');
+  if (fs.existsSync(distDir)) {
+    for (const file of [...sitemapFiles, 'sitemap.xml']) {
+      fs.copyFileSync(path.join(publicDir, file), path.join(distDir, file));
+    }
+    console.log(`✅ All sitemaps synced to dist/`);
+  }
 }
 
 generateSitemaps();
