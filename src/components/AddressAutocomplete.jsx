@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react"
-import { MapPin, Loader2 } from "lucide-react"
 import { trackBeginBooking } from "../utils/analytics"
 // Migrated from Mapbox backend proxy to Google Maps direct SDK for cost savings
 import GoogleAddressAutocomplete from "./GoogleAddressAutocomplete"

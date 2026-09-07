@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, Link, Navigate } from "react-router-dom";
 import { 
-  Truck, MapPin, ShieldCheck, CheckCircle, ArrowRight, 
+  Truck, ShieldCheck, CheckCircle, ArrowRight, 
   IndianRupee, Clock, HelpCircle, ChevronDown, ChevronUp, 
   Zap, Bell, Briefcase, PhoneCall, Sparkles 
 } from "lucide-react";
@@ -229,7 +229,7 @@ export default function DriverLoadHubPage() {
                         <span className="text-xs font-black text-emerald-400 shrink-0 ml-2">{load.estEarning}</span>
                       </div>
                       <div className="flex justify-between items-center text-[11px] text-slate-400">
-                        <span className="flex items-center gap-1"><MapPin size={11} className="text-amber-400" /> {load.location}</span>
+                        <span className="flex items-center gap-1"><img src="/google-maps-icon.webp" alt="Location" width={11} height={11} className="w-3 h-3 object-contain shrink-0" /> {load.location}</span>
                         <span className="text-slate-500">{load.posted}</span>
                       </div>
                     </div>

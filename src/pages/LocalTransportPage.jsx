@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   Truck,
-  MapPin,
   Clock,
   Zap,
   CheckCircle,
@@ -75,7 +74,7 @@ const areas = [
 
 const stats = [
   { icon: <Clock className="w-7 h-7 text-brand-400" />, value: '~20 min', label: 'Avg. Pickup Time' },
-  { icon: <MapPin className="w-7 h-7 text-brand-400" />, value: '50+ Areas', label: 'Coverage across Kolkata' },
+  { icon: <img src="/google-maps-icon.webp" alt="Location" width={28} height={28} className="w-7 h-7 object-contain" />, value: '50+ Areas', label: 'Coverage across Kolkata' },
   { icon: <Zap className="w-7 h-7 text-brand-400" />, value: 'Online', label: 'Request submission' },
 ];
 
@@ -149,7 +148,7 @@ export default function LocalTransportPage() {
 
   const stats = [
     { icon: <Clock className="w-7 h-7 text-brand-400" />, value: '~20 min', label: 'Avg. Pickup Time' },
-    { icon: <MapPin className="w-7 h-7 text-brand-400" />, value: 'All Areas', label: `Coverage across ${cityName}` },
+    { icon: <img src="/google-maps-icon.webp" alt="Location" width={28} height={28} className="w-7 h-7 object-contain" />, value: 'All Areas', label: `Coverage across ${cityName}` },
     { icon: <Zap className="w-7 h-7 text-brand-400" />, value: 'Online', label: 'Request submission' },
   ];
 
@@ -284,7 +283,7 @@ export default function LocalTransportPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <span className="inline-flex items-center gap-1.5 text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">
-              <MapPin className="w-4 h-4" /> Service Coverage
+              <img src="/google-maps-icon.webp" alt="Location" width={16} height={16} className="w-4 h-4 object-contain shrink-0" /> Service Coverage
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
               Areas Covered in Kolkata
@@ -300,7 +299,7 @@ export default function LocalTransportPage() {
                 key={area}
                 className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 border border-brand-200 text-sm font-medium px-4 py-2 rounded-full hover:bg-brand-100 transition-colors cursor-default"
               >
-                <MapPin className="w-3.5 h-3.5 text-brand-500" />
+                <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" />
                 {area}
               </span>
             ))}
@@ -478,7 +477,7 @@ export default function LocalTransportPage() {
                 to: '/barrackpore/truck-booking',
                 label: 'Transport in Barrackpore',
                 desc: 'Dedicated logistics for Barrackpore & North 24 Pgs.',
-                icon: <MapPin className="w-5 h-5" />,
+                icon: <img src="/google-maps-icon.webp" alt="Location" width={20} height={20} className="w-5 h-5 object-contain" />,
               },
               {
                 to: '/book-truck-online',

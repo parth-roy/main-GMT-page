@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { MapPin, ChevronDown, ArrowRight, Loader2, AlertCircle, Shield, CheckCircle } from "lucide-react"
+import { ChevronDown, ArrowRight, Loader2, AlertCircle, Shield, CheckCircle } from "lucide-react"
 import { geocodeAddress, fetchEstimate, SERVICE_TO_VEHICLE_TYPE, detectCurrentCity, CITY_HERO_IMAGES } from "../../api/pricingApi"
 import EstimateResultModal from "../EstimateResultModal"
 import AddressAutocomplete from "../AddressAutocomplete"
@@ -109,7 +109,7 @@ export default function BikeHero({ city, setCity }) {
                 onClick={() => setCityOpen(true)}
                 className="flex items-center gap-2 text-slate-900 font-bold text-sm cursor-pointer w-fit hover:text-brand-600 transition-colors"
               >
-                <MapPin size={18} className="text-brand-600 shrink-0" />
+                <img src="/google-maps-icon.webp" alt="City" width={18} height={18} className="w-4.5 h-4.5 object-contain shrink-0" />
                 {cityDetecting ? (
                   <span className="flex items-center gap-1.5 text-slate-400 font-normal">
                     <Loader2 size={13} className="animate-spin" />

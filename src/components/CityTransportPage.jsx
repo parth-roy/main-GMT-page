@@ -6,7 +6,7 @@
  */
 import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { MapPin, Truck, Bike, Package, Home, ArrowRight, CheckCircle, PhoneCall, Plus, Minus, MessageCircleQuestion } from "lucide-react"
+import { Truck, Bike, Package, Home, ArrowRight, CheckCircle, PhoneCall, Plus, Minus, MessageCircleQuestion } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
 import TrustBadgeRow from "./TrustBadgeRow"
 import { generateCityFaqs } from "../lib/locationFaqHelper"
@@ -98,7 +98,7 @@ export default function CityTransportPage({
         </div>
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-300 text-xs font-bold tracking-widest uppercase mb-5">
-            <MapPin size={12} /> Serving {city} &amp; Surrounding Hubs
+            <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" /> Serving {city} &amp; Surrounding Hubs
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold text-white tracking-tight leading-tight mb-6">
             {headline || `Transport Services in ${city}`}
@@ -191,7 +191,7 @@ export default function CityTransportPage({
             <div className="flex flex-wrap justify-center gap-3">
               {areas.map((area, i) => (
                 <div key={i} className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-700 font-medium text-sm">
-                  <MapPin size={13} className="text-brand-500" /> {area}
+                  <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" /> {area}
                 </div>
               ))}
             </div>

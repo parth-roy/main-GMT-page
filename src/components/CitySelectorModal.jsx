@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search, MapPin, X, Navigation, Loader2, Anchor, Package, Check, Sparkles, Building2 } from "lucide-react";
+import { Search, X, Navigation, Loader2, Anchor, Package, Check, Sparkles, Building2 } from "lucide-react";
 import { SEO_CITIES } from "../lib/cities";
 import { CITY_HERO_IMAGES } from "../api/pricingApi";
 import { useCity } from "../context/CityContext";
@@ -182,8 +182,8 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-brand-500/10 flex items-center justify-center text-brand-600">
-              <MapPin size={20} />
+            <div className="w-10 h-10 rounded-2xl bg-white shadow-xs border border-slate-100 flex items-center justify-center p-1.5">
+              <img src="/google-maps-icon.webp" alt="Location" width={22} height={22} className="w-5 h-5 object-contain" />
             </div>
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">Choose your city or location</h2>
@@ -349,7 +349,7 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
                         ) : item.category === "mandi" ? (
                           <Package size={14} />
                         ) : (
-                          <MapPin size={14} />
+                          <img src="/google-maps-icon.webp" alt="City" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" />
                         )}
                       </div>
 

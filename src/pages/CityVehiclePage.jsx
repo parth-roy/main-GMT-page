@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, Link, Navigate } from "react-router-dom";
 import { 
-  Truck, MapPin, ShieldCheck, CheckCircle, ArrowRight, 
+  Truck, ShieldCheck, CheckCircle, ArrowRight, 
   PhoneCall, Weight, Ruler, Clock, IndianRupee, HelpCircle, 
   ChevronDown, ChevronUp, Zap, Sparkles 
 } from "lucide-react";
@@ -128,7 +128,7 @@ export default function CityVehiclePage() {
             {/* Left Content */}
             <div className="lg:col-span-7">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/20 border border-brand-400/40 text-brand-300 text-xs font-bold tracking-wider uppercase mb-4">
-                <MapPin size={13} /> {cityName}, {state} · Verified Fleet
+                <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" /> {cityName}, {state} · Verified Fleet
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">

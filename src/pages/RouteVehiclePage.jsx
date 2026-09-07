@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, Link, Navigate } from "react-router-dom";
 import { 
-  Truck, MapPin, ArrowRight, ShieldCheck, CheckCircle, 
+  Truck, ArrowRight, ShieldCheck, CheckCircle, 
   HelpCircle, ChevronDown, ChevronUp, Zap, Sparkles, 
   Clock, Navigation, IndianRupee, Layers 
 } from "lucide-react";

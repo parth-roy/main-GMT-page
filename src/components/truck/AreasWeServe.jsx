@@ -1,5 +1,4 @@
 import React from "react"
-import { MapPin } from "lucide-react"
 
 const areas = [
   "Central Kolkata", "Salt Lake", "New Town", "Howrah", "Dum Dum",
@@ -23,7 +22,7 @@ export default function AreasWeServe({ city }) {
         <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
           {areas.map((name) => (
             <span key={name} className="flex min-h-11 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 font-semibold text-slate-700 shadow-sm">
-              <MapPin size={14} className="shrink-0 text-brand-500" /> {name}
+              <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" /> {name}
             </span>
           ))}
         </div>

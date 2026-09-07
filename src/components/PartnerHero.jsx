@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { Send, BadgeCheck, ShieldCheck, MapPin, X, Zap, ArrowRight, Truck } from "lucide-react"
+import { Send, BadgeCheck, ShieldCheck, X, Zap, ArrowRight, Truck } from "lucide-react"
 import { trackFleetRegistration } from "../utils/analytics"
 import { useAuth } from "../context/AuthContext"
 import { VEHICLE_CATEGORIES } from "../constants/vehicleOptions"

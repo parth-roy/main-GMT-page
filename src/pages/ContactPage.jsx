@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import {
   PhoneCall,
   Mail,
-  MapPin,
   MessageCircle,
   Clock,
   ArrowRight,
@@ -274,7 +273,7 @@ export default function ContactPage() {
             {/* Address */}
             <div className="relative z-10 flex items-start gap-4">
               <div className="w-11 h-11 shrink-0 rounded-xl bg-brand-600/20 border border-brand-500/30 flex items-center justify-center">
-                <MapPin size={20} className="text-brand-400" />
+                <img src="/google-maps-icon.webp" alt="Location" width={20} height={20} className="w-5 h-5 object-contain" />
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Address</p>

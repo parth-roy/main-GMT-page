@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { MapPin, ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp, Loader2, Star } from "lucide-react"
+import { ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp, Loader2, Star } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import CitySelectorModal from "./CitySelectorModal"
 import { useCity } from "../context/CityContext"
@@ -79,7 +79,7 @@ export default function Hero({
   return (
     <>
       {/* ── HERO ──────────────────────────────────────── */}
-      <section className="relative min-h-[85vh] pt-24 pb-24 sm:pb-32 flex flex-col justify-end items-center bg-slate-900 overflow-visible mb-32">
+      <section className="relative min-h-[75vh] sm:min-h-[85vh] pt-24 sm:pt-28 pb-16 sm:pb-48 md:pb-52 lg:pb-56 flex flex-col justify-center items-center bg-slate-900 overflow-visible mb-36 sm:mb-40 md:mb-44">
         {/* Full-bleed Video Background */}
         <div className="absolute inset-0 z-0">
           {isMobile ? (
@@ -106,60 +106,62 @@ export default function Hero({
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
           {/* 5% Commission Badge */}
-          <div className="inline-flex items-center gap-2 bg-brand-600/20 border border-brand-400/40 rounded-full px-4 py-1.5 mb-6">
+          <div className="inline-flex items-center gap-2 bg-brand-600/20 border border-brand-400/40 rounded-full px-4 py-1.5 mb-5 sm:mb-6">
             <BadgePercent size={16} className="text-brand-300" />
-            <span className="text-brand-200 font-bold text-sm tracking-wide">India's Most Transparent Freight Marketplace — Only 5% Commission</span>
+            <span className="text-brand-200 font-bold text-xs sm:text-sm tracking-wide">India's Most Transparent Freight Marketplace — Only 5% Commission</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto drop-shadow-lg">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto drop-shadow-lg">
             Online Truck Booking &amp; Goods Transport in {currentCity.name}
           </h1>
 
-          <p className="mt-5 text-xl sm:text-2xl font-bold text-slate-200 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-4 sm:mt-5 text-base sm:text-xl lg:text-2xl font-semibold sm:font-bold text-slate-200 max-w-2xl mx-auto leading-relaxed">
             Connect directly with verified trucks across {currentCity.state || currentCity.region || "India"}.{" "}
             <span className="text-brand-300">No brokers. No surge pricing. No hidden fees.</span>
           </p>
 
-          <p className="mt-3 text-base text-brand-200 font-bold italic" lang="hi-Latn">
+          <p className="mt-2.5 sm:mt-3 text-sm sm:text-base text-brand-200 font-bold italic" lang="hi-Latn">
             Saaman aapka, transport hamara
           </p>
         </div>
 
         {/* Floating Services Bar */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-full px-4 z-20 flex justify-center">
-          <div className="bg-brand-50 rounded-xl shadow-2xl p-6 sm:p-8 sm:px-12 flex flex-col gap-6 border border-slate-100 w-full sm:w-fit">
+        <div className="relative z-20 w-full px-4 flex justify-center mt-8 -mb-28 sm:mt-0 sm:mb-0 sm:absolute sm:bottom-0 sm:left-1/2 sm:-translate-x-1/2 sm:translate-y-1/2">
+          <div className="bg-brand-50 rounded-xl shadow-2xl p-4 sm:p-8 sm:px-12 flex flex-col gap-4 sm:gap-6 border border-slate-100 w-full sm:w-fit">
           {/* Top Bar: Left (City Selector + Dot + Rating) + Right (Direct Driver / Partner Contact Button) */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-200/60 pb-3.5">
             {/* Left side: City Selector Trigger + Dot + Ratings */}
-            <div className="flex items-center gap-2 sm:gap-2.5 text-slate-900 font-bold text-xs sm:text-sm px-1 sm:px-2 w-full sm:w-fit justify-between sm:justify-start">
+            <div className="flex items-center gap-3 sm:gap-4 text-slate-900 font-bold text-lg sm:text-2xl px-1 sm:px-2 w-full sm:w-fit justify-between sm:justify-start">
               <div 
-                className="flex items-center gap-2 cursor-pointer hover:text-brand-600 transition-colors"
+                className="flex items-center gap-2.5 sm:gap-3 cursor-pointer hover:text-brand-600 transition-colors group/city"
                 onClick={() => setCityOpen(true)}
               >
-                <span className="relative flex h-2.5 w-2.5 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                </span>
-                <MapPin size={18} className="text-brand-600 shrink-0" />
+                <img 
+                  src="/google-maps-icon.webp" 
+                  alt="Location" 
+                  width={28} 
+                  height={28} 
+                  className="w-7 h-7 object-contain shrink-0 group-hover/city:scale-110 transition-transform drop-shadow-xs" 
+                />
                 {cityDetecting ? (
-                  <span className="flex items-center gap-1.5 text-slate-400 font-normal">
-                    <Loader2 size={13} className="animate-spin" />
+                  <span className="flex items-center gap-2 text-slate-400 font-normal text-base sm:text-lg">
+                    <Loader2 size={18} className="animate-spin" />
                     Detecting...
                   </span>
                 ) : (
-                  <>
-                    <span>City: <strong className="text-brand-700">{currentCity.name}</strong></span>
-                    <span className="text-xs text-brand-500 font-medium ml-1 underline underline-offset-2">Change</span>
-                  </>
+                  <div className="flex items-center gap-2">
+                    <span className="leading-tight">City: <strong className="text-brand-700 font-black tracking-tight">{currentCity.name}</strong></span>
+                    <span className="text-xs sm:text-sm font-bold bg-brand-100/90 hover:bg-brand-200 text-brand-800 border border-brand-300/80 px-2.5 py-0.5 rounded-lg shadow-xs transition-all hover:scale-105 active:scale-95">Change</span>
+                  </div>
                 )}
               </div>
 
-              <span className="text-slate-300 font-normal select-none">·</span>
+              <span className="text-slate-300 font-normal select-none text-xl sm:text-2xl">·</span>
 
-              <div className="flex items-center gap-1 text-amber-500 font-extrabold text-xs sm:text-sm shrink-0">
-                <Star size={14} className="fill-amber-400 text-amber-400" />
+              <div className="flex items-center gap-1.5 text-amber-500 font-extrabold text-sm sm:text-base shrink-0">
+                <Star size={18} className="fill-amber-400 text-amber-400" />
                 <span>4.8</span>
-                <span className="text-slate-400 font-medium text-[11px] sm:text-xs">(15k+)</span>
+                <span className="text-slate-400 font-medium text-xs sm:text-sm">(15k+)</span>
               </div>
             </div>
 
@@ -201,7 +203,7 @@ export default function Hero({
             </div>
           </div>
 
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-10 lg:gap-16">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-10 lg:gap-16">
               {/* Service Tabs */}
               <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto justify-start">
                 {services.map((srv) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { X, Check, Truck, Loader2, Package, Banknote, ChevronDown, MapPin, Gift, MousePointerClick, AlertCircle } from "lucide-react"
+import { X, Check, Truck, Loader2, Package, Banknote, ChevronDown, Gift, MousePointerClick, AlertCircle } from "lucide-react"
 import { fetchEstimate, fetchVehicles } from "../api/pricingApi"
 import { createBooking, confirmBooking, cancelBooking } from "../api/bookingApi"
 import { trackBookingSubmitted } from "../utils/analytics"
@@ -535,7 +535,7 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                   
                   {/* Features List */}
                   <div className="space-y-5 mb-10 z-10 mt-4">
-                    <div className="flex items-center gap-4"><div className="w-6 flex justify-center"><MapPin size={20} className="text-blue-300"/></div><span className="font-medium text-sm">In-Transit Updates</span></div>
+                    <div className="flex items-center gap-4"><div className="w-6 flex justify-center"><img src="/google-maps-icon.webp" alt="Location" width={20} height={20} className="w-5 h-5 object-contain" /></div><span className="font-medium text-sm">In-Transit Updates</span></div>
                     <div className="flex items-center gap-4"><div className="w-6 flex justify-center"><Gift size={20} className="text-blue-300"/></div><span className="font-medium text-sm">Exciting Discounts & Rewards</span></div>
                     <div className="flex items-center gap-4"><div className="w-6 flex justify-center"><MousePointerClick size={20} className="text-blue-300"/></div><span className="font-medium text-sm">1-Tap Booking Options</span></div>
                     <div className="flex items-center gap-4"><div className="w-6 flex justify-center"><Truck size={20} className="text-blue-300"/></div><span className="font-medium text-sm">Loading & Unloading Service</span></div>

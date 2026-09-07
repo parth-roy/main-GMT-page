@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
-  Zap, Phone, Shield, ChevronRight, MapPin, CheckCircle, CheckCircle2,
+  Zap, Phone, Shield, ChevronRight, CheckCircle, CheckCircle2,
   Star, ArrowRight, BadgeCheck, Lock, Banknote, Unlock, Copy, Check, MessageSquare, AlertCircle,
   X, Download, Share2, Truck, ShieldCheck, CreditCard, Loader2
 } from "lucide-react";
@@ -1040,7 +1040,7 @@ export default function DirectContactPage() {
                     className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/40 transition-all group cursor-pointer"
                   >
                     <span className="flex items-center gap-2.5 font-bold text-slate-800 text-sm">
-                      <MapPin className="w-4 h-4 text-emerald-600" />
+                      <img src="/google-maps-icon.webp" alt="Location" width={16} height={16} className="w-4 h-4 object-contain shrink-0" />
                       {selectedCity.name}
                     </span>
                     <span className="text-xs text-emerald-700 font-black group-hover:underline">Change City</span>
@@ -1230,7 +1230,7 @@ export default function DirectContactPage() {
               {/* Prominent city indicator so users never pay for the wrong city */}
               <div className="flex items-center justify-between gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 mb-1">
                 <div className="flex items-center gap-2 min-w-0">
-                  <MapPin size={16} className="text-blue-600 shrink-0" />
+                  <img src="/google-maps-icon.webp" alt="Location" width={16} height={16} className="w-4 h-4 object-contain shrink-0" />
                   <div className="min-w-0">
                     <p className="text-xs text-blue-500 font-semibold uppercase tracking-wider">Showing drivers in</p>
                     <p className="text-sm font-black text-blue-900 truncate">{selectedCity.name}</p>
@@ -1854,7 +1854,7 @@ export default function DirectContactPage() {
               {/* City Confirmation — show clearly before payment */}
               <div className="flex items-center justify-between gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3.5 py-2.5">
                 <div className="flex items-center gap-2 min-w-0">
-                  <MapPin size={14} className="text-blue-600 shrink-0" />
+                  <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" />
                   <div className="min-w-0">
                     <p className="text-[10px] text-blue-500 font-bold uppercase tracking-wider">Unlocking drivers in</p>
                     <p className="text-sm font-black text-blue-900 truncate">{selectedCity.name}</p>

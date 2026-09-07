@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { ArrowRight, MapPin, Phone, TrendingUp, Package, Building2, Truck, MessageCircleQuestion } from 'lucide-react';
+import { ArrowRight, Phone, TrendingUp, Package, Building2, Truck, MessageCircleQuestion } from 'lucide-react';
 import SEOHead from '../seo/SEOHead';
 import { generateStateFaqs } from '../lib/locationFaqHelper';
 
@@ -269,8 +269,8 @@ const StateHubPage = ({ stateKey }) => {
               to={hub.slug} 
               className="bg-white border border-slate-200 rounded-xl p-6 hover:border-brand-500 hover:shadow-lg transition-all group flex flex-col items-start"
             >
-              <div className="bg-slate-50 p-3 rounded-lg text-slate-600 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors mb-4">
-                <MapPin className="w-6 h-6" />
+              <div className="bg-slate-50 p-3 rounded-lg text-slate-600 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors mb-4 flex items-center justify-center">
+                <img src="/google-maps-icon.webp" alt="Location" width={24} height={24} className="w-6 h-6 object-contain" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">{hub.name}</h3>
               <p className="text-slate-600 text-sm">{hub.tagline}</p>

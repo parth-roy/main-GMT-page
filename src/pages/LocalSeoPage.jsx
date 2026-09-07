@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { Link, Navigate } from "react-router-dom"
-import { ArrowRight, CheckCircle2, MapPin, Phone, BadgePercent, MessageCircleQuestion } from "lucide-react"
+import { ArrowRight, CheckCircle2, Phone, BadgePercent, MessageCircleQuestion } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
 import { generateCityFaqs, generateRouteFaqs } from "../lib/locationFaqHelper"
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
@@ -648,7 +648,7 @@ export default function LocalSeoPage({ pageKey }) {
             <aside className="rounded-2xl bg-brand-50 border border-brand-200 p-6">
               <h2 className="text-xl font-black text-slate-900">Coverage highlights</h2>
               <ul className="mt-4 space-y-3">
-                {page.areas.map((area) => <li key={area} className="flex gap-2 text-slate-700"><MapPin size={18} className="text-brand-700 shrink-0 mt-0.5" />{area}</li>)}
+                {page.areas.map((area) => <li key={area} className="flex gap-2 text-slate-700"><img src="/google-maps-icon.webp" alt="Location" width={18} height={18} className="w-4.5 h-4.5 object-contain shrink-0 mt-0.5" />{area}</li>)}
               </ul>
             </aside>
           </div>

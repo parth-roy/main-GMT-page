@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { Link } from "react-router-dom"
-import { TrendingUp, Truck, MapPin, BarChart3, Info, ArrowRight } from "lucide-react"
+import { TrendingUp, Truck, BarChart3, Info, ArrowRight } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
 
 export default function FreightRateIndexPage() {
@@ -128,7 +128,7 @@ export default function FreightRateIndexPage() {
                     {rateData.map((row, idx) => (
                       <tr key={idx} className="hover:bg-slate-50 transition-colors">
                         <td className="px-6 py-4 font-semibold text-slate-900 flex items-center gap-2">
-                          <MapPin size={16} className="text-brand-600" />
+                          <img src="/google-maps-icon.webp" alt="Route" width={16} height={16} className="w-4 h-4 object-contain shrink-0" />
                           {row.route}
                         </td>
                         <td className="px-6 py-4 flex items-center gap-2">

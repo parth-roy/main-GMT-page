@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import SEOHead from '../seo/SEOHead';
 import WhyChooseUs from '../components/WhyChooseUs';
-import { Target, Shield, Zap, MapPin } from 'lucide-react';
+import { Target, Shield, Zap } from 'lucide-react';
 import DirectDriverContactBanner from '../components/common/DirectDriverContactBanner';
 
 export default function AboutPage() {
@@ -87,7 +87,7 @@ export default function AboutPage() {
         <section className="py-20 bg-slate-100 border-y border-slate-200">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
-              <MapPin className="text-brand-600" size={28} />
+              <img src="/google-maps-icon.webp" alt="Location" width={28} height={28} className="w-7 h-7 object-contain" />
             </div>
             <h2 className="text-3xl font-display font-bold text-slate-900 mb-4">Our Headquarters</h2>
             <p className="text-lg text-slate-600 mb-2"><strong>Parther Technologies Pvt. Ltd.</strong></p>

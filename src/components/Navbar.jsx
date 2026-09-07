@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from "react"
-import { Menu, X, ChevronRight, ChevronDown, PhoneCall, LogIn, LogOut, Truck, Package, Building2, Users, MapPin, ArrowRight, Zap } from "lucide-react"
+import { Menu, X, ChevronRight, ChevronDown, PhoneCall, LogIn, LogOut, Truck, Package, Building2, Users, ArrowRight, Zap } from "lucide-react"
 import { useLocation, Link } from "react-router-dom"
 import AppDownloadModal from "./AppDownloadModal"
 import CitySelectorModal from "./CitySelectorModal"
@@ -199,7 +199,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               }`}
               title="Change City"
             >
-              <MapPin size={12} className="text-brand-600 shrink-0" />
+              <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" />
               <span className="max-w-[90px] truncate">{currentCity?.name || "Kolkata"}</span>
               <ChevronDown size={11} className="text-slate-400" />
             </button>
@@ -346,7 +346,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-100 border border-brand-200 text-brand-800 text-xs font-bold"
               title="Change City"
             >
-              <MapPin size={12} className="text-brand-600 shrink-0" />
+              <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" />
               <span className="max-w-[80px] truncate">{currentCity?.name || "Kolkata"}</span>
               <ChevronDown size={11} className="text-slate-400" />
             </button>

@@ -1,5 +1,4 @@
 import React from "react"
-import { MapPin } from "lucide-react"
 
 const hubs = [
   ["Kolkata", "/kolkata"],
@@ -24,7 +23,7 @@ export default function CityCoverage() {
         <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
           {hubs.map(([label, href]) => (
             <a key={href} href={href} className="flex min-h-12 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 font-semibold text-slate-700 shadow-sm transition hover:border-brand-500 hover:text-brand-700">
-              <MapPin size={16} className="text-brand-500" /> {label}
+              <img src="/google-maps-icon.webp" alt="Location" width={16} height={16} className="w-4 h-4 object-contain shrink-0" /> {label}
             </a>
           ))}
         </div>

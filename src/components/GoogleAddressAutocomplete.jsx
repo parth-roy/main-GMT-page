@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { MapPin, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 // API key read from env var — set VITE_GOOGLE_MAPS_KEY in .env
 import { trackBeginBooking } from "../utils/analytics"
 
@@ -207,7 +207,7 @@ export default function GoogleAddressAutocomplete({
                   aria-selected="false"
                   className="flex min-h-11 items-start gap-2 p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0"
                 >
-                  <MapPin size={16} className="text-slate-400 shrink-0 mt-0.5" />
+                  <img src="/google-maps-icon.webp" alt="Location" width={16} height={16} className="w-4 h-4 object-contain shrink-0 mt-0.5" />
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold text-slate-800 line-clamp-1">{p.mainText}</span>
                     <span className="text-xs text-slate-500 line-clamp-1">{p.secondaryText}</span>

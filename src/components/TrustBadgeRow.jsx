@@ -1,12 +1,12 @@
 import React from 'react';
-import { ShieldCheck, PackageCheck, Clock, MapPin } from 'lucide-react';
+import { ShieldCheck, PackageCheck, Clock } from 'lucide-react';
 
 export default function TrustBadgeRow({ city }) {
   const badges = [
     { icon: ShieldCheck, title: "Protection Options", subtitle: "Eligibility shown before confirmation" },
     { icon: PackageCheck, title: "Partner Documents", subtitle: "Onboarding records are reviewed" },
     { icon: Clock, title: "Availability Updates", subtitle: "Assignment timing shown separately" },
-    { icon: MapPin, title: `Check ${city || 'Your Route'}`, subtitle: "Tracking on supported active trips" }
+    { icon: () => <img src="/google-maps-icon.webp" alt="Route" width={24} height={24} className="w-6 h-6 object-contain" />, title: `Check ${city || 'Your Route'}`, subtitle: "Tracking on supported active trips" }
   ];
 
   return (

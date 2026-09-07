@@ -1,5 +1,5 @@
 import React from "react"
-import { ArrowRight, BarChart2, MapPin, Package, Truck, Users } from "lucide-react"
+import { ArrowRight, BarChart2, Package, Truck, Users } from "lucide-react"
 
 const capabilities = [
   {
@@ -118,7 +118,7 @@ export default function SEOContent({ city }) {
 
         <div className="mb-14 rounded-2xl border border-brand-100 bg-brand-50/60 p-8">
           <h2 className="mb-4 flex items-center gap-3 text-3xl font-bold text-slate-900">
-            <MapPin size={28} className="shrink-0 text-brand-600" />
+            <img src="/google-maps-icon.webp" alt="Location" width={28} height={28} className="w-7 h-7 object-contain shrink-0" />
             Local Service Hubs Around {city}
           </h2>
           <p className="text-base leading-relaxed text-slate-600 lg:text-lg">

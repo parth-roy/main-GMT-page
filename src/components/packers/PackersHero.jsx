@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { MapPin, ChevronDown, ArrowRight, AlertCircle, Shield, CheckCircle } from "lucide-react"
+import { ChevronDown, ArrowRight, AlertCircle, Shield, CheckCircle } from "lucide-react"
 import { SERVED_CITIES } from "../../api/pricingApi"
 import AddressAutocomplete from "../AddressAutocomplete"
 import { trackLead, trackWhatsAppClick } from "../../utils/analytics"
@@ -96,7 +96,7 @@ export default function PackersHero({ city, setCity }) {
                 onClick={() => setCityOpen((o) => !o)}
                 className="flex items-center gap-2 text-slate-900 font-bold text-sm cursor-pointer w-fit hover:text-brand-600 transition-colors"
               >
-                <MapPin size={18} className="text-brand-600 shrink-0" />
+                <img src="/google-maps-icon.webp" alt="City" width={18} height={18} className="w-4.5 h-4.5 object-contain shrink-0" />
                 <span>{city}</span>
                 <ChevronDown
                   size={14}
@@ -121,7 +121,7 @@ export default function PackersHero({ city, setCity }) {
                               : "text-slate-700 hover:bg-slate-50"
                             }`}
                         >
-                          <MapPin size={13} className={c === city ? "text-brand-600" : "text-slate-300"} />
+                          <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" />
                           {c}
                         </button>
                       </li>
