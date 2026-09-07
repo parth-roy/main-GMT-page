@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { SEO_CITIES } from "../lib/cities";
 
 const CityContext = createContext(null);
 
-export const DEFAULT_CITY = {
+const DEFAULT_CITY = {
   name: "Kolkata",
   slug: "kolkata",
   state: "West Bengal",
@@ -16,7 +16,7 @@ const LEGACY_STORAGE_KEY = "gomytruck_selected_city";
 /**
  * Match a raw city name or coordinates against our SEO_CITIES registry
  */
-export function resolveCityConfig(rawCityName, rawStateName) {
+function resolveCityConfig(rawCityName, rawStateName) {
   if (!rawCityName) return null;
   const clean = rawCityName.trim().toLowerCase();
 
@@ -58,6 +58,8 @@ export function CityProvider({ children }) {
   const [currentCity, setCurrentCity] = useState(DEFAULT_CITY);
   const [isDetecting, setIsDetecting] = useState(false);
   const [hasDetected, setHasDetected] = useState(false);
+  const currentCityRef = useRef(DEFAULT_CITY);
+  currentCityRef.current = currentCity;
 
   // Set city with optional manual session persistence
   const setCity = useCallback((cityInput, isManual = true) => {
@@ -80,6 +82,16 @@ export function CityProvider({ children }) {
       };
     }
 
+    // Loop & redundant update guard: if the city slug and name match the current city, bail out immediately
+    if (
+      currentCityRef.current &&
+      currentCityRef.current.slug === cityObj.slug &&
+      currentCityRef.current.name.toLowerCase() === cityObj.name.toLowerCase()
+    ) {
+      return;
+    }
+
+    currentCityRef.current = cityObj;
     setCurrentCity(cityObj);
 
     if (typeof window !== "undefined") {
@@ -109,7 +121,7 @@ export function CityProvider({ children }) {
           if (sessionRaw) {
             const parsed = JSON.parse(sessionRaw);
             if (parsed?.name) {
-              setCurrentCity(parsed);
+              setCity(parsed, true);
               setHasDetected(true);
               return parsed;
             }
@@ -178,29 +190,14 @@ export function CityProvider({ children }) {
         // Run IP detection first as it doesn't block or prompt the user
         const ipCity = await detectViaIp();
         if (ipCity) {
-          setCurrentCity(ipCity);
-          setIsDetecting(false);
-          setHasDetected(true);
-          // Broadcast
-          try {
-            window.dispatchEvent(
-              new CustomEvent("gomytruck:city_change", { detail: ipCity })
-            );
-          } catch {}
+          setCity(ipCity, false);
           return ipCity;
         }
 
         // Fallback to browser geolocation
         const geoCity = await detectViaBrowserGeo();
         if (geoCity) {
-          setCurrentCity(geoCity);
-          setIsDetecting(false);
-          setHasDetected(true);
-          try {
-            window.dispatchEvent(
-              new CustomEvent("gomytruck:city_change", { detail: geoCity })
-            );
-          } catch {}
+          setCity(geoCity, false);
           return geoCity;
         }
       } catch (err) {
@@ -212,7 +209,7 @@ export function CityProvider({ children }) {
 
       return DEFAULT_CITY;
     },
-    []
+    [setCity]
   );
 
   // On initial mount / reload: run auto-detection
@@ -220,7 +217,10 @@ export function CityProvider({ children }) {
     detectLocation(false);
 
     const handleCustomChange = (e) => {
-      if (e?.detail?.name && e.detail.name !== currentCity.name) {
+      if (
+        e?.detail?.slug &&
+        e.detail.slug !== currentCityRef.current?.slug
+      ) {
         setCity(e.detail, false);
       }
     };
@@ -228,7 +228,7 @@ export function CityProvider({ children }) {
     window.addEventListener("gomytruck:city_change", handleCustomChange);
     return () =>
       window.removeEventListener("gomytruck:city_change", handleCustomChange);
-  }, [detectLocation, setCity, currentCity.name]);
+  }, [detectLocation, setCity]);
 
   return (
     <CityContext.Provider

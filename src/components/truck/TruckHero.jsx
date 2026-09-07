@@ -29,38 +29,16 @@ export default function TruckHero({ city, setCity }) {
   const [showResult, setShowResult] = useState(false)
 
   // City selector state
-  const [cityDetecting, setCityDetecting] = useState(true)
+  const [cityDetecting, setCityDetecting] = useState(false)
   const [cityOpen, setCityOpen] = useState(false)
   const cityRef = useRef(null)
 
-  // Auto-detect city on mount — check localStorage first, geolocation only as last resort
+  // Sync if navigated with router location state (e.g. from a city card or link)
   useEffect(() => {
-    if (location.state?.selectedCity) {
+    if (location.state?.selectedCity && location.state.selectedCity !== city) {
       setCity(location.state.selectedCity)
-      setCityDetecting(false)
-    } else {
-      // Use stored preference first (instantaneous, no prompt)
-      const persisted = getPersistedCity()
-      if (persisted?.name) {
-        setCity(persisted.name)
-        setCityDetecting(false)
-      } else {
-        detectCurrentCity().then((detected) => {
-          setCity(detected)
-          setCityDetecting(false)
-        })
-      }
     }
-  }, [setCity, location.state?.selectedCity])
-
-  // Stay in sync when any other component changes the global city
-  useEffect(() => {
-    const handler = (e) => {
-      if (e?.detail?.name) setCity(e.detail.name)
-    }
-    window.addEventListener('gomytruck:city_change', handler)
-    return () => window.removeEventListener('gomytruck:city_change', handler)
-  }, [setCity])
+  }, [location.state?.selectedCity, city, setCity])
 
   // Close city dropdown on outside click
   useEffect(() => {
@@ -304,9 +282,6 @@ export default function TruckHero({ city, setCity }) {
       <CitySelectorModal 
         isOpen={cityOpen} 
         onClose={() => setCityOpen(false)} 
-        onCitySelect={(cityName) => {
-          setCity(cityName)
-        }}
       />
 
       {/* Estimate Result Modal */}

@@ -18,15 +18,8 @@ export default function BikeHero({ city, setCity }) {
   const [estimateResult, setEstimateResult] = useState(null)
   const [showResult, setShowResult] = useState(false)
 
-  const [cityDetecting, setCityDetecting] = useState(true)
+  const [cityDetecting, setCityDetecting] = useState(false)
   const [cityOpen, setCityOpen] = useState(false)
-
-  useEffect(() => {
-    detectCurrentCity().then((detected) => {
-      setCity(detected)
-      setCityDetecting(false)
-    })
-  }, [setCity])
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -223,10 +216,6 @@ export default function BikeHero({ city, setCity }) {
       <CitySelectorModal
         isOpen={cityOpen}
         onClose={() => setCityOpen(false)}
-        onCitySelect={(selectedCity) => {
-          setCity(selectedCity)
-          setCityOpen(false)
-        }}
       />
 
       {showResult && estimateResult && (

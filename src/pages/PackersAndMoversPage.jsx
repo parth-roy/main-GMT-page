@@ -11,9 +11,8 @@ import DirectDriverContactBanner from "../components/common/DirectDriverContactB
 import { useCity } from "../context/CityContext"
 
 export default function PackersAndMoversPage() {
-  const { currentCity, setCity: setGlobalCity } = useCity()
+  const { currentCity, setCity } = useCity()
   const city = currentCity.name
-  const setCity = (c) => setGlobalCity(c)
 
   useEffect(() => {
     window.scrollTo(0, 0)
