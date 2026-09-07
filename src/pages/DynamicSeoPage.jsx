@@ -81,6 +81,16 @@ export default function DynamicSeoPage({ serviceType }) {
     serviceHeadline = `Moving Truck Hire in ${cityName}`;
     serviceBanner = `Household shifting and office relocation moving trucks in ${cityName}`;
     serviceDesc = `Hire moving trucks in ${cityName} for safe house shifting and office relocation. Dedicated closed container trucks and careful cargo transport.`;
+  } else if (serviceType === "goods-transport") {
+    urlSegment = "goods-transport";
+    serviceHeadline = `Goods Transport Services in ${cityName}`;
+    serviceBanner = `Commercial goods transport and freight logistics across ${cityName}`;
+    serviceDesc = `Reliable goods transport services in ${cityName}, ${state}. Hire verified trucks for retail cargo, manufacturing consignments, and wholesale distribution with flat 5% commission.`;
+  } else if (serviceType === "ftl-transport") {
+    urlSegment = "ftl-transport";
+    serviceHeadline = `Full Truckload (FTL) Freight in ${cityName}`;
+    serviceBanner = `Dedicated full truckload (FTL) commercial freight from ${cityName}`;
+    serviceDesc = `Book dedicated Full Truckload (FTL) freight services in ${cityName}. Direct point-to-point transit for 14ft to 32ft commercial trucks with guaranteed placement and live GPS tracking.`;
   }
 
   const routePath = serviceType === "hub" ? `/${city}` : `/${city}/${urlSegment}`;

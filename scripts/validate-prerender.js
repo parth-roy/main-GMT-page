@@ -60,6 +60,8 @@ const sitemaps = [
   "sitemap-cities.xml",
   "sitemap-routes.xml",
   "sitemap-vehicles.xml",
+  "sitemap-driver-loads.xml",
+  "sitemap-cargo.xml",
   "sitemap-resources.xml",
 ]
 

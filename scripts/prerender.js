@@ -32,7 +32,7 @@ async function writeRoute(route, outputFile) {
   await fs.writeFile(destination, document)
 }
 
-const BATCH_SIZE = 16
+const BATCH_SIZE = 32
 let completed = 0
 for (let i = 0; i < PRERENDER_ROUTES.length; i += BATCH_SIZE) {
   const chunk = PRERENDER_ROUTES.slice(i, i + BATCH_SIZE)

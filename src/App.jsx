@@ -56,6 +56,10 @@ const BlogPostPage = lazy(() => import("./pages/BlogPostPage"))
 const DriverOnboardingPage = lazy(() => import("./pages/DriverOnboardingPage"))
 const DirectoryPage = lazy(() => import("./pages/DirectoryPage"))
 const DirectContactPage = lazy(() => import("./pages/DirectContactPage"))
+const CityVehiclePage = lazy(() => import("./pages/CityVehiclePage"))
+const RouteVehiclePage = lazy(() => import("./pages/RouteVehiclePage"))
+const DriverLoadHubPage = lazy(() => import("./pages/DriverLoadHubPage"))
+const CargoReturnLoadPage = lazy(() => import("./pages/CargoReturnLoadPage"))
 
 // A simple premium spinner for Suspense fallback
 const PageLoader = () => (
@@ -311,6 +315,19 @@ export default function App() {
             
             <Route path="/delete-account" element={<DeleteAccountPage />} />
 
+            {/* PROGRAMMATIC SEO & GEO TEMPLATE ROUTES */}
+            <Route path="/:city/truck-booking/:vehicle" element={<CityVehiclePage />} />
+            <Route path="/transport/:route/:vehicle" element={<RouteVehiclePage />} />
+            <Route path="/transport/:route/:vehicle/:cargo" element={<RouteVehiclePage />} />
+            <Route path="/routes/:route/:vehicle" element={<RouteVehiclePage />} />
+            <Route path="/loads/:city/:vehicle" element={<DriverLoadHubPage />} />
+            <Route path="/drivers/:city/:vehicle" element={<DriverLoadHubPage />} />
+            <Route path="/return-loads/:route" element={<CargoReturnLoadPage mode="return-load" />} />
+            <Route path="/cargo/:city/:cargoType" element={<CargoReturnLoadPage mode="cargo" />} />
+            <Route path="/industrial/:city/:vehicle" element={<CityVehiclePage />} />
+            <Route path="/industrial/:route" element={<RouteVehiclePage />} />
+            <Route path="/local/:city/:vehicle" element={<CityVehiclePage />} />
+
             {/* DYNAMIC PSEO ROUTES FOR ALL CITIES */}
             <Route path="/:city" element={<DynamicSeoPage serviceType="hub" />} />
             <Route path="/:city/truck-booking" element={<DynamicSeoPage serviceType="truck-booking" />} />
@@ -320,6 +337,8 @@ export default function App() {
             <Route path="/:city/tata-ace-booking" element={<DynamicSeoPage serviceType="tata-ace" />} />
             <Route path="/:city/14-feet-truck-rental" element={<DynamicSeoPage serviceType="14ft-truck" />} />
             <Route path="/:city/moving-truck-hire" element={<DynamicSeoPage serviceType="moving-truck" />} />
+            <Route path="/:city/goods-transport" element={<DynamicSeoPage serviceType="goods-transport" />} />
+            <Route path="/:city/ftl-transport" element={<DynamicSeoPage serviceType="ftl-transport" />} />
 
             {/* Catch-all 404 Route */}
             <Route path="*" element={<NotFoundPage />} />

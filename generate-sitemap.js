@@ -9,8 +9,20 @@ const __dirname = path.dirname(__filename);
 const BASE_URL = 'https://gomytruck.com';
 
 function getCategory(route) {
-  if (route.startsWith('/routes/') || route.startsWith('/intercity/') || route.startsWith('/local-transport/')) {
+  if (route.startsWith('/routes/') || route.startsWith('/intercity/') || route.startsWith('/local-transport/') || route.startsWith('/transport/')) {
     return 'routes';
+  }
+  if (route.startsWith('/loads/') || route.startsWith('/drivers/')) {
+    return 'driver-loads';
+  }
+  if (route.startsWith('/cargo/') || route.startsWith('/return-loads/')) {
+    return 'cargo';
+  }
+  if (route.startsWith('/industrial/')) {
+    return route.includes('-to-') ? 'routes' : 'vehicles';
+  }
+  if (route.startsWith('/local/')) {
+    return 'vehicles';
   }
   if (route.startsWith('/blog') || route.startsWith('/resources/') || route.startsWith('/industries/')) {
     return 'resources';
@@ -25,7 +37,7 @@ function getCategory(route) {
     return 'core';
   }
 
-  const vehicleKeywords = ['truck', 'bike', 'packers-and-movers', 'goods-transport', 'tata-ace', 'labour', 'container', 'bolero', 'eicher'];
+  const vehicleKeywords = ['truck', 'bike', 'packers-and-movers', 'goods-transport', 'tata-ace', 'labour', 'container', 'bolero', 'eicher', 'ftl-transport'];
   if (vehicleKeywords.some(kw => route.includes(kw))) {
     return 'vehicles';
   }
@@ -41,6 +53,8 @@ function generateSitemaps() {
     cities: [],
     routes: [],
     vehicles: [],
+    'driver-loads': [],
+    cargo: [],
     resources: []
   };
 

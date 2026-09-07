@@ -339,45 +339,60 @@ export default function DriverOnboardingPage() {
     try {
       const data = new FormData();
 
-      // Append text fields
+      // Resolve city and state cleanly
+      const resolvedCity = formData.city || givenLocation?.district || givenLocation?.address || "";
+      const resolvedState = formData.state || givenLocation?.state || "";
+
+      // Append text fields from formData, skipping location keys to avoid duplicate entries
+      const locationKeys = new Set([
+        "city", "state",
+        "givenAddress", "givenStreet", "givenDistrict", "givenState", "givenPincode", "givenLat", "givenLng",
+        "autoAddress", "autoStreet", "autoDistrict", "autoState", "autoPincode", "autoLat", "autoLng"
+      ]);
+
       Object.keys(formData).forEach((key) => {
-        data.append(key, formData[key]);
+        if (!locationKeys.has(key) && formData[key] !== null && formData[key] !== undefined) {
+          data.set(key, String(formData[key]));
+        }
       });
 
-      // Append Location Data
+      // Explicitly set single city & state
+      data.set("city", resolvedCity);
+      data.set("state", resolvedState);
+
+      // Append Given Location Data
       if (givenLocation) {
-        data.append("city", givenLocation.district || givenLocation.address || "");
-        data.append("state", givenLocation.state || "");
-        data.append("givenAddress", givenLocation.address || "");
-        data.append("givenStreet", givenLocation.street || "");
-        data.append("givenDistrict", givenLocation.district || "");
-        data.append("givenState", givenLocation.state || "");
-        data.append("givenPincode", givenLocation.pincode || "");
-        if (givenLocation.lat) data.append("givenLat", givenLocation.lat);
-        if (givenLocation.lng) data.append("givenLng", givenLocation.lng);
+        if (givenLocation.address) data.set("givenAddress", givenLocation.address);
+        if (givenLocation.street) data.set("givenStreet", givenLocation.street);
+        if (givenLocation.district) data.set("givenDistrict", givenLocation.district);
+        if (givenLocation.state) data.set("givenState", givenLocation.state);
+        if (givenLocation.pincode) data.set("givenPincode", givenLocation.pincode);
+        if (givenLocation.lat) data.set("givenLat", String(givenLocation.lat));
+        if (givenLocation.lng) data.set("givenLng", String(givenLocation.lng));
       }
 
+      // Append Auto Location Data
       if (autoLocation) {
-        data.append("autoAddress", autoLocation.address || "");
-        data.append("autoStreet", autoLocation.street || "");
-        data.append("autoDistrict", autoLocation.district || "");
-        data.append("autoState", autoLocation.state || "");
-        data.append("autoPincode", autoLocation.pincode || "");
-        if (autoLocation.lat) data.append("autoLat", autoLocation.lat);
-        if (autoLocation.lng) data.append("autoLng", autoLocation.lng);
+        if (autoLocation.address) data.set("autoAddress", autoLocation.address);
+        if (autoLocation.street) data.set("autoStreet", autoLocation.street);
+        if (autoLocation.district) data.set("autoDistrict", autoLocation.district);
+        if (autoLocation.state) data.set("autoState", autoLocation.state);
+        if (autoLocation.pincode) data.set("autoPincode", autoLocation.pincode);
+        if (autoLocation.lat) data.set("autoLat", String(autoLocation.lat));
+        if (autoLocation.lng) data.set("autoLng", String(autoLocation.lng));
       }
 
       // Append files
       Object.keys(files).forEach((key) => {
         if (files[key]) {
-          data.append(key, files[key]);
+          data.set(key, files[key]);
         }
       });
 
       // Append payment details
       Object.keys(paymentDetails).forEach((key) => {
-        if (paymentDetails[key]) {
-          data.append(key, paymentDetails[key]);
+        if (paymentDetails[key] !== undefined && paymentDetails[key] !== null) {
+          data.set(key, String(paymentDetails[key]));
         }
       });
 
