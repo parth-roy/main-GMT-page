@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useLocation, Link, Navigate } from "react-router-dom";
 import { 
   Truck, ArrowRight, ShieldCheck, CheckCircle, 
@@ -95,6 +95,13 @@ export default function RouteVehiclePage() {
     }
   ];
 
+  const isDfcCorridor = useMemo(() => {
+    const dfcSlugs = ['dankuni', 'kolkata', 'asansol', 'ludhiana', 'kanpur', 'varanasi', 'mumbai', 'jnpt', 'sanand', 'ahmedabad', 'vadodara', 'surat', 'new-delhi', 'dadri', 'rewari', 'gurugram'];
+    return dfcSlugs.includes(corridor?.originSlug) || dfcSlugs.includes(corridor?.destSlug);
+  }, [corridor]);
+
+  const isThinRoute = !corridor.highway || distanceKm < 15;
+
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -127,6 +134,21 @@ export default function RouteVehiclePage() {
     },
     {
       "@context": "https://schema.org",
+      "@type": "Product",
+      "name": `10 Direct Driver Numbers for ${originName} to ${destName} (${vehicle.name})`,
+      "description": `Direct mobile numbers of 10 verified commercial drivers active on the ${originName} to ${destName} highway corridor. Flat ₹99 fee with zero broker margin.`,
+      "image": `https://gomytruck.com${vehicle.image}`,
+      "offers": {
+        "@type": "Offer",
+        "price": "99",
+        "priceCurrency": "INR",
+        "priceValidUntil": "2026-12-31",
+        "availability": "https://schema.org/InStock",
+        "url": `https://gomytruck.com/direct-driver-contact?city=${corridor.originSlug}&vehicle=${vehicle.slug}`
+      }
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "FAQPage",
       "mainEntity": pageFaqs.map(f => ({
         "@type": "Question",
@@ -144,6 +166,7 @@ export default function RouteVehiclePage() {
         canonical={canonicalPath}
         keywords={`${originName} to ${destName} truck, ${vehicle.shortName} ${originName} ${destName}, freight rate ${originName} to ${destName}, book ${vehicle.slug} intercity`}
         jsonLd={jsonLd}
+        noindex={isThinRoute}
       />
 
       {/* Hero Section */}
@@ -164,8 +187,15 @@ export default function RouteVehiclePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Content */}
             <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold tracking-wider uppercase mb-4">
-                <Navigation size={13} /> {highway} · Route Corridor
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold tracking-wider uppercase">
+                  <Navigation size={13} /> {highway} · Route Corridor
+                </div>
+                {isDfcCorridor && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/40 text-blue-300 text-xs font-extrabold tracking-wider uppercase">
+                    <Sparkles size={13} className="text-blue-400" /> Dedicated Freight Corridor (DFC) Node
+                  </div>
+                )}
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
@@ -224,7 +254,7 @@ export default function RouteVehiclePage() {
                   to="/direct-driver-contact"
                   className="bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold px-6 py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2"
                 >
-                  <Zap size={17} className="fill-slate-900" /> Unlock Route Drivers · ₹99
+                  <Zap size={17} className="fill-slate-900 animate-bounce" /> Unlock 10 Route Drivers · ₹99 (Save ₹1,500+)
                 </Link>
               </div>
             </div>

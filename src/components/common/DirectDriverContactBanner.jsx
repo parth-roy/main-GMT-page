@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Zap, Phone, BadgeCheck, ShieldCheck, ArrowRight, Truck } from "lucide-react";
 
@@ -46,7 +46,7 @@ export default function DirectDriverContactBanner({
             className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black px-4 py-2 rounded-xl transition-all shadow-sm hover:scale-105 active:scale-95 whitespace-nowrap shrink-0"
           >
             <Phone className="w-3.5 h-3.5" />
-            <span>Unlock Numbers · ₹99</span>
+            <span>Unlock 10 Numbers · ₹99 (Save ₹1,500)</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -126,15 +126,15 @@ export default function DirectDriverContactBanner({
         <div className="shrink-0 w-full lg:w-auto flex flex-col items-center lg:items-end gap-2.5">
           <Link
             to="/direct-driver-contact"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-base sm:text-lg px-8 py-4 sm:py-4.5 rounded-2xl transition-all shadow-xl shadow-amber-300/80 hover:shadow-2xl hover:scale-105 active:scale-95 group text-center"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-base sm:text-lg px-7 py-4 sm:py-4.5 rounded-2xl transition-all shadow-xl shadow-amber-300/80 hover:shadow-2xl hover:scale-105 active:scale-95 group text-center"
           >
-            <Zap className="w-5 h-5 fill-current animate-bounce" />
-            <span>Unlock 10 Driver Numbers — ₹99</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+            <Zap className="w-5 h-5 fill-current animate-bounce shrink-0" />
+            <span>Unlock 10 Direct Numbers for ₹99 (Save ₹1,500 in Broker Fees)</span>
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform shrink-0" />
           </Link>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Instant reveal · One-time fee · Zero broker commission</span>
+            <span>Instant reveal · 100% Call-Connect Guarantee · Zero broker fees</span>
           </div>
         </div>
 

@@ -262,6 +262,8 @@ export default function App() {
             <Route path="/resources/motor-vehicle-aggregator-guidelines-2025" element={<ResourcesPage resourceKey="mv-aggregator-guidelines" />} />
             <Route path="/resources/hsn-codes-for-logistics" element={<ResourcesPage resourceKey="hsn-codes-for-logistics" />} />
             <Route path="/resources/section-9-5-vs-52-gta" element={<ResourcesPage resourceKey="section-9-5-vs-52-gta" />} />
+            <Route path="/freight-rate-index" element={<FreightRateIndexPage />} />
+            <Route path="/data/freight-rate-index-2026" element={<Navigate to="/freight-rate-index" replace />} />
 
             
             <Route path="/services/transport-for-msmes" element={<TransportMSMEPage />} />

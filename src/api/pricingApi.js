@@ -277,3 +277,78 @@ export async function detectCurrentCity() {
   // 5. Final fallback
   return 'Kolkata';
 }
+
+/**
+ * Off-thread dynamic fare calculation helper using Web Workers (ENG-003).
+ * Keeps Main Thread INP (Interaction to Next Paint) within Google's "Good" threshold.
+ */
+let sharedPricingWorker = null;
+
+export async function calculateFareAsync(params = {}) {
+  if (typeof window !== 'undefined' && typeof window.Worker !== 'undefined') {
+    try {
+      if (!sharedPricingWorker) {
+        sharedPricingWorker = new Worker(new URL('../workers/pricingWorker.js', import.meta.url), { type: 'module' });
+      }
+      return new Promise((resolve) => {
+        const requestId = 'calc_' + Math.random().toString(36).slice(2);
+        const handleMessage = (e) => {
+          if (e.data && e.data.id === requestId) {
+            sharedPricingWorker.removeEventListener('message', handleMessage);
+            if (e.data.success) {
+              resolve(e.data.data);
+            } else {
+              resolve(fallbackFareSync(params));
+            }
+          }
+        };
+        sharedPricingWorker.addEventListener('message', handleMessage);
+        sharedPricingWorker.postMessage({ id: requestId, ...params });
+      });
+    } catch {
+      return fallbackFareSync(params);
+    }
+  }
+  return fallbackFareSync(params);
+}
+
+function fallbackFareSync(params = {}) {
+  const {
+    distanceKm = 10,
+    baseFare = 600,
+    baseDistanceKm = 3,
+    perKmRate = 25,
+    estimatedTolls = 0,
+    fuelSurchargePct = 0.05,
+    gstPct = 0.05,
+    isReturnLoad = false,
+  } = params;
+
+  const extraKm = Math.max(0, distanceKm - baseDistanceKm);
+  const distanceFare = Math.round(extraKm * perKmRate);
+  const fuelSurcharge = Math.round((baseFare + distanceFare) * fuelSurchargePct);
+  const subtotal = baseFare + distanceFare + fuelSurcharge + estimatedTolls;
+  const gstAmount = Math.round(subtotal * gstPct);
+  const standardTotal = subtotal + gstAmount;
+  const returnLoadDiscount = isReturnLoad ? Math.round(standardTotal * 0.30) : 0;
+  const finalFare = standardTotal - returnLoadDiscount;
+  const platformCommission = Math.round(finalFare * 0.05);
+  const driverPayout = finalFare - platformCommission;
+
+  return {
+    distanceKm,
+    baseFare,
+    distanceFare,
+    fuelSurcharge,
+    estimatedTolls,
+    subtotal,
+    gstAmount,
+    standardTotal,
+    returnLoadDiscount,
+    finalFare,
+    platformCommission,
+    driverPayout,
+    computedAt: Date.now(),
+  };
+}
+
