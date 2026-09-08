@@ -82,6 +82,8 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [detectingLoc, setDetectingLoc] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
   const { currentCity, setCity, detectLocation } = useCity();
 
   useEffect(() => {
@@ -121,6 +123,32 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
 
     if (onCitySelect) {
       onCitySelect(finalName, citySlug);
+      onClose();
+      return;
+    }
+
+    // Smart route adaptation for location-based routes
+    const pathParts = location.pathname.split("/").filter(Boolean);
+    const isKnownLocation = (slug) => ALL_LOCATIONS.some((c) => c.slug === slug);
+
+    if (pathParts.length === 1 && isKnownLocation(pathParts[0])) {
+      navigate(`/${citySlug}`);
+    } else if (pathParts.length === 2 && isKnownLocation(pathParts[0])) {
+      navigate(`/${citySlug}/${pathParts[1]}`);
+    } else if (pathParts.length === 3 && isKnownLocation(pathParts[0])) {
+      navigate(`/${citySlug}/${pathParts[1]}/${pathParts[2]}`);
+    } else if (pathParts.length >= 3 && (pathParts[0] === "loads" || pathParts[0] === "drivers" || pathParts[0] === "industrial" || pathParts[0] === "local")) {
+      navigate(`/${pathParts[0]}/${citySlug}/${pathParts[2]}`);
+    } else if (pathParts.length >= 3 && pathParts[0] === "cargo") {
+      navigate(`/cargo/${citySlug}/${pathParts[2]}`);
+    } else if (pathParts[0] === "local-transport") {
+      navigate(`/local-transport/${citySlug}`);
+    } else if (pathParts[0] === "intercity") {
+      navigate(`/intercity/${citySlug}`);
+    } else if (pathParts[0] === "direct-driver-contact" || pathParts[0] === "direct-contact") {
+      const params = new URLSearchParams(location.search);
+      params.set("city", citySlug);
+      navigate(`/direct-driver-contact?${params.toString()}`, { replace: true });
     }
     onClose();
   };
@@ -129,10 +157,9 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
     setDetectingLoc(true);
     try {
       const detected = await detectLocation(true);
-      if (detected && onCitySelect) {
-        onCitySelect(detected.name, detected.slug);
+      if (detected) {
+        handleCitySelect(detected.slug, detected.name);
       }
-      onClose();
     } catch {
       // ignore
     } finally {

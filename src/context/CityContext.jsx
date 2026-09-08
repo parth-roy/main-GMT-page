@@ -133,31 +133,11 @@ export function CityProvider({ children }) {
 
       setIsDetecting(true);
 
-      // Strategy 1: Ultra-fast, zero-CORS IP lookup (~80-150ms)
-      const detectViaIp = async () => {
-        try {
-          const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 3500);
-          const res = await fetch("https://ipwho.is/", {
-            signal: controller.signal,
-          });
-          clearTimeout(timer);
-          if (!res.ok) return null;
-          const data = await res.json();
-          if (data && data.success && data.city) {
-            return resolveCityConfig(data.city, data.region);
-          }
-        } catch {
-          // IP fallback failed
-        }
-        return null;
-      };
-
-      // Strategy 2: High-accuracy browser geolocation if already permitted
+      // Strategy 1: Prompt for browser location permission (HTML5 Geolocation)
       const detectViaBrowserGeo = async () => {
         if (!navigator.geolocation) return null;
         return new Promise((resolve) => {
-          const timeout = setTimeout(() => resolve(null), 3000);
+          const timeout = setTimeout(() => resolve(null), 5000);
           navigator.geolocation.getCurrentPosition(
             async ({ coords }) => {
               clearTimeout(timeout);
@@ -177,28 +157,49 @@ export function CityProvider({ children }) {
               }
               resolve(null);
             },
-            () => {
+            (err) => {
               clearTimeout(timeout);
+              console.log("Browser geolocation not granted or failed:", err.message);
               resolve(null);
             },
-            { timeout: 3000, maximumAge: 60000 }
+            { timeout: 5000, maximumAge: 0, enableHighAccuracy: true }
           );
         });
       };
 
+      // Strategy 2: Seamless fallback to IP lookup if user blocks/dismisses GPS
+      const detectViaIp = async () => {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 3500);
+          const res = await fetch("https://ipwho.is/", {
+            signal: controller.signal,
+          });
+          clearTimeout(timer);
+          if (!res.ok) return null;
+          const data = await res.json();
+          if (data && data.success && data.city) {
+            return resolveCityConfig(data.city, data.region);
+          }
+        } catch {
+          // IP fallback failed
+        }
+        return null;
+      };
+
       try {
-        // Run IP detection first as it doesn't block or prompt the user
+        // 1. Ask for location permission first
+        const geoCity = await detectViaBrowserGeo();
+        if (geoCity) {
+          setCity(geoCity, true);
+          return geoCity;
+        }
+
+        // 2. Fallback to IP detection if GPS is blocked or timed out
         const ipCity = await detectViaIp();
         if (ipCity) {
           setCity(ipCity, false);
           return ipCity;
-        }
-
-        // Fallback to browser geolocation
-        const geoCity = await detectViaBrowserGeo();
-        if (geoCity) {
-          setCity(geoCity, false);
-          return geoCity;
         }
       } catch (err) {
         console.warn("Location auto-detection encountered an error:", err);

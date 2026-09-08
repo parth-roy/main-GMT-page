@@ -4,6 +4,8 @@ import { ArrowRight, CheckCircle2, Phone, BadgePercent, MessageCircleQuestion } 
 import SEOHead from "../seo/SEOHead"
 import { generateCityFaqs, generateRouteFaqs } from "../lib/locationFaqHelper"
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
+import { useCity } from "../context/CityContext"
+import { SEO_CITIES } from "../lib/cities"
 
 const pages = {
   kolkata: {
@@ -538,7 +540,26 @@ const pages = {
 
 export default function LocalSeoPage({ pageKey }) {
   const page = pages[pageKey]
+  const { currentCity, setCity } = useCity()
+
   useEffect(() => { window.scrollTo(0, 0) }, [pageKey])
+
+  useEffect(() => {
+    if (page && !page.canonical?.startsWith("/routes/")) {
+      const rawCity = page.h1.includes(" in ")
+        ? page.h1.split(" in ")[1].split(",")[0].trim()
+        : (page.areas?.[0] || pageKey.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()))
+      const matched = SEO_CITIES.find(c => c.slug === pageKey) || {
+        name: rawCity,
+        slug: pageKey,
+        state: "West Bengal",
+        region: "West Bengal",
+      }
+      if (currentCity?.slug !== matched.slug) {
+        setCity(matched, true)
+      }
+    }
+  }, [pageKey, page, currentCity?.slug, setCity])
 
   if (!page) {
     return <Navigate to="/404" replace />

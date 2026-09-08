@@ -12,15 +12,34 @@ import { SEO_CITIES } from "../lib/cities";
 import { getCorridorBySlug } from "../lib/corridors";
 import { getCargoTypeBySlug, ALL_CARGO_TYPES } from "../lib/cargoTypes";
 import { getVehicleBySlug } from "../lib/vehicles";
+import { useCity } from "../context/CityContext";
 
 export default function CargoReturnLoadPage({ mode = "return-load" }) {
   const { route, city, cargoType } = useParams();
   const location = useLocation();
+  const { currentCity, setCity } = useCity();
   const [openFaq, setOpenFaq] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [route, city, cargoType]);
+
+  const cityConfig = mode === "cargo" ? (SEO_CITIES.find((c) => c.slug === city) || (city ? {
+    name: city.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
+    slug: city,
+    state: "India"
+  } : null)) : null;
+
+  useEffect(() => {
+    if (mode === "cargo" && cityConfig && currentCity?.slug !== cityConfig.slug) {
+      setCity({
+        name: cityConfig.name,
+        slug: cityConfig.slug,
+        state: cityConfig.state || "India",
+        region: cityConfig.state || "India",
+      }, true);
+    }
+  }, [mode, cityConfig, currentCity?.slug, setCity]);
 
   // Mode 1: Return Loads / Backhaul
   if (mode === "return-load") {
@@ -190,11 +209,6 @@ export default function CargoReturnLoadPage({ mode = "return-load" }) {
   }
 
   // Mode 2: Dedicated Cargo Transport
-  const cityConfig = SEO_CITIES.find((c) => c.slug === city) || (city ? {
-    name: city.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
-    slug: city,
-    state: "India"
-  } : null);
   const cargo = getCargoTypeBySlug(cargoType);
 
   if (!cityConfig || !cargo) {

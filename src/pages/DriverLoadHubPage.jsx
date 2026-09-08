@@ -10,10 +10,12 @@ import TrustBadgeRow from "../components/TrustBadgeRow";
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner";
 import { SEO_CITIES } from "../lib/cities";
 import { getVehicleBySlug, ALL_SEO_VEHICLES } from "../lib/vehicles";
+import { useCity } from "../context/CityContext";
 
 export default function DriverLoadHubPage() {
   const { city, vehicle: vehicleParam } = useParams();
   const location = useLocation();
+  const { currentCity, setCity } = useCity();
   const [openFaq, setOpenFaq] = useState(null);
 
   useEffect(() => {
@@ -25,6 +27,18 @@ export default function DriverLoadHubPage() {
     slug: city,
     state: "India"
   } : null);
+
+  useEffect(() => {
+    if (cityConfig && currentCity?.slug !== cityConfig.slug) {
+      setCity({
+        name: cityConfig.name,
+        slug: cityConfig.slug,
+        state: cityConfig.state || "India",
+        region: cityConfig.state || "India",
+      }, true);
+    }
+  }, [cityConfig, currentCity?.slug, setCity]);
+
   const vehicle = getVehicleBySlug(vehicleParam);
 
   if (!cityConfig || !vehicle) {

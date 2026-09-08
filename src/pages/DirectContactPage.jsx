@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Zap, Phone, Shield, ChevronRight, CheckCircle, CheckCircle2,
   Star, ArrowRight, BadgeCheck, Lock, Banknote, Unlock, Copy, Check, MessageSquare, AlertCircle,
@@ -8,6 +8,7 @@ import {
 import SEOHead from "../seo/SEOHead";
 import CitySelectorModal from "../components/CitySelectorModal";
 import { useAuth } from "../context/AuthContext";
+import { useCity } from "../context/CityContext";
 import { getPersistedCity, setPersistedCity, detectCurrentCity } from "../api/pricingApi";
 
 const API_BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE || "https://api.gomytruck.com/api/v1";
@@ -373,8 +374,17 @@ function getPhoneDisplayParts(phoneRaw, phoneMasked) {
 }
 
 export default function DirectContactPage() {
-  // Global persisted city state — seeded from localStorage via helper
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { currentCity, setCity } = useCity();
+
+  // Global persisted city state — seeded from URL search param or localStorage
   const [selectedCity, setSelectedCity] = useState(() => {
+    const paramCity = searchParams.get("city");
+    if (paramCity) {
+      const slug = paramCity.toLowerCase().replace(/[\s_]+/g, "-");
+      const name = paramCity.charAt(0).toUpperCase() + paramCity.slice(1).replace(/-/g, " ");
+      return { name, slug };
+    }
     const persisted = getPersistedCity();
     return persisted || { name: "Kolkata", slug: "kolkata" };
   });
@@ -382,6 +392,39 @@ export default function DirectContactPage() {
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(VEHICLE_CATEGORIES[0]);
   const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(false);
+
+  // Dedicated city select handler that updates local state, storage, and URL searchParams synchronously
+  const handleCitySelect = (cityName, citySlug) => {
+    const slug = citySlug || (cityName ? cityName.toLowerCase().replace(/[\s_]+/g, "-") : "kolkata");
+    const name = cityName || slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " ");
+    const matched = { name, slug, state: "India", region: "India" };
+    setSelectedCity(matched);
+    setCity(matched, true);
+    setPersistedCity(name);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("city", slug);
+      return next;
+    }, { replace: true });
+  };
+
+  // Synchronize with external paramCity or currentCity changes
+  useEffect(() => {
+    const paramCity = searchParams.get("city");
+    if (paramCity) {
+      const slug = paramCity.toLowerCase().replace(/[\s_]+/g, "-");
+      const name = paramCity.charAt(0).toUpperCase() + paramCity.slice(1).replace(/-/g, " ");
+      const matched = { name, slug, state: "India", region: "India" };
+      if (selectedCity?.slug !== slug) {
+        setSelectedCity(matched);
+      }
+      if (currentCity?.slug !== slug) {
+        setCity(matched, true);
+      }
+    } else if (currentCity && currentCity.slug !== selectedCity?.slug) {
+      setSelectedCity(currentCity);
+    }
+  }, [searchParams, currentCity, setCity]);
 
   // Authentication & Logged-in User Profile
   const { user, setIsLoginModalOpen } = useAuth();
@@ -432,7 +475,7 @@ export default function DirectContactPage() {
 
   // Auto-detect city if none stored (first-time visitors)
   useEffect(() => {
-    if (!getPersistedCity()) {
+    if (!getPersistedCity() && !searchParams.get("city")) {
       detectCurrentCity().then((detected) => {
         if (detected) {
           const slug = detected.toLowerCase().replace(/[\s_]+/g, "-");
@@ -447,15 +490,21 @@ export default function DirectContactPage() {
   useEffect(() => {
     const handleCityChange = (e) => {
       if (e?.detail?.name) {
+        const slug = e.detail.slug || e.detail.name.toLowerCase().replace(/[\s_]+/g, "-");
         setSelectedCity({
           name: e.detail.name,
-          slug: e.detail.slug || e.detail.name.toLowerCase().replace(/[\s_]+/g, "-")
+          slug
         });
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          next.set("city", slug);
+          return next;
+        }, { replace: true });
       }
     };
     window.addEventListener("gomytruck:city_change", handleCityChange);
     return () => window.removeEventListener("gomytruck:city_change", handleCityChange);
-  }, []);
+  }, [setSearchParams]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -601,14 +650,6 @@ export default function DirectContactPage() {
     // Always query backend database to verify live payment status for this user
     checkExistingUnlock(loggedInPhone);
   }, [loggedInPhone, selectedCategory.id, selectedCity.slug, checkExistingUnlock]);
-
-  // Handle city selection from CitySelectorModal
-  const handleCitySelect = (cityName, citySlug) => {
-    const slug = citySlug || cityName.toLowerCase().replace(/[\s_]+/g, "-");
-    const newCity = { name: cityName, slug };
-    setSelectedCity(newCity);
-    setPersistedCity(cityName, slug); // persists + fires global event
-  };
 
   // Copy single number
   const copyToClipboard = (text, id) => {

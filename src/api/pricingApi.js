@@ -218,16 +218,9 @@ export async function detectCurrentCity() {
     } catch {}
   }
 
-  // 2. Live IP-based detection (fastest, runs immediately on page load/refresh)
-  const ipCity = await detectCityFromIP();
-  if (ipCity) {
-    setPersistedCity(ipCity);
-    return ipCity;
-  }
-
-  // 3. Try browser geolocation → backend reverse-geocode (strict 3s timeout)
+  // 2. Try browser geolocation → backend reverse-geocode (prompts permission dialog, 5s timeout)
   const geoCity = await new Promise((resolve) => {
-    const fallbackTimer = setTimeout(() => resolve(null), 3000);
+    const fallbackTimer = setTimeout(() => resolve(null), 5000);
 
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       clearTimeout(fallbackTimer);
@@ -261,13 +254,20 @@ export async function detectCurrentCity() {
         }
       },
       () => { clearTimeout(fallbackTimer); resolve(null); },
-      { timeout: 3000, maximumAge: 60_000 }
+      { timeout: 5000, maximumAge: 0, enableHighAccuracy: true }
     );
   });
 
   if (geoCity) {
     setPersistedCity(geoCity);
     return geoCity;
+  }
+
+  // 3. Live IP-based detection fallback (if geolocation denied or unavailable)
+  const ipCity = await detectCityFromIP();
+  if (ipCity) {
+    setPersistedCity(ipCity);
+    return ipCity;
   }
 
   // 4. Fallback to localStorage if present
