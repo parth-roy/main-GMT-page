@@ -1221,14 +1221,6 @@ export default function DirectContactPage() {
                       </span>
                       <ArrowRight className="w-4 h-4 shrink-0" />
                     </button>
-
-                    {/* 100% Risk Reversal Guarantee Badge */}
-                    <div className="flex items-start gap-2 p-2.5 rounded-xl bg-emerald-50/90 border border-emerald-200/90 text-emerald-950 text-[11px] font-medium leading-snug">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>
-                        <strong className="font-extrabold text-emerald-900">100% Call-Connect Guarantee:</strong> If the unlocked drivers do not answer, get an instant full refund or fresh replacement contacts directly on WhatsApp (+91 9331488999).
-                      </span>
-                    </div>
                   </div>
                 ) : (
                   <div className="space-y-3">

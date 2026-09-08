@@ -51,8 +51,8 @@ export default function FreightRateIndexPage() {
       answer: "The operationalization of the Eastern DFC (Ludhiana to Dankuni) and Western DFC (JNPT to Dadri) has concentrated long-haul multi-modal freight into major intermodal terminals. Road transport freight rates connecting first-mile and last-mile logistics to DFC nodes (such as Dankuni and Sanand) experience 15% to 25% higher vehicle turnaround efficiency and competitive backhaul return-load pricing."
     },
     {
-      question: "What is GoMyTruck's 100% Call-Connect Guarantee on the ₹99 driver unlock?",
-      answer: "GoMyTruck provides a 100% Call-Connect Guarantee for the ₹99 direct driver contact feature. If unlocked drivers do not answer or do not have available vehicle capacity, users receive an immediate full refund or fresh replacement contacts directly via GoMyTruck customer support on WhatsApp (+91 9331488999)."
+      question: "How does the ₹99 Direct Driver Contact feature work?",
+      answer: "GoMyTruck allows shippers to unlock 10 verified commercial truck driver and fleet owner contact numbers for a flat one-time fee of ₹99. Shippers can directly call or message drivers on WhatsApp to negotiate trip fares with zero middleman commissions."
     }
   ];
 

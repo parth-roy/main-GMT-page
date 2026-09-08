@@ -134,7 +134,7 @@ export default function DirectDriverContactBanner({
           </Link>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Instant reveal · 100% Call-Connect Guarantee · Zero broker fees</span>
+            <span>Instant reveal · Verified commercial drivers · Zero broker fees</span>
           </div>
         </div>
 
