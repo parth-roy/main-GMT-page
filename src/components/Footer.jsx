@@ -178,7 +178,8 @@ export default function Footer({ onScrollToSection }) {
                 key={index}
                 to={city.to}
                 title={`Truck booking & transport in ${city.name}`}
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors text-[10px] sm:text-[11px] leading-tight truncate"
               >
                 {city.name}
