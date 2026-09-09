@@ -217,13 +217,13 @@ export default function ContactPage() {
                     Talk to a logistics expert who will help you get the right truck, right now.
                   </p>
                 </div>
-                <a
-                  href="tel:9331488999"
+                <Link
+                  to="/direct-driver-contact?openModal=true"
                   className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 px-6 text-base shadow-md shadow-brand-600/30 hover:shadow-brand-600/50 transition-all duration-200 group-hover:scale-[1.02]"
                 >
                   <PhoneCall size={20} />
-                  Call 9331488999
-                </a>
+                  Talk to Drivers
+                </Link>
                 <p className="text-xs text-slate-400">Mon–Sat · 8 AM – 8 PM</p>
               </div>
             </div>
@@ -308,9 +308,9 @@ export default function ContactPage() {
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Phone & WhatsApp</p>
-                <a href="tel:9331488999" className="text-white font-semibold hover:text-brand-300 transition-colors text-sm">
-                  +91 93314 88999
-                </a>
+                <Link to="/direct-driver-contact?openModal=true" className="text-white font-semibold hover:text-brand-300 transition-colors text-sm">
+                  Talk to Drivers
+                </Link>
               </div>
             </div>
 

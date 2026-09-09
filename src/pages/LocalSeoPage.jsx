@@ -632,7 +632,7 @@ export default function LocalSeoPage({ pageKey }) {
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link to="/book-truck-online" className="min-h-12 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 font-bold flex items-center gap-2">Get Instant Estimate <ArrowRight size={18} /></Link>
-            <a href="tel:+919331488999" className="min-h-12 px-6 py-3 rounded-xl border border-white/40 hover:bg-white/10 font-bold flex items-center gap-2"><Phone size={18} /> Call 93314 88999</a>
+            <Link to="/direct-driver-contact?openModal=true" className="min-h-12 px-6 py-3 rounded-xl border border-white/40 hover:bg-white/10 font-bold flex items-center gap-2"><Phone size={18} /> Talk to Drivers</Link>
           </div>
         </div>
       </header>

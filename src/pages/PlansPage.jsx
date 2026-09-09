@@ -36,7 +36,7 @@ export default function PlansPage() {
     },
     {
       question: "What happens if I face technical issues with the subscription?",
-      answer: "You can reach out to our Partner Support hotline at 9331488999 for immediate assistance with any technical or payment-related issues."
+      answer: "You can reach out to our Partner Support hotline or connect directly with our support desk for immediate assistance with any technical or payment-related issues."
     }
   ]
 

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import SEOHead from '../seo/SEOHead';
 import FAQ from '../components/FAQ';
 import { Mail, PhoneCall, LifeBuoy, Clock } from 'lucide-react';
@@ -13,10 +14,11 @@ export default function SupportPage() {
     {
       icon: PhoneCall,
       title: 'Call Us',
-      detail: '+91 93314 88999',
+      detail: 'Talk to Drivers',
       sub: 'Mon-Sat, 8am to 8pm',
       color: 'bg-brand-50 text-brand-600',
-      action: 'tel:+919331488999'
+      action: '/direct-driver-contact?openModal=true',
+      isInternal: true
     },
     {
       icon: Mail,
@@ -67,12 +69,8 @@ export default function SupportPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {supportChannels.map((channel, idx) => {
               const Icon = channel.icon;
-              return (
-                <a 
-                  key={idx} 
-                  href={channel.action}
-                  className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-1 hover:border-brand-300 transition-all block text-center group"
-                >
+              const cardContent = (
+                <>
                   <div className={`w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${channel.color}`}>
                     <Icon size={28} />
                   </div>
@@ -81,6 +79,30 @@ export default function SupportPage() {
                   <p className="text-sm font-medium text-slate-500 flex items-center justify-center gap-1.5">
                     <Clock size={14} /> {channel.sub}
                   </p>
+                </>
+              );
+
+              if (channel.isInternal) {
+                return (
+                  <Link 
+                    key={idx} 
+                    to={channel.action}
+                    className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-1 hover:border-brand-300 transition-all block text-center group"
+                  >
+                    {cardContent}
+                  </Link>
+                );
+              }
+
+              return (
+                <a 
+                  key={idx} 
+                  href={channel.action}
+                  target={channel.action.startsWith("http") ? "_blank" : undefined}
+                  rel={channel.action.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-1 hover:border-brand-300 transition-all block text-center group"
+                >
+                  {cardContent}
                 </a>
               );
             })}

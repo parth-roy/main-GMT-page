@@ -13,14 +13,14 @@ export default function GlobalFABs() {
   return (
     <>
       <div className="fixed inset-x-0 bottom-0 z-[70] grid grid-cols-2 gap-2 border-t border-slate-200 bg-white p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-6px_20px_rgba(15,23,42,0.14)] md:hidden">
-        <a
-          href="tel:+919331488999"
+        <Link
+          to="/direct-driver-contact?openModal=true"
           data-analytics-context={`mobile-sticky:${pathname}`}
           className="flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-brand-600 bg-white px-3 py-2.5 text-sm font-extrabold text-brand-700"
-          aria-label="Call GoMyTruck now"
+          aria-label="Talk to Drivers"
         >
-          <PhoneCall size={20} /> Call Now
-        </a>
+          <PhoneCall size={20} /> Talk to Drivers
+        </Link>
         <a
           href={whatsappLink}
           data-analytics-context={`mobile-sticky:${pathname}`}

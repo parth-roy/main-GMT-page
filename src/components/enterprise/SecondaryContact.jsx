@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router-dom"
 import { PhoneCall } from "lucide-react"
 
 export default function SecondaryContact() {
@@ -36,7 +37,7 @@ export default function SecondaryContact() {
             </div>
             
             <p className="text-slate-500 text-sm mt-4">
-              Or call the GoMyTruck team: <a href="tel:+919331488999" className="text-brand-600 font-bold hover:underline">+91 93314 88999</a>
+              Or connect directly with drivers: <Link to="/direct-driver-contact?openModal=true" className="text-brand-600 font-bold hover:underline">Talk to Drivers</Link>
             </p>
           </div>
 

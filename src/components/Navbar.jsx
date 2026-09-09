@@ -281,15 +281,16 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
             <div className={`h-6 w-px ${isDarkTheme ? "bg-gray-700" : "bg-slate-300"}`} />
 
             <div className="flex items-center gap-2 shrink-0">
-              <a
-                href="tel:9331488999"
+              <Link
+                to="/direct-driver-contact?openModal=true"
                 className={`flex items-center gap-1.5 font-bold text-sm transition-colors ${
                   isDarkTheme ? "text-white hover:text-gray-300" : "text-slate-700 hover:text-brand-600"
                 }`}
+                title="Talk to Drivers"
               >
                 <PhoneCall size={15} className={isDarkTheme ? "text-white" : "text-brand-500"} />
-                <span className="hidden lg:inline">9331488999</span>
-              </a>
+                <span className="hidden lg:inline">Talk to Drivers</span>
+              </Link>
 
               {isLoggedIn ? (
                 <div className="flex items-center gap-2">
@@ -350,9 +351,14 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               <span className="max-w-[80px] truncate">{currentCity?.name || "Kolkata"}</span>
               <ChevronDown size={11} className="text-slate-400" />
             </button>
-            <a href="tel:9331488999" className="p-2 rounded-lg text-slate-700 hover:bg-slate-100" title="Call Support">
+            <Link
+              to="/direct-driver-contact?openModal=true"
+              className="p-2 rounded-lg text-slate-700 hover:bg-slate-100"
+              title="Talk to Drivers"
+              aria-label="Talk to Drivers"
+            >
               <PhoneCall size={18} />
-            </a>
+            </Link>
             <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg transition-colors text-slate-800 hover:bg-slate-100" aria-label="Toggle Menu">
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -423,10 +429,14 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
 
           <div className="h-px bg-slate-200 my-3" />
           <div className="grid grid-cols-2 gap-3 px-2">
-            <a href="tel:9331488999" className="flex items-center justify-center gap-2 border border-slate-300 text-slate-800 font-bold py-3 rounded-lg text-sm hover:bg-slate-50 active:scale-98 transition-all">
+            <Link
+              to="/direct-driver-contact?openModal=true"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-800 font-bold py-3 rounded-lg text-sm hover:bg-slate-50 active:scale-98 transition-all"
+            >
               <PhoneCall size={16} className="text-brand-600" />
-              <span>Call Now</span>
-            </a>
+              <span>Talk to Drivers</span>
+            </Link>
             <button onClick={() => { setIsOpen(false); onOpenEstimate() }} className="btn-ripple bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm py-3 px-4 rounded-lg shadow-md shadow-brand-500/20 active:scale-98 transition-all">
               <span className="relative z-10">Get Estimate</span>
             </button>

@@ -44,7 +44,7 @@ export default function TransportKolkataPage() {
               </span>
             </summary>
             <p className="mt-4 text-slate-600 leading-relaxed">
-              Booking is fast and easy with GoMyTruck. Simply visit our website, enter your pickup and drop locations in Kolkata, choose your required vehicle (like a Mini Truck, Tata Ace, or Full Truck Load), and confirm. You can also book via a quick call or WhatsApp message to 9331488999.
+              Booking is fast and easy with GoMyTruck. Simply visit our website, enter your pickup and drop locations in Kolkata, choose your required vehicle (like a Mini Truck, Tata Ace, or Full Truck Load), and confirm. You can also book by talking to drivers directly or sending a WhatsApp message.
             </p>
           </details>
           <details className="group bg-white border border-slate-200 rounded-xl p-6 open:shadow-md transition-all">

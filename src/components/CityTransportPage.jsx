@@ -114,12 +114,12 @@ export default function CityTransportPage({
             >
               Book Transport in {city} <ArrowRight size={18} />
             </Link>
-            <a
-              href="tel:9331488999"
+            <Link
+              to="/direct-driver-contact?openModal=true"
               className="border border-white/30 text-white font-bold px-7 py-3.5 rounded-xl hover:bg-white/10 transition-colors flex items-center gap-2"
             >
-              <PhoneCall size={16} /> Call 9331488999
-            </a>
+              <PhoneCall size={16} /> Talk to Drivers
+            </Link>
           </div>
         </div>
       </section>
@@ -216,7 +216,7 @@ export default function CityTransportPage({
                 "Verified driver profiles and commercial vehicle documentation",
                 "Live GPS trip tracking available on active bookings",
                 "Flat 5% platform commission — zero hidden broker markups",
-                "Trip support via phone and WhatsApp: +91 9331488999",
+                "Direct trip support: talk to drivers directly or connect via WhatsApp",
               ]).map((h, i) => (
                 <li key={i} className="flex items-center gap-3 text-slate-700 font-medium">
                   <CheckCircle size={20} className="text-brand-600 shrink-0" />

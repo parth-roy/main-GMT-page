@@ -178,7 +178,7 @@ const resources = {
       },
       {
         heading: "Grievance Redressal",
-        content: "Aggregators must designate a Grievance Officer and publish contact details. Complaints must be acknowledged within 24 hours and resolved within 30 days. GoMyTruck's support team is available via in-app support, phone (9331488999) and email."
+        content: "Aggregators must designate a Grievance Officer and publish contact details. Complaints must be acknowledged within 24 hours and resolved within 30 days. GoMyTruck's support team is available via in-app support, direct contact desk and email."
       }
     ],
     keyFact: "GoMyTruck operates as a Motor Vehicle Aggregator (not a GTA) under the Motor Vehicles Aggregator Guidelines. GoMyTruck charges a 5% platform commission with zero surge pricing and provides a GST-compliant digital invoice for every transaction.",

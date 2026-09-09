@@ -399,7 +399,39 @@ export default function DirectContactPage() {
 
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(VEHICLE_CATEGORIES[0]);
-  const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(false);
+  const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(() => {
+    return (
+      searchParams.get("openModal") === "true" ||
+      searchParams.get("modal") === "true" ||
+      searchParams.get("call") === "true"
+    );
+  });
+
+  // Automatically open modal when directed with openModal, modal, or call query param
+  useEffect(() => {
+    if (
+      searchParams.get("openModal") === "true" ||
+      searchParams.get("modal") === "true" ||
+      searchParams.get("call") === "true"
+    ) {
+      setIsWorkerModalOpen(true);
+    }
+  }, [searchParams]);
+
+  // Cleanly close modal and sanitize query params so user stays on Direct Contact page
+  const closeWorkerModal = () => {
+    setIsWorkerModalOpen(false);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (next.has("openModal") || next.has("modal") || next.has("call")) {
+        next.delete("openModal");
+        next.delete("modal");
+        next.delete("call");
+        return next;
+      }
+      return prev;
+    }, { replace: true });
+  };
 
   // Dedicated city select handler that updates local state, storage, and URL searchParams synchronously
   const handleCitySelect = (cityName, citySlug) => {
@@ -1601,8 +1633,12 @@ export default function DirectContactPage() {
           Styled exactly after the About Page Hero Promotional Card UI & Background.
          ══════════════════════════════════════════════════════════════════════════ */}
       {isWorkerModalOpen && (
-        <div className="fixed inset-0 z-[190] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+        <div
+          className="fixed inset-0 z-[190] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={closeWorkerModal}
+        >
           <div
+            onClick={(e) => e.stopPropagation()}
             className="relative overflow-hidden rounded-t-[32px] sm:rounded-3xl border-2 border-amber-300/90 bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100/70 p-0 shadow-2xl shadow-amber-200/50 flex flex-col max-h-[92vh] sm:max-h-[88vh] w-full max-w-2xl animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200"
           >
             {/* Background Decorative Blobs from About Page */}
@@ -1616,7 +1652,7 @@ export default function DirectContactPage() {
             <div className="p-4 sm:p-5 pb-3 border-b border-amber-200/70 relative shrink-0 z-10 text-left">
               <button
                 type="button"
-                onClick={() => setIsWorkerModalOpen(false)}
+                onClick={closeWorkerModal}
                 className="absolute top-3.5 right-3.5 p-2 rounded-full bg-white/80 hover:bg-white text-slate-400 hover:text-slate-700 transition-colors border border-amber-200/80 shadow-2xs cursor-pointer z-20"
                 aria-label="Close"
               >

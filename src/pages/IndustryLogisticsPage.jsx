@@ -342,9 +342,9 @@ export default function IndustryLogisticsPage({ industryKey }) {
             <Link to="/enterprise" className="min-h-12 px-6 py-3 rounded-xl border border-white/40 hover:bg-white/10 font-bold flex items-center gap-2">
               Enterprise Contract
             </Link>
-            <a href="tel:+919331488999" className="min-h-12 px-6 py-3 rounded-xl border border-white/40 hover:bg-white/10 font-bold flex items-center gap-2">
-              <Phone size={18} /> 93314 88999
-            </a>
+            <Link to="/direct-driver-contact?openModal=true" className="min-h-12 px-6 py-3 rounded-xl border border-white/40 hover:bg-white/10 font-bold flex items-center gap-2">
+              <Phone size={18} /> Talk to Drivers
+            </Link>
           </div>
         </div>
       </header>

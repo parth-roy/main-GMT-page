@@ -197,12 +197,12 @@ export default function LocalTransportPage() {
             >
               Book Local Truck Now <ArrowRight className="w-5 h-5" />
             </Link>
-            <a
-              href="tel:9331488999"
+            <Link
+              to="/direct-driver-contact?openModal=true"
               className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-4 rounded-xl ring-1 ring-white/20 transition-all duration-200"
             >
-              📞 Call: 93314 88999
-            </a>
+              📞 Talk to Drivers
+            </Link>
           </div>
 
           {/* trust strip */}
