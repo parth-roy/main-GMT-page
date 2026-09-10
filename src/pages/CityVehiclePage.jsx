@@ -12,6 +12,7 @@ import { SEO_CITIES } from "../lib/cities";
 import { getVehicleBySlug, ALL_SEO_VEHICLES } from "../lib/vehicles";
 import { generateCityFaqs } from "../lib/locationFaqHelper";
 import { useCity } from "../context/CityContext";
+import CityMap from "../components/common/CityMap";
 
 export default function CityVehiclePage() {
   const { city, vehicle: vehicleParam } = useParams();
@@ -399,6 +400,13 @@ export default function CityVehiclePage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Dynamic Interactive City Logistics Map */}
+      <section className="py-12 bg-white border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CityMap cityName={cityName} stateName={state} vehicleName={vehicle.name} />
         </div>
       </section>
 

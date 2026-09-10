@@ -6,6 +6,7 @@ import { generateCityFaqs, generateRouteFaqs } from "../lib/locationFaqHelper"
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
 import { useCity } from "../context/CityContext"
 import { SEO_CITIES } from "../lib/cities"
+import CityMap from "../components/common/CityMap"
 
 const pages = {
   kolkata: {
@@ -566,17 +567,19 @@ export default function LocalSeoPage({ pageKey }) {
   }
 
   // Dynamic FAQ generation for either corridor routes or local city/hub pages
+  const isRoutePage = page.canonical?.startsWith("/routes/");
+  const rawCity = page.h1.includes(" in ")
+    ? page.h1.split(" in ")[1].split(",")[0].trim()
+    : (page.areas[0] || page.eyebrow.split(" ")[0] || "Kolkata");
+
   let dynamicFaqData;
-  if (page.canonical?.startsWith("/routes/")) {
+  if (isRoutePage) {
     const rawClean = page.h1.replace(/—.*$/, "").replace(/Goods Transport.*/, "").trim()
     const parts = rawClean.split(" to ")
     const fromCity = parts[0] ? parts[0].trim() : "Kolkata"
     const toCity = parts[1] ? parts[1].trim() : "Destination"
     dynamicFaqData = generateRouteFaqs(fromCity, toCity, "standard highway corridor distance", "12 to 36 hours", "National Highway")
   } else {
-    const rawCity = page.h1.includes(" in ")
-      ? page.h1.split(" in ")[1].split(",")[0].trim()
-      : (page.areas[0] || page.eyebrow.split(" ")[0] || "Kolkata")
     dynamicFaqData = generateCityFaqs({ name: rawCity, slug: pageKey }, "hub", page.areas)
   }
 
@@ -685,6 +688,14 @@ export default function LocalSeoPage({ pageKey }) {
             </div>
           </div>
         </section>
+
+        {!isRoutePage && (
+          <section className="py-12 bg-white">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+              <CityMap cityName={rawCity} stateName="West Bengal" />
+            </div>
+          </section>
+        )}
 
         <section className="py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

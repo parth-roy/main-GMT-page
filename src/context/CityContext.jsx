@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { SEO_CITIES } from "../lib/cities";
 
 const CityContext = createContext(null);
 
-const DEFAULT_CITY = {
+export const DEFAULT_CITY = {
   name: "Kolkata",
   slug: "kolkata",
   state: "West Bengal",
@@ -13,10 +14,67 @@ const DEFAULT_CITY = {
 const SESSION_CITY_KEY = "gomytruck_session_city";
 const LEGACY_STORAGE_KEY = "gomytruck_selected_city";
 
+// O(1) slug map for instantaneous lookup across all 516+ cities
+const CITY_SLUG_MAP = new Map(
+  SEO_CITIES.map((c) => [c.slug.toLowerCase(), c])
+);
+
+/**
+ * Extract active city from current URL pathname
+ */
+export function extractCityFromUrl(pathname) {
+  if (!pathname || typeof pathname !== "string") return null;
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) return null;
+
+  // Prefixed patterns: /loads/:city/..., /drivers/:city/..., /cargo/:city/..., /industrial/:city/..., /local/:city/..., /intercity/:city, /local-transport/:city
+  const prefixHandlers = ["loads", "drivers", "cargo", "industrial", "local", "intercity", "local-transport"];
+  if (prefixHandlers.includes(segments[0]) && segments[1]) {
+    const candidate = segments[1].toLowerCase().replace(/-transport$/, "");
+    if (CITY_SLUG_MAP.has(candidate)) {
+      const found = CITY_SLUG_MAP.get(candidate);
+      return {
+        name: found.name,
+        slug: found.slug,
+        state: found.state || "India",
+        region: found.state || "India",
+      };
+    }
+  }
+
+  // Corridor routes: /routes/:origin-to-:destination or /transport/:origin-to-:destination
+  if ((segments[0] === "routes" || segments[0] === "transport") && segments[1]) {
+    const routeParts = segments[1].split("-to-");
+    if (routeParts[0] && CITY_SLUG_MAP.has(routeParts[0].toLowerCase())) {
+      const found = CITY_SLUG_MAP.get(routeParts[0].toLowerCase());
+      return {
+        name: found.name,
+        slug: found.slug,
+        state: found.state || "India",
+        region: found.state || "India",
+      };
+    }
+  }
+
+  // Direct first segment pattern: /:city or /:city/... e.g. /kolkata/mini-truck-booking, /jaipur, /ahmedabad/truck-booking/tata-ace
+  const firstSeg = segments[0].toLowerCase();
+  if (CITY_SLUG_MAP.has(firstSeg)) {
+    const found = CITY_SLUG_MAP.get(firstSeg);
+    return {
+      name: found.name,
+      slug: found.slug,
+      state: found.state || "India",
+      region: found.state || "India",
+    };
+  }
+
+  return null;
+}
+
 /**
  * Match a raw city name or coordinates against our SEO_CITIES registry
  */
-function resolveCityConfig(rawCityName, rawStateName) {
+export function resolveCityConfig(rawCityName, rawStateName) {
   if (!rawCityName) return null;
   const clean = rawCityName.trim().toLowerCase();
 
@@ -55,10 +113,33 @@ function resolveCityConfig(rawCityName, rawStateName) {
 }
 
 export function CityProvider({ children }) {
-  const [currentCity, setCurrentCity] = useState(DEFAULT_CITY);
+  let location;
+  try {
+    location = useLocation();
+  } catch {
+    location = { pathname: "/" };
+  }
+
+  // Initial city resolved synchronously from current route (SSR & Client)
+  const [currentCity, setCurrentCity] = useState(() => {
+    const urlCity = extractCityFromUrl(location?.pathname);
+    if (urlCity) return urlCity;
+
+    if (typeof window !== "undefined") {
+      try {
+        const sessionRaw = sessionStorage.getItem(SESSION_CITY_KEY);
+        if (sessionRaw) {
+          const parsed = JSON.parse(sessionRaw);
+          if (parsed?.name && parsed?.slug) return parsed;
+        }
+      } catch {}
+    }
+    return DEFAULT_CITY;
+  });
+
   const [isDetecting, setIsDetecting] = useState(false);
   const [hasDetected, setHasDetected] = useState(false);
-  const currentCityRef = useRef(DEFAULT_CITY);
+  const currentCityRef = useRef(currentCity);
   currentCityRef.current = currentCity;
 
   // Set city with optional manual session persistence
@@ -109,10 +190,26 @@ export function CityProvider({ children }) {
     }
   }, []);
 
+  // Reactively synchronize CityContext with URL location on route change
+  useEffect(() => {
+    const urlCity = extractCityFromUrl(location.pathname);
+    if (urlCity && urlCity.slug !== currentCityRef.current?.slug) {
+      setCity(urlCity, false);
+    }
+  }, [location.pathname, setCity]);
+
   // Perform live auto-detection
   const detectLocation = useCallback(
     async (forceFresh = false) => {
-      if (typeof window === "undefined") return;
+      if (typeof window === "undefined") return currentCityRef.current || DEFAULT_CITY;
+
+      // GUARD: If current URL path already specifies a city and forceFresh is false, NEVER allow IP overwrite!
+      const activeUrlCity = extractCityFromUrl(location.pathname);
+      if (activeUrlCity && !forceFresh) {
+        setCity(activeUrlCity, false);
+        setHasDetected(true);
+        return activeUrlCity;
+      }
 
       // Check if user manually chose a city during this active session
       if (!forceFresh) {
@@ -137,7 +234,7 @@ export function CityProvider({ children }) {
       const detectViaBrowserGeo = async () => {
         if (!navigator.geolocation) return null;
         return new Promise((resolve) => {
-          const timeout = setTimeout(() => resolve(null), 5000);
+          const timeout = setTimeout(() => resolve(null), 4000);
           navigator.geolocation.getCurrentPosition(
             async ({ coords }) => {
               clearTimeout(timeout);
@@ -157,12 +254,11 @@ export function CityProvider({ children }) {
               }
               resolve(null);
             },
-            (err) => {
+            () => {
               clearTimeout(timeout);
-              console.log("Browser geolocation not granted or failed:", err.message);
               resolve(null);
             },
-            { timeout: 5000, maximumAge: 0, enableHighAccuracy: true }
+            { timeout: 4000, maximumAge: 0, enableHighAccuracy: false }
           );
         });
       };
@@ -190,6 +286,12 @@ export function CityProvider({ children }) {
       try {
         // 1. Ask for location permission first
         const geoCity = await detectViaBrowserGeo();
+        const currentUrlCity = extractCityFromUrl(window.location.pathname);
+        if (currentUrlCity && !forceFresh) {
+          setCity(currentUrlCity, false);
+          return currentUrlCity;
+        }
+
         if (geoCity) {
           setCity(geoCity, true);
           return geoCity;
@@ -197,6 +299,12 @@ export function CityProvider({ children }) {
 
         // 2. Fallback to IP detection if GPS is blocked or timed out
         const ipCity = await detectViaIp();
+        const currentUrlCityAfterIp = extractCityFromUrl(window.location.pathname);
+        if (currentUrlCityAfterIp && !forceFresh) {
+          setCity(currentUrlCityAfterIp, false);
+          return currentUrlCityAfterIp;
+        }
+
         if (ipCity) {
           setCity(ipCity, false);
           return ipCity;
@@ -208,12 +316,12 @@ export function CityProvider({ children }) {
         setHasDetected(true);
       }
 
-      return DEFAULT_CITY;
+      return currentCityRef.current || DEFAULT_CITY;
     },
-    [setCity]
+    [location.pathname, setCity]
   );
 
-  // On initial mount / reload: run auto-detection
+  // On initial mount: run auto-detection
   useEffect(() => {
     detectLocation(false);
 

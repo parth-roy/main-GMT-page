@@ -76,10 +76,10 @@ export default function DirectDriverContactBanner({
         </p>
       </div>
 
-      <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-8 justify-between">
+      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
         
         {/* Left: Content */}
-        <div className="flex-1 max-w-2xl">
+        <div className="flex-1 min-w-0">
           {/* Animated Badge */}
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm mb-3.5 animate-pulse">
             <Zap className="w-3.5 h-3.5 fill-current animate-bounce" />
@@ -87,7 +87,7 @@ export default function DirectDriverContactBanner({
           </div>
 
           {/* Heading */}
-          <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-2 leading-tight tracking-tight">
+          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 mb-2.5 leading-tight tracking-tight">
             Skip transport brokers!{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700">
               Unlock 10 direct {categoryName} numbers {cityLabel}
@@ -95,7 +95,7 @@ export default function DirectDriverContactBanner({
           </h3>
 
           {/* Subtext */}
-          <p className="text-slate-700 text-sm sm:text-base font-medium mb-5 leading-relaxed">
+          <p className="text-slate-700 text-sm sm:text-base font-medium mb-5 leading-relaxed max-w-xl">
             Pay a flat <strong className="text-emerald-700 font-black text-base sm:text-lg">₹99 one-time fee</strong> — get instant mobile numbers of 10
             verified commercial truck drivers &amp; fleet owners {cityLabel}.
             Zero broker commission. Zero middleman markup. Negotiate load rates with vehicle owners directly.
@@ -113,7 +113,7 @@ export default function DirectDriverContactBanner({
             ].map(({ icon: Icon, text }) => (
               <span
                 key={text}
-                className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-amber-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-2xs"
+                className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-amber-200/90 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-2xs"
               >
                 <Icon className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                 {text}
@@ -122,19 +122,34 @@ export default function DirectDriverContactBanner({
           </div>
         </div>
 
-        {/* Right: Big Animating CTA */}
-        <div className="shrink-0 w-full lg:w-auto flex flex-col items-center lg:items-end gap-2.5">
-          <Link
-            to="/direct-driver-contact"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-base sm:text-lg px-7 py-4 sm:py-4.5 rounded-2xl transition-all shadow-xl shadow-amber-300/80 hover:shadow-2xl hover:scale-105 active:scale-95 group text-center"
-          >
-            <Zap className="w-5 h-5 fill-current animate-bounce shrink-0" />
-            <span>Unlock 10 Direct Numbers for ₹99 (Save ₹1,500 in Broker Fees)</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform shrink-0" />
-          </Link>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Instant reveal · Verified commercial drivers · Zero broker fees</span>
+        {/* Right: High-Impact Action Card */}
+        <div className="w-full lg:w-80 xl:w-96 shrink-0 flex flex-col items-center lg:items-stretch justify-center">
+          <div className="w-full bg-white/85 backdrop-blur-md rounded-2xl border border-amber-200/90 p-5 sm:p-6 shadow-lg shadow-amber-200/40 flex flex-col items-center text-center">
+            <div className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-900 text-xs font-black px-3 py-1 rounded-full mb-3">
+              <Zap className="w-3 h-3 text-amber-600 fill-current" />
+              <span>Instant Unlock · Save ₹1,500</span>
+            </div>
+
+            <div className="text-slate-900 font-black text-2xl sm:text-3xl mb-1">
+              Flat <span className="text-emerald-600">₹99</span> <span className="text-xs font-normal text-slate-400 line-through">₹500</span>
+            </div>
+            <p className="text-xs text-slate-600 mb-4 leading-normal">
+              Direct mobile numbers of 10 verified commercial drivers &amp; fleet owners {cityLabel}
+            </p>
+
+            <Link
+              to="/direct-driver-contact"
+              className="w-full inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm sm:text-base px-5 py-3.5 rounded-xl transition-all shadow-md shadow-amber-300/80 hover:shadow-lg hover:scale-[1.02] active:scale-95 group"
+            >
+              <Zap className="w-4 h-4 fill-current animate-bounce shrink-0" />
+              <span>Unlock 10 Direct Numbers</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+            </Link>
+
+            <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold text-slate-500 mt-3.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+              <span>Instant reveal · Zero broker commission</span>
+            </div>
           </div>
         </div>
 

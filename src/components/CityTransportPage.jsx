@@ -11,6 +11,8 @@ import SEOHead from "../seo/SEOHead"
 import TrustBadgeRow from "./TrustBadgeRow"
 import { generateCityFaqs } from "../lib/locationFaqHelper"
 import DirectDriverContactBanner from "./common/DirectDriverContactBanner"
+import CityMap from "./common/CityMap"
+import { useCity } from "../context/CityContext"
 
 export default function CityTransportPage({
   city,
@@ -31,8 +33,19 @@ export default function CityTransportPage({
   serviceType = "hub",
 }) {
   const [openFaqIndex, setOpenFaqIndex] = useState(null)
+  const { currentCity, setCity } = useCity()
 
-  useEffect(() => { window.scrollTo(0, 0) }, [])
+  useEffect(() => { 
+    window.scrollTo(0, 0) 
+    if (slug && currentCity?.slug !== slug) {
+      setCity({
+        name: city,
+        slug: slug,
+        state: state || "India",
+        region: state || "India",
+      }, false)
+    }
+  }, [slug, city, state, currentCity?.slug, setCity])
 
   // Auto-generate dynamic, hyper-localized FAQs if custom FAQs are not passed
   const dynamicFaqData = faqs 
@@ -257,6 +270,13 @@ export default function CityTransportPage({
           </div>
         </section>
       )}
+
+      {/* Dynamic Interactive City Logistics Map */}
+      <section className="py-12 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CityMap cityName={city} stateName={state} serviceType={serviceType} />
+        </div>
+      </section>
 
       {/* Dynamic Hyper-Local FAQ Section */}
       {customFaqs ? (
