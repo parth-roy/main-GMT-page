@@ -199,6 +199,21 @@ export default function Footer({ onScrollToSection }) {
               GoMyTruck connects customers with independent logistics partners. Coverage, assignment, price and service scope are confirmed for each booking.
             </p>
           </div>
+
+          <div className="mt-6 pt-4 border-t border-[#1a1a1a] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-gray-500">
+            <p>© 2026 GoMyTruck. All rights reserved.</p>
+            <p>
+              Developed by{' '}
+              <a
+                href="https://parthertech.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-orange-400 hover:text-orange-300 font-semibold transition-colors hover:underline"
+              >
+                Parther Technologies Private Limited
+              </a>
+            </p>
+          </div>
         </div>
 
       </div>
