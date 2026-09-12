@@ -10,6 +10,7 @@ import CitySelectorModal from "../components/CitySelectorModal";
 import { useAuth } from "../context/AuthContext";
 import { useCity } from "../context/CityContext";
 import { getPersistedCity, setPersistedCity, detectCurrentCity } from "../api/pricingApi";
+import { getPluralVehicleName } from "../utils/vehicleNaming";
 
 const API_BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE || "https://api.gomytruck.com/api/v1";
 
@@ -399,6 +400,9 @@ export default function DirectContactPage() {
 
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(VEHICLE_CATEGORIES[0]);
+  const vehicleCallTarget = useMemo(() => {
+    return getPluralVehicleName(selectedCategory?.label || selectedCategory?.vehicle || "");
+  }, [selectedCategory]);
   const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(() => {
     return (
       searchParams.get("openModal") === "true" ||
@@ -842,7 +846,7 @@ export default function DirectContactPage() {
         amount: amount || 9900, // 9900 paise = ₹99.00
         currency: currency || "INR",
         name: "GoMyTruck",
-        description: `Unlock 10 ${selectedCategory.label} Drivers in ${selectedCity.name}`,
+        description: `Call 10 Verified ${vehicleCallTarget} in ${selectedCity.name}`,
         image: "/go-my-truck-logo.png",
         order_id: orderId,
         prefill: {
@@ -1074,7 +1078,7 @@ export default function DirectContactPage() {
     <>
       <SEOHead
         title={`Direct Driver & Partner Contact in ${selectedCity.name} | Zero Broker Commission | GoMyTruck`}
-        description={`Unlock direct phone numbers of 10 verified commercial truck drivers in ${selectedCity.name} for just flat ₹99. Zero broker cuts, direct freight negotiation.`}
+        description={`Call 10 verified commercial ${vehicleCallTarget} in ${selectedCity.name} for just flat ₹99. Zero broker cuts, direct freight negotiation.`}
         canonical="/direct-driver-contact"
         keywords={`direct truck driver phone number, hire truck driver without broker, truck mating number, lorry mating contact number, transporter contact number ${selectedCity.name}, tata ace driver phone number, bolero pickup driver contact number, truck driver mobile number list`}
         jsonLd={directContactSchemas}
@@ -1088,7 +1092,7 @@ export default function DirectContactPage() {
             <span>Direct Driver / Partner Contact · Zero Commission · No Middleman</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight mb-3">
-            Get <span className="text-amber-500">10 Verified Driver</span> Phone Numbers for{" "}
+            Call <span className="text-amber-500">10 Verified {vehicleCallTarget}</span> for{" "}
             <span className="text-emerald-600">₹99</span>
           </h1>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
@@ -1221,7 +1225,7 @@ export default function DirectContactPage() {
                   </div>
 
                   <p className="text-[11px] text-slate-600 leading-relaxed pt-1">
-                    Unlocks direct mobile phone numbers of 10 verified <strong>{selectedCategory.label}</strong> drivers in <strong>{selectedCity.name}</strong>. One-time payment. Zero middleman fees.
+                    Call 10 verified <strong>{vehicleCallTarget}</strong> in <strong>{selectedCity.name}</strong>. One-time payment. Zero middleman fees.
                   </p>
                 </div>
 
@@ -1233,7 +1237,7 @@ export default function DirectContactPage() {
                     className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm shadow-md shadow-amber-200 flex items-center justify-center gap-2 cursor-pointer active:scale-98 transition-all"
                   >
                     <Phone className="w-4 h-4 fill-current" />
-                    <span>View 10 Verified {selectedCategory.label} Numbers</span>
+                    <span>Call 10 Verified {vehicleCallTarget}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -1249,7 +1253,7 @@ export default function DirectContactPage() {
                     >
                       <Zap className="w-5 h-5 fill-current animate-bounce shrink-0" />
                       <span className="text-center leading-tight">
-                        {isProcessing ? "Processing..." : "Unlock 10 Direct Numbers for ₹99 (Save ₹1,500 in Broker Fees)"}
+                        {isProcessing ? "Processing..." : `Call 10 Verified ${vehicleCallTarget} — ₹99 (Save ₹1,500)`}
                       </span>
                       <ArrowRight className="w-4 h-4 shrink-0" />
                     </button>
@@ -1259,7 +1263,7 @@ export default function DirectContactPage() {
                     {/* Unlocked Confirmation Badge */}
                     <div className="w-full py-3 px-4 rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 text-emerald-800 bg-emerald-100 border border-emerald-300">
                       <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
-                      <span>10 Driver Numbers Unlocked &amp; Saved!</span>
+                      <span>10 Verified {vehicleCallTarget} Unlocked &amp; Saved!</span>
                     </div>
 
                     {/* Action Buttons: Copy All, Download TXT, Share WhatsApp */}
@@ -1369,7 +1373,7 @@ export default function DirectContactPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="text-lg sm:text-xl font-black text-slate-900">
-                      10 Verified {selectedCategory.label}s
+                      10 Verified {vehicleCallTarget}
                     </h2>
                     <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
                       Live
@@ -1665,7 +1669,7 @@ export default function DirectContactPage() {
               </div>
 
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
-                10 Verified <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700">{selectedCategory.label}s</span> in {selectedCity.name}
+                Call 10 Verified <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700">{vehicleCallTarget}</span> in {selectedCity.name}
               </h3>
 
               <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
@@ -1876,7 +1880,7 @@ export default function DirectContactPage() {
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500 font-medium">
-                    Instant unlock · 10 {selectedCategory.label} numbers · Zero broker commission
+                    Call 10 verified {vehicleCallTarget} · Zero broker commission
                   </p>
                 </div>
 
@@ -1895,7 +1899,7 @@ export default function DirectContactPage() {
                   className="w-full py-3.5 sm:py-4 px-6 rounded-2xl font-black text-base sm:text-lg flex items-center justify-center gap-2.5 text-white bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 shadow-xl shadow-amber-300/80 hover:shadow-2xl transition-all active:scale-98 cursor-pointer text-center"
                 >
                   <Zap className="w-5 h-5 fill-current animate-bounce shrink-0" />
-                  <span>{isProcessing ? "Processing..." : "Unlock 10 Driver Numbers — ₹99"}</span>
+                  <span>{isProcessing ? "Processing..." : `Call 10 Verified ${vehicleCallTarget} — ₹99`}</span>
                   <ArrowRight className="w-5 h-5 shrink-0" />
                 </button>
               ) : (
@@ -1941,10 +1945,10 @@ export default function DirectContactPage() {
                 <span>Razorpay Live Secure Checkout</span>
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
-                Unlock 10 Driver Numbers
+                Call 10 Verified {vehicleCallTarget}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Verified <strong>{selectedCategory.label}</strong> Drivers in <strong>{selectedCity.name}</strong> · Flat ₹99
+                Verified <strong>{vehicleCallTarget}</strong> in <strong>{selectedCity.name}</strong> · Flat ₹99
               </p>
               <button
                 type="button"

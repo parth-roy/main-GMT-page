@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Zap, Phone, BadgeCheck, ShieldCheck, ArrowRight, Truck } from "lucide-react";
+import { getPluralVehicleName } from "../../utils/vehicleNaming";
 
 /**
  * DirectDriverContactBanner
@@ -19,6 +20,7 @@ export default function DirectDriverContactBanner({
   variant = "default",
 }) {
   const cityLabel = cityName === "your city" || !cityName ? "near you" : "in " + cityName;
+  const pluralVehicle = getPluralVehicleName(categoryName);
 
   /* ── COMPACT VARIANT (Used on compact or subordinate screens) ── */
   if (variant === "compact") {
@@ -26,7 +28,7 @@ export default function DirectDriverContactBanner({
       <div className="my-6 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 p-0.5 shadow-md shadow-amber-200/50">
         <div className="bg-amber-50/95 rounded-[14px] px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
           <span className="sr-only">
-            Get direct phone numbers of verified {categoryName} {cityLabel} for just Rs.99. Zero broker commission. Zero middleman charges.
+            Get direct phone numbers to call 10 verified {pluralVehicle} {cityLabel} for just Rs.99. Zero broker commission. Zero middleman charges.
             GoMyTruck Direct Driver Connect: Verified commercial truck drivers &amp; fleet owners without paying broker fees.
           </span>
           <div className="flex items-center gap-2.5">
@@ -36,7 +38,7 @@ export default function DirectDriverContactBanner({
             </span>
             <p className="text-sm font-black text-slate-800">
               Direct Driver / Partner Contact:{" "}
-              <span className="text-amber-800">Unlock 10 verified {categoryName} numbers {cityLabel}</span>{" "}
+              <span className="text-amber-800">Call 10 Verified {pluralVehicle} {cityLabel}</span>{" "}
               <span className="text-slate-400 line-through text-xs font-normal">₹500</span>{" "}
               <span className="text-emerald-700 font-black text-base">₹99</span>
             </p>
@@ -46,7 +48,7 @@ export default function DirectDriverContactBanner({
             className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black px-4 py-2 rounded-xl transition-all shadow-sm hover:scale-105 active:scale-95 whitespace-nowrap shrink-0"
           >
             <Phone className="w-3.5 h-3.5" />
-            <span>Unlock 10 Numbers · ₹99 (Save ₹1,500)</span>
+            <span>Call 10 Verified {pluralVehicle} · ₹99</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -66,7 +68,7 @@ export default function DirectDriverContactBanner({
 
       {/* Hidden crawler text for SEO / GEO / AEO indexing */}
       <div className="sr-only">
-        <h2>Get Direct Phone Numbers of Verified {categoryName} {cityLabel} for Just Rs.99 — Zero Broker Commission</h2>
+        <h2>Get Direct Phone Numbers to Call 10 Verified {pluralVehicle} {cityLabel} for Just Rs.99 — Zero Broker Commission</h2>
         <p>
           GoMyTruck offers direct driver and fleet partner contact. For a flat one-time fee of Rs.99, you can unlock
           the direct mobile numbers of 10 commercial-licensed, verified truck drivers and fleet owners {cityLabel}.
@@ -90,7 +92,7 @@ export default function DirectDriverContactBanner({
           <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 mb-2.5 leading-tight tracking-tight">
             Skip transport brokers!{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700">
-              Unlock 10 direct {categoryName} numbers {cityLabel}
+              Call 10 Verified {pluralVehicle} {cityLabel}
             </span>
           </h3>
 
@@ -134,7 +136,7 @@ export default function DirectDriverContactBanner({
               Flat <span className="text-emerald-600">₹99</span> <span className="text-xs font-normal text-slate-400 line-through">₹500</span>
             </div>
             <p className="text-xs text-slate-600 mb-4 leading-normal">
-              Direct mobile numbers of 10 verified commercial drivers &amp; fleet owners {cityLabel}
+              Direct mobile numbers of 10 verified {pluralVehicle} {cityLabel}
             </p>
 
             <Link
@@ -142,7 +144,7 @@ export default function DirectDriverContactBanner({
               className="w-full inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm sm:text-base px-5 py-3.5 rounded-xl transition-all shadow-md shadow-amber-300/80 hover:shadow-lg hover:scale-[1.02] active:scale-95 group"
             >
               <Zap className="w-4 h-4 fill-current animate-bounce shrink-0" />
-              <span>Unlock 10 Direct Numbers</span>
+              <span>Call 10 Verified {pluralVehicle}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
             </Link>
 
@@ -162,7 +164,7 @@ export default function DirectDriverContactBanner({
             Can I contact truck drivers and fleet owners directly without broker commission?
           </p>
           <p className="text-xs text-slate-600 leading-relaxed">
-            Yes. GoMyTruck charges a flat Rs.99 one-time fee to unlock 10 verified driver and fleet partner phone numbers
+            Yes. GoMyTruck charges a flat Rs.99 one-time fee to call 10 verified {pluralVehicle}
             {cityLabel !== "near you" ? (" " + cityLabel) : ""}. Zero broker margin. You talk directly with the vehicle driver or transporter.
           </p>
         </div>

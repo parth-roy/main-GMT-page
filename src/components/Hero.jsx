@@ -169,7 +169,7 @@ export default function Hero({
             <div className="relative group/unlock">
               <Link
                 to="/direct-driver-contact"
-                aria-label="Direct Driver & Partner Contact — Unlock 10 verified numbers for ₹99"
+                aria-label="Direct Driver & Partner Contact — Call 10 verified trucks for ₹99"
                 className={[
                   "inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl font-bold text-xs sm:text-sm",
                   "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white",

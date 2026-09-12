@@ -254,7 +254,7 @@ export default function RouteVehiclePage() {
                   to="/direct-driver-contact"
                   className="bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold px-6 py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2"
                 >
-                  <Zap size={17} className="fill-slate-900 animate-bounce" /> Unlock 10 Route Drivers · ₹99 (Save ₹1,500+)
+                  <Zap size={17} className="fill-slate-900 animate-bounce" /> Call 10 Verified {vehicle.shortName} · ₹99 (Save ₹1,500+)
                 </Link>
               </div>
             </div>

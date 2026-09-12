@@ -127,7 +127,7 @@ export default function FreightRateIndexPage() {
               to="/direct-driver-contact"
               className="bg-amber-500 hover:bg-amber-400 text-slate-900 font-black px-6 py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2"
             >
-              <Zap size={17} className="fill-slate-900 animate-bounce" /> Unlock 10 Direct Drivers · ₹99
+              <Zap size={17} className="fill-slate-900 animate-bounce" /> Call 10 Verified Trucks · ₹99
             </Link>
             <Link
               to="/book-truck-online"

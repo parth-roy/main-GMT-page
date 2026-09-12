@@ -63,7 +63,7 @@ export default function CityVehiclePage() {
     },
     {
       question: `Can I get direct phone numbers of ${vehicle.shortName} drivers in ${cityName} without brokers?`,
-      answer: `Yes. GoMyTruck offers Direct Driver Connect. For a flat one-time fee of ₹99, you can instantly unlock 10 verified ${vehicle.shortName} drivers and vehicle owners in ${cityName} to negotiate trip rates directly with zero middleman commissions.`
+      answer: `Yes. GoMyTruck offers Direct Driver Connect. For a flat one-time fee of ₹99, you can instantly call 10 verified ${vehicle.shortName} drivers and vehicle owners in ${cityName} to negotiate trip rates directly with zero middleman commissions.`
     },
     {
       question: `How do commercial ${vehicle.shortName} owners attach their vehicle in ${cityName}?`,
