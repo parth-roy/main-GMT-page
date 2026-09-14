@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Search, X, Navigation, Loader2, Anchor, Package, Check, Sparkles, Building2 } from "lucide-react";
 import { SEO_CITIES } from "../lib/cities";
@@ -85,6 +86,11 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentCity, setCity, detectLocation } = useCity();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -156,12 +162,17 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
   const handleAutoDetectClick = async () => {
     setDetectingLoc(true);
     try {
+      if (typeof window !== "undefined") {
+        try {
+          sessionStorage.removeItem("gomytruck_session_city");
+        } catch {}
+      }
       const detected = await detectLocation(true);
-      if (detected) {
+      if (detected && detected.slug) {
         handleCitySelect(detected.slug, detected.name);
       }
-    } catch {
-      // ignore
+    } catch (err) {
+      console.warn("Auto-detect failed:", err);
     } finally {
       setDetectingLoc(false);
     }
@@ -193,21 +204,21 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
     });
   }, [searchQuery, activeFilter]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted || typeof document === "undefined") return null;
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity" 
+        className="fixed inset-0 bg-slate-950/65 backdrop-blur-xs transition-opacity cursor-pointer" 
         onClick={onClose}
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200 z-10">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white shadow-xs border border-slate-100 flex items-center justify-center p-1.5">
               <img src="/google-maps-icon.webp" alt="Location" width={22} height={22} className="w-5 h-5 object-contain" />
@@ -281,17 +292,17 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
             <button
               onClick={handleAutoDetectClick}
               disabled={detectingLoc}
-              className="w-full flex items-center justify-center gap-2.5 py-3 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 rounded-2xl font-bold text-sm transition-all shadow-2xs cursor-pointer"
+              className="w-full flex items-center justify-center gap-2.5 py-3 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 rounded-2xl font-bold text-sm transition-all shadow-2xs cursor-pointer active:scale-[0.99]"
             >
               {detectingLoc ? (
                 <>
                   <Loader2 size={16} className="animate-spin text-emerald-600" />
-                  <span>Detecting your current location...</span>
+                  <span>Detecting your real location via GPS / IP...</span>
                 </>
               ) : (
                 <>
                   <Navigation size={16} className="text-emerald-600" />
-                  <span>Auto-Detect Current Location (Current: <strong className="ml-1 text-emerald-900 font-black">{currentCity.name}</strong>)</span>
+                  <span>Auto-Detect Current Location <span className="text-xs font-medium text-emerald-700/80">(Use live GPS / IP)</span></span>
                 </>
               )}
             </button>
@@ -415,6 +426,7 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
           
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

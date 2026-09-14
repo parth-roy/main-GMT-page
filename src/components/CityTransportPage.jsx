@@ -6,13 +6,15 @@
  */
 import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { Truck, Bike, Package, Home, ArrowRight, CheckCircle, PhoneCall, Plus, Minus, MessageCircleQuestion } from "lucide-react"
+import { Truck, Bike, Package, Home, ArrowRight, CheckCircle, PhoneCall, Plus, Minus, MessageCircleQuestion, Weight, Ruler, Zap } from "lucide-react"
 import SEOHead from "../seo/SEOHead"
 import TrustBadgeRow from "./TrustBadgeRow"
 import { generateCityFaqs } from "../lib/locationFaqHelper"
 import DirectDriverContactBanner from "./common/DirectDriverContactBanner"
 import CityMap from "./common/CityMap"
 import { useCity } from "../context/CityContext"
+import { ALL_SEO_VEHICLES } from "../lib/vehicles"
+import { POPULAR_CORRIDORS } from "../lib/corridors"
 
 export default function CityTransportPage({
   city,
@@ -211,6 +213,136 @@ export default function CityTransportPage({
           </div>
         </section>
       )}
+
+      {/* ── Internal Link Engine: Commercial Fleet Available in City ── */}
+      <section className="py-16 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider mb-3">
+              <Truck size={14} /> Commercial Fleet
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">
+              Commercial Vehicles Available for Rent in <span className="text-brand-600">{city}</span>
+            </h2>
+            <p className="text-slate-600 text-sm max-w-xl mx-auto">
+              Compare payload capacities, deck dimensions, and per-km freight rates for verified transport vehicles in {city}.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {ALL_SEO_VEHICLES.map((v) => (
+              <Link
+                key={v.slug}
+                to={slug ? `/${slug}/truck-booking/${v.slug}` : `/mini-truck-booking`}
+                className="bg-white rounded-2xl border border-slate-200 p-4 hover:border-brand-400 hover:shadow-md transition-all group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="aspect-video bg-slate-50 rounded-xl mb-3 flex items-center justify-center p-2">
+                    <img src={v.image} alt={v.name} className="max-h-full object-contain group-hover:scale-105 transition-transform" />
+                  </div>
+                  <h3 className="font-bold text-slate-900 text-sm group-hover:text-brand-600 transition-colors">{v.name}</h3>
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
+                    <Weight size={12} className="text-brand-500 shrink-0" />
+                    <span>{v.capacityKg} kg ({v.capacityTons}T)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
+                    <Ruler size={12} className="text-brand-500 shrink-0" />
+                    <span>{v.lengthFt} × {v.widthFt} ft</span>
+                  </div>
+                </div>
+                <div className="text-xs font-bold text-brand-600 mt-3 flex items-center justify-between border-t border-slate-100 pt-2">
+                  <span>Book in {city}</span>
+                  <ArrowRight size={12} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Internal Link Engine: Popular Outstation Freight Corridors & Driver Hubs ── */}
+      <section className="py-16 bg-white border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            {/* Left: Intercity Freight Corridors from City */}
+            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">
+                    Outstation Corridors from {city}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Popular highway freight transit routes</p>
+                </div>
+                <Link to="/intercity/kolkata" className="text-xs font-bold text-brand-600 hover:underline">
+                  All Routes →
+                </Link>
+              </div>
+
+              <div className="space-y-3">
+                {((slug ? POPULAR_CORRIDORS.filter(c => c.originSlug === slug || c.destSlug === slug) : []).slice(0, 5).concat(
+                  [{ slug: `${slug || 'delhi'}-to-delhi`, originName: city, destName: "Delhi", highway: "NH Trunk Axis", distanceKm: 420 },
+                   { slug: `${slug || 'mumbai'}-to-mumbai`, originName: city, destName: "Mumbai", highway: "Western Highway", distanceKm: 580 },
+                   { slug: `${slug || 'kolkata'}-to-kolkata`, originName: city, destName: "Kolkata", highway: "East Logistics Corridor", distanceKm: 520 }]
+                )).slice(0, 5).map((c, i) => (
+                  <Link
+                    key={i}
+                    to={`/transport/${c.slug}/14ft-truck`}
+                    className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl hover:border-brand-400 hover:shadow-xs transition-all group"
+                  >
+                    <div>
+                      <div className="font-bold text-slate-800 text-sm group-hover:text-brand-700">
+                        {c.originName || city} → {c.destName}
+                      </div>
+                      <div className="text-[11px] text-slate-500">{c.highway || "Express National Highway"} · {c.distanceKm || 350} km</div>
+                    </div>
+                    <span className="text-xs font-bold text-brand-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      Check Rates <ArrowRight size={12} />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Direct Driver Supply Hubs in City */}
+            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">
+                    Direct Driver Contact in {city}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Call verified truck owners directly · ₹99</p>
+                </div>
+                <Zap size={18} className="text-amber-500 fill-amber-500" />
+              </div>
+
+              <div className="space-y-3">
+                {ALL_SEO_VEHICLES.slice(0, 5).map((v) => (
+                  <Link
+                    key={v.slug}
+                    to={slug ? `/drivers/${slug}/${v.slug}` : `/direct-driver-contact`}
+                    className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl hover:border-amber-400 hover:shadow-xs transition-all group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+                        <Truck size={16} className="text-amber-600" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-slate-800 text-sm group-hover:text-amber-700">
+                          {v.shortName} Drivers in {city}
+                        </div>
+                        <div className="text-[11px] text-slate-500">10 Verified Contacts · 0% Commission</div>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold text-amber-600 flex items-center gap-1">
+                      View Leads <ArrowRight size={12} />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Why GoMyTruck */}
       <section className={`py-20 ${areas.length > 0 ? "bg-slate-50" : "bg-white"} border-t border-slate-200`}>

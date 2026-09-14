@@ -1,3 +1,38 @@
+# ==============================================================================
+# GoMyTruck Robots.txt — Pan-India Logistics & Freight Platform
+# Canonical Sitemap Index: https://gomytruck.com/sitemap.xml
+# ==============================================================================
+
+User-agent: Googlebot
+Allow: /
+Disallow: /cdn-cgi/
+Disallow: /search*
+
+User-agent: Bingbot
+Allow: /
+Disallow: /cdn-cgi/
+Disallow: /search*
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /cdn-cgi/
+Disallow: /search*
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /cdn-cgi/
+Disallow: /search*
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /cdn-cgi/
+Disallow: /search*
+
+User-agent: Applebot
+Allow: /
+Disallow: /cdn-cgi/
+Disallow: /search*
+
 User-agent: *
 Allow: /
 Disallow: /cdn-cgi/

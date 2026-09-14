@@ -8,7 +8,7 @@ import {
 import SEOHead from "../seo/SEOHead";
 import TrustBadgeRow from "../components/TrustBadgeRow";
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner";
-import { getCorridorBySlug } from "../lib/corridors";
+import { getCorridorBySlug, POPULAR_CORRIDORS } from "../lib/corridors";
 import { getVehicleBySlug, ALL_SEO_VEHICLES } from "../lib/vehicles";
 import { getCargoTypeBySlug } from "../lib/cargoTypes";
 
@@ -415,6 +415,58 @@ export default function RouteVehiclePage() {
                 </div>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Reverse Return Load & Connecting Corridors */}
+      <section className="py-14 bg-white border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Reverse Return Load Card */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col justify-between">
+              <div>
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full uppercase mb-3">
+                  <Sparkles size={12} /> Return Load Available
+                </span>
+                <h3 className="text-xl font-extrabold text-slate-900 mb-2">
+                  {destName} to {originName} Return Freight
+                </h3>
+                <p className="text-sm text-slate-600 mb-4">
+                  Need a return load or backhaul transport from {destName} back to {originName}? Book verified empty trucks returning on this highway with up to 30% backhaul discounts.
+                </p>
+              </div>
+              <Link
+                to={`/transport/${corridor.destSlug || 'dest'}-to-${corridor.originSlug || 'origin'}/${vehicle.slug}`}
+                className="inline-flex items-center justify-between px-5 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-sm transition-all"
+              >
+                <span>View {destName} → {originName} Rates</span>
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+
+            {/* Connecting Outstation Corridors */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+              <h3 className="text-lg font-extrabold text-slate-900 mb-1">
+                Connecting Corridors from {originName}
+              </h3>
+              <p className="text-xs text-slate-500 mb-4">Other frequent freight routes originating from {originName}</p>
+              <div className="space-y-2.5">
+                {(POPULAR_CORRIDORS.filter(c => (c.originSlug === corridor.originSlug || c.destSlug === corridor.originSlug) && c.slug !== corridor.slug).slice(0, 3).concat([
+                  { slug: `${corridor.originSlug}-to-delhi`, originName, destName: "Delhi", highway: "NH Trunk Axis", distanceKm: 420 },
+                  { slug: `${corridor.originSlug}-to-mumbai`, originName, destName: "Mumbai", highway: "Western Highway", distanceKm: 650 }
+                ])).slice(0, 3).map((sc, i) => (
+                  <Link
+                    key={i}
+                    to={`/transport/${sc.slug}/${vehicle.slug}`}
+                    className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-brand-400 text-xs font-semibold text-slate-800 transition-colors"
+                  >
+                    <span>{sc.originName || originName} → {sc.destName}</span>
+                    <span className="text-brand-600 font-bold flex items-center gap-1">Rates <ArrowRight size={12} /></span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

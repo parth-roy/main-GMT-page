@@ -1,10 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Truck, ChevronRight, Building2 } from 'lucide-react';
+import { Search, Truck, ChevronRight, Building2, Navigation, Layers, Zap, ArrowRight, ShieldCheck } from 'lucide-react';
 import { SEO_CITIES } from '../lib/cities';
+import { ALL_SEO_VEHICLES } from '../lib/vehicles';
+import { POPULAR_CORRIDORS } from '../lib/corridors';
 import SEOHead from '../seo/SEOHead';
+import { useCity } from '../context/CityContext';
 
 const DirectoryPage = () => {
+  const { currentCity } = useCity();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Group cities by state and filter by search query
@@ -107,6 +111,78 @@ const DirectoryPage = () => {
               <span>Showing <strong>{totalMatchingCities}</strong> cities across <strong>{sortedStates.length}</strong> states/UTs</span>
             </div>
           </div>
+
+          {/* ── National Logistics Corridors Hub ── */}
+          {!searchQuery && (
+            <div className="mb-14 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-700 bg-brand-50 px-3 py-1 rounded-full uppercase mb-1">
+                    <Navigation size={12} /> National Express Corridors
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                    High-Traffic Highway Freight Routes
+                  </h2>
+                </div>
+                <span className="text-xs text-slate-500 font-medium">Daily verified FTL &amp; PTL transit</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+                {POPULAR_CORRIDORS.slice(0, 16).map((c) => (
+                  <Link
+                    key={c.slug}
+                    to={`/transport/${c.slug}/14ft-truck`}
+                    className="p-3.5 bg-slate-50 hover:bg-brand-50/60 border border-slate-200/80 hover:border-brand-300 rounded-xl flex items-center justify-between transition-all group"
+                  >
+                    <div>
+                      <div className="font-bold text-slate-800 text-sm group-hover:text-brand-700">
+                        {c.originName} → {c.destName}
+                      </div>
+                      <div className="text-[11px] text-slate-500">{c.highway} · {c.distanceKm} km</div>
+                    </div>
+                    <ArrowRight size={14} className="text-slate-400 group-hover:text-brand-600 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── Commercial Vehicle Fleet Directory ── */}
+          {!searchQuery && (
+            <div className="mb-14 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-700 bg-brand-50 px-3 py-1 rounded-full uppercase mb-1">
+                    <Layers size={12} /> Commercial Vehicles
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                    Transport Vehicles by Payload &amp; Size
+                  </h2>
+                </div>
+                <Link to="/truck" className="text-xs font-bold text-brand-600 hover:underline">
+                  All Vehicles &amp; Pricing →
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {ALL_SEO_VEHICLES.map((v) => (
+                  <Link
+                    key={v.slug}
+                    to={`/${currentCity?.slug || 'kolkata'}/truck-booking/${v.slug}`}
+                    className="p-4 bg-slate-50 hover:bg-brand-50/60 border border-slate-200/80 hover:border-brand-300 rounded-2xl flex flex-col justify-between transition-all group"
+                  >
+                    <div className="aspect-video bg-white rounded-xl mb-3 flex items-center justify-center p-2 border border-slate-100">
+                      <img src={v.image} alt={v.name} className="max-h-full object-contain group-hover:scale-105 transition-transform" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm group-hover:text-brand-700">{v.name}</h3>
+                      <p className="text-[11px] text-slate-500 mt-0.5">{v.capacityKg} kg · {v.lengthFt}×{v.widthFt} ft</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* States Masonry Layout (Eliminates vertical whitespace gaps & misalignments) */}
           {sortedStates.length === 0 ? (

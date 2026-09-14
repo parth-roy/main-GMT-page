@@ -12,7 +12,6 @@ import { useCity } from '../context/CityContext';
 import { SEO_CITIES } from '../lib/cities';
 
 
-/* ─── Data ────────────────────────────────────────────────────── */
 const reasons = [
   {
     icon: <Zap className="w-8 h-8 text-brand-600" />,
@@ -31,53 +30,6 @@ const reasons = [
   },
 ];
 
-const useCases = [
-  {
-    icon: '\uD83C\uDFE0',
-    title: 'Home Shifting within Kolkata',
-    desc: 'Request transport for declared furniture, appliances, or packed items after confirming load fit and availability.',
-  },
-  {
-    icon: '\uD83D\uDED2',
-    title: 'Shop Stock Delivery',
-    desc: 'Deliver wholesale stock, retail goods or raw materials to your shop quickly.',
-  },
-  {
-    icon: '\uD83D\uDDA5\uFE0F',
-    title: 'Office Relocation',
-    desc: 'Shift workstations, files and office equipment with care across Kolkata.',
-  },
-  {
-    icon: '\uD83C\uDFAA',
-    title: 'Event Material Transport',
-    desc: 'Transport decorations, equipment and setups for events, exhibitions & promotions.',
-  },
-];
-
-const areas = [
-  'Park Street',
-  'Salt Lake',
-  'New Town',
-  'Howrah',
-  'Dum Dum',
-  'Behala',
-  'Tollygunge',
-  'Jadavpur',
-  'Kasba',
-  'Garia',
-  'Barasat',
-  'Barrackpore',
-  'Ballygunge',
-  'Ultadanga',
-  'Shyambazar',
-];
-
-const stats = [
-  { icon: <Clock className="w-7 h-7 text-brand-400" />, value: '~20 min', label: 'Avg. Pickup Time' },
-  { icon: <img src="/google-maps-icon.webp" alt="Location" width={28} height={28} className="w-7 h-7 object-contain" />, value: '50+ Areas', label: 'Coverage across Kolkata' },
-  { icon: <Zap className="w-7 h-7 text-brand-400" />, value: 'Online', label: 'Request submission' },
-];
-
 /* ─── Component ───────────────────────────────────────────────── */
 export default function LocalTransportPage() {
   const { city: routeCity } = useParams();
@@ -87,6 +39,51 @@ export default function LocalTransportPage() {
   const matchedCity = routeCity ? SEO_CITIES.find((c) => c.slug === routeCity) : null;
   const cityName = matchedCity ? matchedCity.name : currentCity.name;
   const citySlug = matchedCity ? matchedCity.slug : currentCity.slug;
+  const stateName = matchedCity ? (matchedCity.state || 'India') : (currentCity.state || 'India');
+
+  // Localized use cases tailored to active city
+  const useCases = [
+    {
+      icon: '\uD83C\uDFE0',
+      title: `Home Shifting within ${cityName}`,
+      desc: `Request local mini truck or pickup transport for furniture, appliances, and packed cartons across ${cityName}.`,
+    },
+    {
+      icon: '\uD83D\uDED2',
+      title: 'Shop & Wholesale Delivery',
+      desc: `Deliver commercial stock, raw materials, and retail goods directly to your shop in ${cityName}.`,
+    },
+    {
+      icon: '\uD83D\uDDA5\uFE0F',
+      title: 'Office & Workstation Shifting',
+      desc: `Relocate computers, desks, files, and commercial inventory smoothly across ${cityName} commercial hubs.`,
+    },
+    {
+      icon: '\uD83C\uDFAA',
+      title: 'Industrial & Event Logistics',
+      desc: `Move exhibition material, industrial machinery, and event fabrications with fast on-demand dispatch.`,
+    },
+  ];
+
+  // Dynamic areas list based on city metadata or popular commercial zones
+  const areas = (matchedCity?.areas && matchedCity.areas.length > 0)
+    ? matchedCity.areas
+    : [
+        `${cityName} Central`,
+        `${cityName} Industrial Area`,
+        `${cityName} Wholesale Market`,
+        `${cityName} Railway Hub`,
+        `${cityName} Bypass Zone`,
+        `${cityName} Ring Road Hub`,
+        `${cityName} Transport Nagar`,
+        `${cityName} Express Corridor`,
+      ];
+
+  const stats = [
+    { icon: <Clock className="w-7 h-7 text-brand-400" />, value: '~20 min', label: 'Avg. Pickup Time' },
+    { icon: <img src="/google-maps-icon.webp" alt="Location" width={28} height={28} className="w-7 h-7 object-contain" />, value: '100% Coverage', label: `Across ${cityName}` },
+    { icon: <Zap className="w-7 h-7 text-brand-400" />, value: 'Online', label: 'Instant Booking' },
+  ];
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -145,12 +142,6 @@ export default function LocalTransportPage() {
       },
     ],
   };
-
-  const stats = [
-    { icon: <Clock className="w-7 h-7 text-brand-400" />, value: '~20 min', label: 'Avg. Pickup Time' },
-    { icon: <img src="/google-maps-icon.webp" alt="Location" width={28} height={28} className="w-7 h-7 object-contain" />, value: 'All Areas', label: `Coverage across ${cityName}` },
-    { icon: <Zap className="w-7 h-7 text-brand-400" />, value: 'Online', label: 'Request submission' },
-  ];
 
   return (
     <>
@@ -374,9 +365,9 @@ export default function LocalTransportPage() {
       {/* ── SEO Article & FAQs ───────────────────────────────── */}
       <section className="bg-white py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate prose-lg">
-          <h2 className="text-3xl font-bold text-slate-900 mt-0 mb-6 text-center">Fast & Reliable Local Transport Services in Kolkata</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mt-0 mb-6 text-center">Fast & Reliable Local Transport Services in {cityName}</h2>
           <p>
-            Navigating the bustling, narrow lanes of Kolkata requires a logistics partner who understands the city's unique geography. <strong>GoMyTruck</strong> provides top-tier <strong>local transport services in Kolkata</strong>, ensuring your goods are delivered quickly and safely, no matter where you are located. From the busy commercial hubs of Burrabazar and Posta to the modern IT corridors of Salt Lake and New Town, our fleet is equipped to handle every local shifting and delivery requirement.
+            Navigating the bustling streets and industrial zones of {cityName} requires a logistics partner who understands the local geography. <strong>GoMyTruck</strong> provides dependable <strong>local transport services in {cityName}</strong>, ensuring your goods are moved safely across all major markets, distribution centers, and residential neighborhoods.
           </p>
           <p>
             Local transport supports stock replenishment, residential moves, and distribution work. GoMyTruck collects the exact route, declared goods, vehicle, and handling requirements, calculates a current estimate, and starts partner matching after confirmation. Supported active trips can provide status and location updates.
@@ -384,70 +375,70 @@ export default function LocalTransportPage() {
           
           <h3 className="text-2xl font-semibold text-slate-800 mt-10 mb-4">Comprehensive Local Goods Transport Solutions</h3>
           <p>
-            We cater to a diverse array of local transport needs. Our services are designed to be flexible, accommodating varying load capacities and route requirements:
+            We cater to a diverse array of local transport needs. Our services are designed to be flexible, accommodating varying load capacities and route requirements in {cityName}:
           </p>
           <ul className="space-y-2 mb-8">
-            <li><strong>House & Room Shifting:</strong> Moving within Kolkata? We provide right-sized vehicles like <Link to="/kolkata/mini-truck-booking" className="text-brand-600 font-semibold hover:underline">Mini Trucks</Link> and Tata Aces, perfect for shifting 1BHKs, PG luggage, and individual rooms through narrow alleys without a hitch.</li>
-            <li><strong>B2B Logistics & Retail Distribution:</strong> For SMEs and wholesalers, we offer dedicated fleet assignments. Transport raw materials to your factory in Howrah, or distribute finished FMCG products to retailers across North and South 24 Parganas effortlessly.</li>
-            <li><strong>Heavy Commercial Deliveries:</strong> When a Tata Ace isn't enough, book our sturdy <Link to="/kolkata/pickup-truck-booking" className="text-brand-600 font-semibold hover:underline">Pickup Trucks</Link> (like the Bolero Pickup). They are ideal for transporting construction materials, heavy machinery, and bulk wholesale goods up to 1.5 tons.</li>
-            <li><strong>E-Commerce & Courier Last-Mile:</strong> Businesses can discuss recurring local distribution requirements. Coverage, capacity, and timing must be confirmed for the operating scope.</li>
+            <li><strong>House & Room Shifting:</strong> Moving within {cityName}? We provide right-sized vehicles like <Link to={`/${citySlug}/truck-booking/tata-ace`} className="text-brand-600 font-semibold hover:underline">Mini Trucks</Link> and Tata Aces, perfect for shifting 1BHKs, PG luggage, and individual rooms through narrow alleys without a hitch.</li>
+            <li><strong>B2B Logistics & Retail Distribution:</strong> For SMEs and wholesalers, we offer dedicated fleet assignments. Transport raw materials to your factory, or distribute finished goods to retailers across {cityName} and nearby industrial estates effortlessly.</li>
+            <li><strong>Heavy Commercial Deliveries:</strong> When a Tata Ace isn't enough, book our sturdy <Link to={`/${citySlug}/truck-booking/bolero-pickup`} className="text-brand-600 font-semibold hover:underline">Pickup Trucks</Link> (like the Bolero Pickup) or 14-ft Eicher trucks. They are ideal for transporting construction materials, heavy machinery, and bulk wholesale goods.</li>
+            <li><strong>E-Commerce & Courier Last-Mile:</strong> Businesses can book on-demand or recurring local distribution for express parcels and palletized cargo.</li>
           </ul>
 
-          <h3 className="text-2xl font-semibold text-slate-800 mt-10 mb-4">Why GoMyTruck is Kolkata's Preferred Local Transporter</h3>
+          <h3 className="text-2xl font-semibold text-slate-800 mt-10 mb-4">Why GoMyTruck is {cityName}'s Preferred Local Transporter</h3>
           <p>
-            The local transport market is often plagued by unreliable service, hidden costs, and unavailable vehicles. GoMyTruck eliminates these pain points entirely:
+            The local transport market is often plagued by unreliable service, hidden broker commissions, and unavailable vehicles. GoMyTruck eliminates these pain points entirely:
           </p>
           <ol className="space-y-4 mb-8">
-            <li><strong>Availability Status:</strong> The booking enters partner matching after confirmation. Allocation and arrival depend on the route, goods, vehicle class, traffic, and current partner supply.</li>
-            <li><strong>Pricing Breakdown:</strong> The estimate uses the mapped distance and time, vehicle, fuel, demand, workforce, and tax inputs. Toll, waiting, or confirmed trip changes can affect the final total as stated in the booking terms.</li>
-            <li><strong>Wide Range of Vehicles:</strong> Our fleet includes everything from two-wheelers for fast document delivery to Tata Aces, Bolero Pickups, and larger 14-ft trucks. We match the right vehicle to your specific cargo volume, saving you money.</li>
-            <li><strong>Trip visibility:</strong> Supported active bookings can provide status and location updates after an eligible partner is assigned and tracking is active.</li>
+            <li><strong>Availability Status:</strong> The booking enters partner matching after confirmation. Allocation and arrival depend on the route, goods, vehicle class, traffic, and current partner supply in {cityName}.</li>
+            <li><strong>Pricing Breakdown:</strong> The estimate uses mapped distance and time, vehicle, fuel, and demand inputs with 0% hidden middleman markups.</li>
+            <li><strong>Wide Range of Vehicles:</strong> Our fleet in {cityName} includes everything from Tata Aces, Bolero Pickups, to 14ft and 20ft trucks, ensuring an optimal match for your cargo volume.</li>
+            <li><strong>Direct Driver Option:</strong> Unlock direct phone numbers of 10 local {cityName} truck drivers for just ₹99 with zero broker commission.</li>
           </ol>
 
           <h3 className="text-2xl font-semibold text-slate-800 mt-10 mb-4">Frequently Asked Questions (FAQs)</h3>
           <div className="space-y-4 not-prose mt-6">
             <details className="group bg-slate-50 border border-slate-200 rounded-xl p-6 open:shadow-md transition-all">
               <summary className="flex cursor-pointer items-center justify-between font-bold text-slate-900">
-                How do I book a local transport vehicle in Kolkata?
+                How do I book a local transport vehicle in {cityName}?
                 <span className="transition group-open:rotate-180">
                   <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                 </span>
               </summary>
               <p className="mt-4 text-slate-600 leading-relaxed">
-                Visit the <Link to="/book-truck-online" className="text-brand-600 font-semibold hover:underline">booking page</Link> or message on WhatsApp. Enter the addresses, choose a vehicle, declare the goods, and review the estimate. Confirmation starts partner matching; assignment is not immediate or guaranteed.
+                Visit the <Link to="/book-truck-online" className="text-brand-600 font-semibold hover:underline">booking page</Link> or connect on WhatsApp. Enter pickup and drop addresses in {cityName}, choose a vehicle, declare the goods, and review the live estimate.
               </p>
             </details>
             <details className="group bg-slate-50 border border-slate-200 rounded-xl p-6 open:shadow-md transition-all">
               <summary className="flex cursor-pointer items-center justify-between font-bold text-slate-900">
-                Do you provide labor for loading and unloading?
+                Do you provide labor for loading and unloading in {cityName}?
                 <span className="transition group-open:rotate-180">
                   <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                 </span>
               </summary>
               <p className="mt-4 text-slate-600 leading-relaxed">
-                Yes, driver-helper or additional labor options are available during the booking process for a nominal extra charge. This ensures your goods are loaded and unloaded safely without you having to lift a finger.
+                Yes, driver-helper or additional labor options are available during the booking process for a nominal charge, ensuring your goods are handled safely.
               </p>
             </details>
             <details className="group bg-slate-50 border border-slate-200 rounded-xl p-6 open:shadow-md transition-all">
               <summary className="flex cursor-pointer items-center justify-between font-bold text-slate-900">
-                Are there any "No Entry" timing restrictions for local trucks?
+                Are there any "No Entry" timing restrictions for local trucks in {cityName}?
                 <span className="transition group-open:rotate-180">
                   <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                 </span>
               </summary>
               <p className="mt-4 text-slate-600 leading-relaxed">
-                Commercial-vehicle restrictions and local access rules can vary by road, time and vehicle class. Confirm the planned route and dispatch window with the assigned partner; the website does not automatically certify legal access or a delay-free time.
+                Commercial vehicle restrictions and peak-hour "no-entry" zones vary across municipal zones in {cityName}. Our verified local drivers are experienced with local traffic guidelines and optimal transit timings.
               </p>
             </details>
             <details className="group bg-slate-50 border border-slate-200 rounded-xl p-6 open:shadow-md transition-all">
               <summary className="flex cursor-pointer items-center justify-between font-bold text-slate-900">
-                Can I transport goods from Kolkata to Barrackpore or Howrah?
+                Can I get direct phone numbers of {cityName} truck drivers?
                 <span className="transition group-open:rotate-180">
                   <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                 </span>
               </summary>
               <p className="mt-4 text-slate-600 leading-relaxed">
-                Absolutely! Our local transport services cover the entire Kolkata Metropolitan Area, including seamless transport to <Link to="/barrackpore/goods-transport" className="text-brand-600 font-semibold hover:underline">Barrackpore</Link>, Howrah, Hooghly, and parts of North/South 24 Parganas.
+                Yes! Through GoMyTruck Direct Driver Connect, you can instantly unlock 10 verified phone numbers of commercial drivers stationed in {cityName} for a one-time ₹99 pass.
               </p>
             </details>
           </div>
@@ -458,38 +449,37 @@ export default function LocalTransportPage() {
       <section className="bg-slate-50 py-14 md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-2">
-            Explore More Transport Services
+            Explore More Transport Services in {cityName}
           </h2>
           <p className="text-slate-500 mb-8 text-sm">
-            GoMyTruck connects you to a full range of logistics solutions across
-            Kolkata and beyond.
+            GoMyTruck connects you to a full range of logistics solutions across {cityName} and {stateName}.
           </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {
-                to: '/kolkata/truck-booking',
-                label: 'Transport Services in Kolkata',
-                desc: 'Full city-wide goods transport solutions.',
+                to: `/${citySlug}/truck-booking`,
+                label: `Truck Booking in ${cityName}`,
+                desc: `Full city-wide commercial goods transport.`,
                 icon: <Truck className="w-5 h-5" />,
               },
               {
-                to: '/barrackpore/truck-booking',
-                label: 'Transport in Barrackpore',
-                desc: 'Dedicated logistics for Barrackpore & North 24 Pgs.',
-                icon: <img src="/google-maps-icon.webp" alt="Location" width={20} height={20} className="w-5 h-5 object-contain" />,
+                to: `/${citySlug}/truck-booking/tata-ace`,
+                label: `Tata Ace in ${cityName}`,
+                desc: `750kg mini truck for city logistics.`,
+                icon: <Truck className="w-5 h-5" />,
               },
               {
-                to: '/book-truck-online',
-                label: 'Book Truck Online',
-                desc: 'Submit the route and goods details online.',
+                to: `/${citySlug}/truck-booking/14ft-truck`,
+                label: `14ft Eicher Truck in ${cityName}`,
+                desc: `Up to 4-ton commercial & industrial transport.`,
+                icon: <Truck className="w-5 h-5" />,
+              },
+              {
+                to: `/drivers/${citySlug}/tata-ace`,
+                label: `Driver Load Hub: ${cityName}`,
+                desc: `Connect directly with local truck owners.`,
                 icon: <Zap className="w-5 h-5" />,
-              },
-              {
-                to: '/mini-truck-booking',
-                label: 'Mini Truck Booking',
-                desc: 'Tata Ace, Bolero Pickup & small tempos.',
-                icon: <Truck className="w-5 h-5" />,
               },
             ].map((link) => (
               <Link
@@ -504,7 +494,7 @@ export default function LocalTransportPage() {
                   {link.desc}
                 </p>
                 <span className="flex items-center gap-1 text-brand-500 text-xs font-medium mt-auto group-hover:gap-2 transition-all">
-                  Learn more <ArrowRight className="w-3.5 h-3.5" />
+                  Book or View Rates <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </Link>
             ))}

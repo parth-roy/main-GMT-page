@@ -163,12 +163,18 @@ export function CityProvider({ children }) {
       };
     }
 
-    // Loop & redundant update guard: if the city slug and name match the current city, bail out immediately
+    // Loop & redundant update guard: if the city slug and name match the current city, ensure persistence and return
     if (
       currentCityRef.current &&
       currentCityRef.current.slug === cityObj.slug &&
       currentCityRef.current.name.toLowerCase() === cityObj.name.toLowerCase()
     ) {
+      if (typeof window !== "undefined" && isManual) {
+        try {
+          sessionStorage.setItem(SESSION_CITY_KEY, JSON.stringify(cityObj));
+          localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(cityObj));
+        } catch {}
+      }
       return;
     }
 
@@ -202,6 +208,14 @@ export function CityProvider({ children }) {
   const detectLocation = useCallback(
     async (forceFresh = false) => {
       if (typeof window === "undefined") return currentCityRef.current || DEFAULT_CITY;
+
+      // When forcing fresh detection (e.g. user clicked "Auto-Detect Current Location"),
+      // wipe the old session lock immediately so the last action always wins!
+      if (forceFresh) {
+        try {
+          sessionStorage.removeItem(SESSION_CITY_KEY);
+        } catch {}
+      }
 
       // GUARD: If current URL path already specifies a city and forceFresh is false, NEVER allow IP overwrite!
       const activeUrlCity = extractCityFromUrl(location.pathname);
@@ -238,20 +252,36 @@ export function CityProvider({ children }) {
           navigator.geolocation.getCurrentPosition(
             async ({ coords }) => {
               clearTimeout(timeout);
+              // 1a. Try backend reverse geocode
               try {
                 const res = await fetch(
                   `https://api-test.gomytruck.com/api/v1/maps/reverse-geocode?lat=${coords.latitude}&lng=${coords.longitude}`
                 );
-                if (!res.ok) return resolve(null);
-                const json = await res.json();
-                if (json.success && json.data?.city) {
-                  return resolve(
-                    resolveCityConfig(json.data.city, json.data.region)
-                  );
+                if (res.ok) {
+                  const json = await res.json();
+                  if (json.success && json.data?.city) {
+                    const matched = resolveCityConfig(json.data.city, json.data.region);
+                    if (matched) return resolve(matched);
+                  }
                 }
-              } catch {
-                resolve(null);
-              }
+              } catch {}
+
+              // 1b. Fast OpenStreetMap Nominatim reverse geocode fallback
+              try {
+                const osmRes = await fetch(
+                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&zoom=10`
+                );
+                if (osmRes.ok) {
+                  const osmData = await osmRes.json();
+                  const address = osmData?.address || {};
+                  const detectedName = address.city || address.town || address.state_district || address.county;
+                  if (detectedName) {
+                    const matched = resolveCityConfig(detectedName, address.state);
+                    if (matched) return resolve(matched);
+                  }
+                }
+              } catch {}
+
               resolve(null);
             },
             () => {
@@ -263,28 +293,41 @@ export function CityProvider({ children }) {
         });
       };
 
-      // Strategy 2: Seamless fallback to IP lookup if user blocks/dismisses GPS
+      // Strategy 2: Seamless fallback to high-speed IP lookup (ipwho.is + ipapi.co)
       const detectViaIp = async () => {
         try {
           const controller = new AbortController();
           const timer = setTimeout(() => controller.abort(), 3500);
-          const res = await fetch("https://ipwho.is/", {
-            signal: controller.signal,
-          });
+          const res = await fetch("https://ipwho.is/", { signal: controller.signal });
           clearTimeout(timer);
-          if (!res.ok) return null;
-          const data = await res.json();
-          if (data && data.success && data.city) {
-            return resolveCityConfig(data.city, data.region);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.success && data.city) {
+              const matched = resolveCityConfig(data.city, data.region);
+              if (matched) return matched;
+            }
           }
-        } catch {
-          // IP fallback failed
-        }
+        } catch {}
+
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 3500);
+          const res = await fetch("https://ipapi.co/json/", { signal: controller.signal });
+          clearTimeout(timer);
+          if (res.ok) {
+            const data = await res.json();
+            if (data?.city) {
+              const matched = resolveCityConfig(data.city, data.region);
+              if (matched) return matched;
+            }
+          }
+        } catch {}
+
         return null;
       };
 
       try {
-        // 1. Ask for location permission first
+        // 1. Try GPS location first
         const geoCity = await detectViaBrowserGeo();
         const currentUrlCity = extractCityFromUrl(window.location.pathname);
         if (currentUrlCity && !forceFresh) {
@@ -293,11 +336,12 @@ export function CityProvider({ children }) {
         }
 
         if (geoCity) {
+          // Explicitly save as authoritative active city
           setCity(geoCity, true);
           return geoCity;
         }
 
-        // 2. Fallback to IP detection if GPS is blocked or timed out
+        // 2. Fallback to IP detection if GPS is blocked, unavailable or timed out
         const ipCity = await detectViaIp();
         const currentUrlCityAfterIp = extractCityFromUrl(window.location.pathname);
         if (currentUrlCityAfterIp && !forceFresh) {
@@ -306,7 +350,8 @@ export function CityProvider({ children }) {
         }
 
         if (ipCity) {
-          setCity(ipCity, false);
+          // Explicitly save as authoritative active city (Last Action Wins!)
+          setCity(ipCity, true);
           return ipCity;
         }
       } catch (err) {
@@ -314,6 +359,12 @@ export function CityProvider({ children }) {
       } finally {
         setIsDetecting(false);
         setHasDetected(true);
+      }
+
+      // If forceFresh was explicitly clicked by user, never return the stale manual selection!
+      if (forceFresh) {
+        setCity(DEFAULT_CITY, true);
+        return DEFAULT_CITY;
       }
 
       return currentCityRef.current || DEFAULT_CITY;

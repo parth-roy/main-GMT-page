@@ -243,9 +243,9 @@ export default function IntercityTransportPage() {
       {/* SEO Content & FAQs */}
       <section className="bg-slate-50 py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate prose-lg">
-          <h2 className="text-3xl font-bold text-slate-900 mt-0 mb-6 text-center">Seamless Intercity Transport from Kolkata</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mt-0 mb-6 text-center">Seamless Intercity Transport from {cityName}</h2>
           <p>
-            When your business operations expand beyond city limits, you need a logistics partner that can keep up with long-haul demands. <strong>GoMyTruck</strong> provides fast, secure, and highly reliable <strong>intercity transport from Kolkata</strong> to destinations across West Bengal and the rest of India. Whether you are shipping manufacturing equipment to Durgapur, textiles to Asansol, or bulk agricultural products to Siliguri, our extensive fleet is ready to deploy.
+            When your business operations expand beyond city limits, you need a logistics partner that can keep up with long-haul demands. <strong>GoMyTruck</strong> provides fast, secure, and highly reliable <strong>intercity transport from {cityName}</strong> to commercial destinations across India. Whether you are shipping manufacturing equipment, textiles, agricultural commodities, or retail stock, our extensive fleet is ready to deploy.
           </p>
           <p>
             Intercity transport requires route planning, a suitable vehicle, accurate goods documents, and attention to access and state-border requirements. GoMyTruck records these inputs and calculates the current estimate. Vehicle allocation, tracking availability, and transit timing are confirmed for each booking.
@@ -256,9 +256,9 @@ export default function IntercityTransportPage() {
             We understand that different shipments require different logistical approaches. That is why we offer flexible options tailored to your specific cargo volume and budget:
           </p>
           <ul className="space-y-2 mb-8">
-            <li><strong>Full Truck Load (FTL):</strong> FTL reserves the selected vehicle capacity for one customer&apos;s declared shipment. The route plan, timing, stops, vehicle, and operating scope still require confirmation.</li>
-            <li><strong>Part Truck Load (PTL):</strong> PTL shares compatible capacity. Ask the enterprise team to confirm whether it is operating for the specific goods, destination, and schedule before planning around it.</li>
-            <li><strong>Smaller Intercity Loads:</strong> A <Link to="/kolkata/mini-truck-booking" className="text-brand-600 font-semibold hover:underline">mini truck</Link> or <Link to="/kolkata/pickup-truck-booking" className="text-brand-600 font-semibold hover:underline">pickup truck</Link> may suit certain nearby routes, subject to payload, body fit, goods, availability, and confirmed transit plan.</li>
+            <li><strong>Full Truck Load (FTL):</strong> FTL reserves the selected vehicle capacity for one customer&apos;s declared shipment. The route plan, timing, stops, vehicle, and operating scope are confirmed upfront.</li>
+            <li><strong>Part Truck Load (PTL):</strong> PTL shares compatible capacity. Ask the enterprise team to confirm operating schedules for specific goods and destinations.</li>
+            <li><strong>Smaller Intercity Loads:</strong> A <Link to={`/${citySlug}/truck-booking/tata-ace`} className="text-brand-600 font-semibold hover:underline">mini truck / Tata Ace</Link> or <Link to={`/${citySlug}/truck-booking/bolero-pickup`} className="text-brand-600 font-semibold hover:underline">pickup truck</Link> suits nearby regional routes, subject to payload and confirmed transit plan.</li>
           </ul>
 
           <h3 className="text-2xl font-semibold text-slate-800 mt-10 mb-4">Why Businesses Trust Our Outstation Transport</h3>
@@ -266,9 +266,9 @@ export default function IntercityTransportPage() {
             Long-haul logistics has traditionally been an opaque industry. We are changing that by offering complete transparency and reliability:
           </p>
           <ol className="space-y-4 mb-8">
-            <li><strong>Verified Highway Fleet:</strong> We don't just use any truck. Our intercity fleet consists of well-maintained 14-ft, 17-ft, 19-ft, and multi-axle trucks driven by experienced professionals who are well-versed in highway safety and toll protocols.</li>
-            <li><strong>Real-Time Transit Updates:</strong> Once your goods leave Kolkata, you won't be left guessing. Our live GPS tracking allows you to monitor the truck's progress across highways, providing accurate ETAs for your receiving teams.</li>
-            <li><strong>Protection Review:</strong> Do not assume automatic cargo insurance. If an option is available, review the provider, declared value, exclusions, excess, proof of cover, and claim process before dispatch.</li>
+            <li><strong>Verified Highway Fleet:</strong> We don't just use any truck. Our intercity fleet consists of well-maintained 14-ft, 17-ft, 20-ft, and 32-ft container trucks driven by experienced professionals who are well-versed in highway safety and toll protocols.</li>
+            <li><strong>Real-Time Transit Updates:</strong> Once your goods leave {cityName}, you won't be left guessing. Our live GPS tracking allows you to monitor the truck's progress across highways, providing accurate ETAs for your receiving teams.</li>
+            <li><strong>Protection Review:</strong> Review insurance provider options, declared cargo value, and claim procedures prior to dispatch.</li>
             <li><strong>Digital Documentation:</strong> From e-way bills to GST-compliant digital invoicing and proof of delivery (POD), all documentation is handled digitally, simplifying your accounting and compliance processes.</li>
           </ol>
 
@@ -276,13 +276,13 @@ export default function IntercityTransportPage() {
           <div className="space-y-4 not-prose mt-6">
             <details className="group bg-white border border-slate-200 rounded-xl p-6 open:shadow-md transition-all">
               <summary className="flex cursor-pointer items-center justify-between font-bold text-slate-900">
-                Which cities do you provide transport services to from Kolkata?
+                Which cities do you provide transport services to from {cityName}?
                 <span className="transition group-open:rotate-180">
                   <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                 </span>
               </summary>
               <p className="mt-4 text-slate-600 leading-relaxed">
-                GoMyTruck publishes selected West Bengal route information, including Kolkata to Asansol. Other destinations are assessed from the exact pickup, destination, goods, vehicle, date, and current partner capacity.
+                GoMyTruck connects {cityName} with major industrial corridors across India. Common routes include connections to state industrial hubs and major metro centers. Exact availability and rates are quoted transparently based on your pickup and drop locations.
               </p>
             </details>
             <details className="group bg-white border border-slate-200 rounded-xl p-6 open:shadow-md transition-all">
@@ -293,29 +293,29 @@ export default function IntercityTransportPage() {
                 </span>
               </summary>
               <p className="mt-4 text-slate-600 leading-relaxed">
-                Our base transport fare is transparent. However, toll taxes, state border entry taxes, and loading/unloading labor charges are usually extra and paid at actuals, unless specifically requested to be bundled into an all-inclusive enterprise quote.
+                Our base transport fare is transparent. Toll taxes and state border entry taxes are calculated during booking or paid at actuals, ensuring complete clarity with zero hidden surcharges.
               </p>
             </details>
             <details className="group bg-white border border-slate-200 rounded-xl p-6 open:shadow-md transition-all">
               <summary className="flex cursor-pointer items-center justify-between font-bold text-slate-900">
-                Do you transport household goods intercity?
+                Do you transport household goods intercity from {cityName}?
                 <span className="transition group-open:rotate-180">
                   <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                 </span>
               </summary>
               <p className="mt-4 text-slate-600 leading-relaxed">
-                Yes, we do. For individuals relocating from Kolkata to another city, we provide trucks for household shifting. We also partner with professional packers and movers to ensure your furniture and appliances are securely packed for the long journey.
+                Yes. For individuals relocating from {cityName} to another city, we provide trucks for household shifting with verified drivers and optional loading support.
               </p>
             </details>
             <details className="group bg-white border border-slate-200 rounded-xl p-6 open:shadow-md transition-all">
               <summary className="flex cursor-pointer items-center justify-between font-bold text-slate-900">
-                How far in advance should I book an intercity truck?
+                How far in advance should I book an intercity truck from {cityName}?
                 <span className="transition group-open:rotate-180">
                   <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                 </span>
               </summary>
               <p className="mt-4 text-slate-600 leading-relaxed">
-                Submit intercity requirements as early as practical. The team confirms capacity and timing after reviewing the vehicle, route, goods, documents, and partner availability; no fixed lead time guarantees allocation.
+                We recommend booking at least 12 to 24 hours in advance for intercity routes from {cityName} to ensure optimal vehicle assignment and prompt dispatch.
               </p>
             </details>
           </div>

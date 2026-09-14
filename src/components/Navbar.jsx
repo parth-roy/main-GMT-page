@@ -156,7 +156,8 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
   }
 
   return (
-    <nav
+    <>
+      <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
           ? isDarkTheme
@@ -463,9 +464,10 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
           </div>
         </div>
       </div>
-
-      <AppDownloadModal isOpen={isDownloadModalOpen} onClose={() => setIsDownloadModalOpen(false)} />
-      <CitySelectorModal isOpen={isCityModalOpen} onClose={() => setIsCityModalOpen(false)} />
     </nav>
-  )
+
+    <AppDownloadModal isOpen={isDownloadModalOpen} onClose={() => setIsDownloadModalOpen(false)} />
+    <CitySelectorModal isOpen={isCityModalOpen} onClose={() => setIsCityModalOpen(false)} />
+  </>
+)
 }

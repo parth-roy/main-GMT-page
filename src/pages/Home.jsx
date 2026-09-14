@@ -1,10 +1,13 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Layers } from 'lucide-react';
 import Hero from '../components/Hero';
 import Services from '../components/Services';
 import WhyChooseUs from '../components/WhyChooseUs';
 import FAQ from '../components/FAQ';
 import SEOHead from '../seo/SEOHead';
 import { useCity } from '../context/CityContext';
+import { ALL_SEO_VEHICLES } from '../lib/vehicles';
 
 const homeSchema = [
   {
@@ -80,6 +83,50 @@ export default function Home({ selectedService, setSelectedService, onOpenEstima
         onSelectVehicle={onSelectVehicle}
       />
 
+      {/* ── Commercial Vehicle Fleet Directory (Transport Vehicles by Payload & Size) ── */}
+      <section className="py-12 sm:py-16 bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-700 bg-brand-50 px-3 py-1 rounded-full uppercase mb-1">
+                  <Layers size={12} /> Commercial Vehicles
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                  Transport Vehicles by Payload &amp; Size
+                </h2>
+              </div>
+              <Link to="/truck" className="text-xs font-bold text-brand-600 hover:underline">
+                All Vehicles &amp; Pricing →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {ALL_SEO_VEHICLES.map((v) => (
+                <Link
+                  key={v.slug}
+                  to={`/${currentCity?.slug || 'kolkata'}/truck-booking/${v.slug}`}
+                  className="p-4 bg-slate-50 hover:bg-brand-50/60 border border-slate-200/80 hover:border-brand-300 rounded-2xl flex flex-col justify-between transition-all group"
+                >
+                  <div className="aspect-video bg-white rounded-xl mb-3 flex items-center justify-center p-2 border border-slate-100">
+                    <img 
+                      src={v.image} 
+                      alt={v.name} 
+                      loading="lazy" 
+                      decoding="async" 
+                      className="max-h-full object-contain group-hover:scale-105 transition-transform" 
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-800 text-sm group-hover:text-brand-700">{v.name}</h3>
+                    <p className="text-[11px] text-slate-500 mt-0.5">{v.capacityKg} kg · {v.lengthFt}×{v.widthFt} ft</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Services onSelectVehicle={onSelectVehicle} />
       <WhyChooseUs />
