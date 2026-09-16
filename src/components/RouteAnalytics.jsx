@@ -14,7 +14,7 @@ export default function RouteAnalytics() {
     if (consent !== "granted") return
 
     const gtmId = import.meta.env.VITE_GTM_ID
-    if (gtmId && !document.querySelector(`script[data-gtm-id="${gtmId}"]`)) {
+    if (gtmId && !document.querySelector(`script[src*="${gtmId}"]`) && !document.querySelector(`script[data-gtm-id="${gtmId}"]`)) {
       window.dataLayer = window.dataLayer || []
       window.dataLayer.push({ "gtm.start": Date.now(), event: "gtm.js" })
       const script = document.createElement("script")
