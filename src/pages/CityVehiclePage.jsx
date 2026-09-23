@@ -96,7 +96,7 @@ export default function CityVehiclePage() {
       "@type": "TransportationService",
       "name": `${vehicle.name} Rental & Transport in ${cityName}`,
       "image": `https://gomytruck.com${vehicle.image}`,
-      "telephone": "+91-9331488999",
+      "telephone": "+91-6291957542",
       "areaServed": {
         "@type": "City",
         "name": cityName,

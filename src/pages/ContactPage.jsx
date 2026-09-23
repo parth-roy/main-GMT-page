@@ -17,7 +17,7 @@ const localBusinessSchema = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
   name: 'GoMyTruck',
-  telephone: '+919331488999',
+  telephone: '+916291957542',
   email: 'hello@parthertech.com',
   url: 'https://gomytruck.com',
   address: {
@@ -38,7 +38,7 @@ const localBusinessSchema = {
   ],
   contactPoint: {
     '@type': 'ContactPoint',
-    telephone: '+919331488999',
+    telephone: '+916291957542',
     contactType: 'customer support',
     availableLanguage: ['English', 'Bengali', 'Hindi'],
   },

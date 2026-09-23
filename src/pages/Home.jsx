@@ -17,7 +17,7 @@ const homeSchema = [
     "name": "GoMyTruck",
     "url": "https://gomytruck.com",
     "logo": "https://gomytruck.com/go-my-truck-logo.png",
-    "contactPoint": { "@type": "ContactPoint", "telephone": "+91-9331488999", "contactType": "customer support" },
+    "contactPoint": { "@type": "ContactPoint", "telephone": "+91-6291957542", "contactType": "customer support" },
     "address": { "@type": "PostalAddress", "addressLocality": "Barrackpore", "addressRegion": "West Bengal", "addressCountry": "IN" }
   },
   {

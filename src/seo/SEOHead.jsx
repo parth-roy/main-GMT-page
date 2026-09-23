@@ -38,7 +38,7 @@ const DEFAULT_GLOBAL_SCHEMA = {
       },
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+919331488999",
+        "telephone": "+916291957542",
         "contactType": "customer support",
         "areaServed": "IN",
         "availableLanguage": ["English", "Hindi", "Bengali"]
@@ -54,7 +54,7 @@ const DEFAULT_GLOBAL_SCHEMA = {
       "name": "GoMyTruck",
       "image": "https://gomytruck.com/og-image.webp",
       "url": "https://gomytruck.com",
-      "telephone": "+919331488999",
+      "telephone": "+916291957542",
       "parentOrganization": { "@id": "https://gomytruck.com/#organization" },
       "areaServed": [
         "Barrackpore",

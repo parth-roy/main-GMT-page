@@ -102,7 +102,7 @@ export default function DynamicSeoPage({ serviceType }) {
       "@type": "TransportationService",
       "name": `GoMyTruck ${cityName}`,
       "image": "https://gomytruck.com/logo.png",
-      "telephone": "+91-9331488999",
+      "telephone": "+91-6291957542",
       "areaServed": {
         "@type": "City",
         "name": cityName

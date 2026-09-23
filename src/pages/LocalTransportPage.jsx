@@ -105,7 +105,7 @@ export default function LocalTransportPage() {
     provider: {
       '@type': 'Organization',
       name: 'GoMyTruck – GoMyTruck',
-      telephone: '+919331488999',
+      telephone: '+916291957542',
       email: 'hello@parthertech.com',
       address: {
         '@type': 'PostalAddress',

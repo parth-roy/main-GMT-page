@@ -20,7 +20,7 @@ const jsonLd = [
       '@type': 'Organization',
       name: 'GoMyTruck',
       url: 'https://gomytruck.com',
-      telephone: '+919331488999',
+      telephone: '+916291957542',
       email: 'hello@parthertech.com',
       address: {
         '@type': 'PostalAddress',

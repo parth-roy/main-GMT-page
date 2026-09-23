@@ -118,7 +118,7 @@ export default function RouteVehiclePage() {
       "@type": "TransportationService",
       "name": `${originName} to ${destName} ${vehicle.name} Transport`,
       "image": `https://gomytruck.com${vehicle.image}`,
-      "telephone": "+91-9331488999",
+      "telephone": "+91-6291957542",
       "serviceType": "Intercity Commercial Freight",
       "areaServed": [
         { "@type": "City", "name": originName },

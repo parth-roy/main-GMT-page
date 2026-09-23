@@ -714,7 +714,7 @@ export default function DirectContactPage() {
   const copyAllNumbers = () => {
     const list = driversList
       .map((d, idx) => {
-        const num = unmaskedNumbers[d.id] || d.phoneRaw || "9331488999";
+        const num = unmaskedNumbers[d.id] || d.phoneRaw || "6291957542";
         return `${idx + 1}. ${d.name} (${d.vehicleType}): +91 ${num} [${d.area}, ${selectedCity.name}]`;
       })
       .join("\n");
@@ -736,12 +736,12 @@ export default function DirectContactPage() {
       `-------------------------------------------------------------`,
       ``,
       ...driversList.map((d, idx) => {
-        const num = unmaskedNumbers[d.id] || d.phoneRaw || "9331488999";
+        const num = unmaskedNumbers[d.id] || d.phoneRaw || "6291957542";
         return `${idx + 1}. ${d.name.toUpperCase()}\n   Vehicle:    ${d.vehicleType} (${d.vehicleNumber})\n   Phone:      ${num}\n   Location:   ${d.area}, ${selectedCity.name}\n   Experience: ${d.experience}\n   Base Fare:  ${d.price}\n   Status:     Commercial DL & RC Verified\n`;
       }),
       `-------------------------------------------------------------`,
       `Direct Call & WhatsApp Enabled. Zero Middleman Fees.`,
-      `Support: support@gomytruck.com | +91 9331488999 | gomytruck.com`,
+      `Support: support@gomytruck.com | +91 62919 57542 | gomytruck.com`,
       `=============================================================`,
     ].join("\n");
 
@@ -763,7 +763,7 @@ export default function DirectContactPage() {
       `_Zero Broker Commission · Flat ₹99 Unlocked_`,
       ``,
       ...driversList.map((d, idx) => {
-        const num = unmaskedNumbers[d.id] || d.phoneRaw || "9331488999";
+        const num = unmaskedNumbers[d.id] || d.phoneRaw || "6291957542";
         return `*${idx + 1}. ${d.name}* (${d.vehicleType} - ${d.vehicleNumber})\n📞 Phone: ${num}\n📍 ${d.area} | Rate: ${d.price}\n`;
       }),
       `Direct Contact via gomytruck.com`,
