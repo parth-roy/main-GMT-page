@@ -1,20 +1,39 @@
-import React, { useState } from 'react';
-import { IndianRupee, Wallet as WalletIcon, ArrowUpRight, Clock, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { apiClient } from '../../api/apiClient';
+import { IndianRupee, Wallet as WalletIcon, Clock, CheckCircle2, RefreshCw } from 'lucide-react';
 
 export default function AgentWalletPage() {
   const [activeTab, setActiveTab] = useState('pending');
+  const [walletData, setWalletData] = useState({
+    totalEarned: 0,
+    pendingBounties: 0,
+    settledCount: 0,
+    pendingCount: 0,
+    transactions: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
-  const pendingBounties = [
-    { id: 'LD-9921', city: 'Kolkata → Patna', amount: 1200, date: '2023-11-20', status: 'Pending Delivery' },
-    { id: 'LD-9934', city: 'Asansol → Durgapur', amount: 800, date: '2023-11-22', status: 'Pending Verification' },
-  ];
+  const fetchWallet = async () => {
+    setIsLoading(true);
+    try {
+      const res = await apiClient('/broker/wallet');
+      const data = await res.json();
+      if (data.success && data.data) {
+        setWalletData(data.data);
+      }
+    } catch (err) {
+      // fallback
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const settledBounties = [
-    { id: 'LD-8812', city: 'Howrah → Haldia', amount: 1500, date: '2023-11-15', status: 'Settled' },
-    { id: 'LD-8805', city: 'Siliguri → Malda', amount: 950, date: '2023-11-10', status: 'Settled' },
-    { id: 'LD-8799', city: 'Kolkata → Ranchi', amount: 2100, date: '2023-11-05', status: 'Settled' },
-  ];
+  useEffect(() => {
+    fetchWallet();
+  }, []);
 
+  const pendingBounties = walletData.transactions.filter(t => !t.isSettled);
+  const settledBounties = walletData.transactions.filter(t => t.isSettled);
   const displayList = activeTab === 'pending' ? pendingBounties : settledBounties;
 
   return (
@@ -35,9 +54,9 @@ export default function AgentWalletPage() {
           <div className="relative z-10">
             <p className="text-green-100 font-medium mb-1">Total Earned (Settled)</p>
             <h2 className="text-4xl font-black flex items-center mb-4">
-              <IndianRupee size={32} strokeWidth={3} /> 4,550
+              <IndianRupee size={32} strokeWidth={3} /> {walletData.totalEarned.toLocaleString('en-IN')}
             </h2>
-            <button className="bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-lg text-sm font-bold backdrop-blur-sm">
+            <button className="bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-lg text-sm font-bold backdrop-blur-sm cursor-pointer">
               Withdraw to Bank
             </button>
           </div>
@@ -47,7 +66,7 @@ export default function AgentWalletPage() {
           <div className="relative z-10">
             <p className="text-slate-500 font-medium mb-1">Pending Bounties</p>
             <h2 className="text-4xl font-black text-slate-800 flex items-center mb-4">
-              <IndianRupee size={32} strokeWidth={3} /> 2,000
+              <IndianRupee size={32} strokeWidth={3} /> {walletData.pendingBounties.toLocaleString('en-IN')}
             </h2>
             <p className="text-sm text-slate-500 flex items-center gap-1">
               <Clock size={16} /> Awaiting delivery completion

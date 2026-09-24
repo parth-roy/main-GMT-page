@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import { 
   Truck, ShieldCheck, CheckCircle2, ArrowRight, PhoneCall, 
@@ -11,6 +11,7 @@ import { SEO_CITIES } from "../lib/cities";
 import { useCity } from "../context/CityContext";
 import { useAuth } from "../context/AuthContext";
 import { apiClient } from "../api/apiClient";
+import { generateCityFaqs } from "../lib/locationFaqHelper";
 
 const VEHICLE_OPTIONS = [
   { value: "TATA_ACE", label: "Tata Ace (Chota Hathi) - 750 kg" },
@@ -25,7 +26,7 @@ const VEHICLE_OPTIONS = [
 export default function AssistedTruckBookingPage() {
   const { city } = useParams();
   const location = useLocation();
-  const { currentCity, setCity } = useCity();
+  const { setCity } = useCity();
   const { user, requireAuth } = useAuth();
   const [openFaq, setOpenFaq] = useState(null);
 
@@ -51,23 +52,25 @@ export default function AssistedTruckBookingPage() {
         state: "India"
       });
 
+  // Scroll to top + pre-fill pickup city whenever URL city changes
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (!pickupCity && !isNational) {
+    if (!isNational) {
       setPickupCity(cityConfig.name);
     }
-  }, [city, cityConfig.name, isNational, pickupCity]);
+  }, [city]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Sync global CityContext (navbar city pill) — false = don't replace URL
   useEffect(() => {
-    if (!isNational && cityConfig && currentCity?.slug !== cityConfig.slug) {
+    if (!isNational && cityConfig?.slug) {
       setCity({
         name: cityConfig.name,
         slug: cityConfig.slug,
         state: cityConfig.state || "India",
         region: cityConfig.state || "India",
-      }, true);
+      }, false);
     }
-  }, [cityConfig, currentCity?.slug, setCity, isNational]);
+  }, [city]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const cityName = cityConfig.name;
   const stateName = cityConfig.state || "India";
@@ -128,27 +131,26 @@ export default function AssistedTruckBookingPage() {
     }
   };
 
+  // ── Dynamic, hyper-local FAQs (same system as the 26K PSEO pages) ──────────
+  const cityFaqData = useMemo(() => generateCityFaqs(cityConfig, "truck-booking"), [city]); // eslint-disable-line react-hooks/exhaustive-deps
   const pageFaqs = [
     {
       question: `What is Assisted Truck Booking in ${cityName}?`,
-      answer: `Assisted Truck Booking is GoMyTruck's custom-budget freight service for MSMEs, traders, and shippers in ${cityName}. Instead of paying inflated spot market rates, you set your preferred target budget. Our regional network of verified Transport Agents coordinates with commercial truck owners to find and match a verified vehicle at your price.`
+      answer: `Assisted Truck Booking is GoMyTruck's custom-budget freight service for MSMEs, traders, and shippers in ${cityName}. You set your preferred target budget. Our regional network of verified Transport Agents in ${cityName} coordinates with commercial truck owners to match a verified vehicle at your price — with 25% advance lock and OTP-verified physical loading.`
     },
     {
-      question: `How does the 25% Advance Lock protect my freight booking?`,
-      answer: `Once a suitable driver and vehicle RC are selected and verified, you pay only a 25% advance to lock in the booking. The remaining 75% balance is paid directly after the vehicle reaches your destination, preventing upfront overpayment risks.`
+      question: `How does the 25% Advance Lock protect my freight booking in ${cityName}?`,
+      answer: `Once a suitable driver and vehicle RC are selected and verified for your shipment from ${cityName}, you pay only a 25% advance to lock in the booking. The remaining 75% balance is paid directly after the vehicle reaches your destination, eliminating upfront overpayment risks common with unverified brokers in ${cityName}.`
     },
     {
       question: `What is the Physical Loading OTP verification?`,
-      answer: `When the assigned truck arrives at your pickup location in ${cityName}, your representative inspects the vehicle and provides a 4-digit Loading OTP to the driver once cargo loading is safely completed. This guarantees that driver and agent payouts are only authorized after your physical goods are securely loaded on board.`
+      answer: `When the assigned truck arrives at your pickup location in ${cityName}, your representative inspects the vehicle and provides a 4-digit Loading OTP to the driver only after cargo is safely loaded. This guarantees that driver and agent payouts are only authorized after your physical goods are securely loaded on board.`
     },
     {
       question: `Can I book assisted trucks for intercity transport from ${cityName}?`,
-      answer: `Yes. GoMyTruck Assisted Booking supports all intracity local trips, regional industrial corridors, and long-haul intercity freight across 900+ cities and all 28 Indian states.`
+      answer: `Yes. GoMyTruck Assisted Booking supports all intracity local trips from ${cityName}, regional industrial corridor freight, and long-haul intercity shipments to 900+ cities across all 28 Indian states. Set your target rate and our agent network handles the rest.`
     },
-    {
-      question: `How quickly will I receive quotes for my posted load in ${cityName}?`,
-      answer: `Most loads receive quotes from local transport partners within 15 to 45 minutes of posting during regular business hours.`
-    }
+    ...cityFaqData.faqs.slice(0, 2), // Dynamic city-specific transport FAQs
   ];
 
   const jsonLd = [
@@ -206,65 +208,68 @@ export default function AssistedTruckBookingPage() {
         jsonLd={jsonLd}
       />
 
-      <div className="bg-slate-50 min-h-screen text-slate-800">
-        {/* HERO SECTION */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white pt-12 pb-20 md:pt-16 md:pb-24 border-b border-slate-800">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#6DBE45_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <div className="bg-white min-h-screen text-slate-800">
+        {/* HERO SECTION — white/light mode, navbar-safe top offset */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-white via-green-50/40 to-emerald-50/60 pt-28 pb-16 md:pt-32 md:pb-20 mt-[68px] border-b border-green-100">
+          {/* Subtle dot grid */}
+          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#6DBE45_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            {/* Breadcrumb */}
-            <nav className="flex items-center space-x-2 text-xs text-slate-400 mb-6">
-              <Link to="/" className="hover:text-green-400">Home</Link>
-              <span>/</span>
-              <Link to="/services/assisted-truck-booking" className="hover:text-green-400">Assisted Truck Booking</Link>
+            {/* Breadcrumb — dark text on white */}
+            <nav className="flex items-center space-x-2 text-xs text-slate-500 mb-8">
+              <Link to="/" className="hover:text-green-600 transition-colors">Home</Link>
+              <span className="text-slate-300">/</span>
+              <Link to="/services/assisted-truck-booking" className="hover:text-green-600 transition-colors">Assisted Truck Booking</Link>
               {!isNational && (
                 <>
-                  <span>/</span>
-                  <span className="text-slate-200">{cityName}</span>
+                  <span className="text-slate-300">/</span>
+                  <span className="text-slate-800 font-semibold">{cityName}</span>
                 </>
               )}
             </nav>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               <div className="lg:col-span-6 space-y-6">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs md:text-sm font-semibold">
-                  <Sparkles size={15} />
-                  <span>Custom Budget Freight Sourcing • {cityName}</span>
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-green-100 border border-green-200 text-green-700 text-xs md:text-sm font-semibold">
+                  <Sparkles size={14} className="text-green-600" />
+                  <span>Custom Budget Freight Sourcing · {cityName}</span>
                 </div>
 
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                  Hire Commercial Trucks at <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300">Your Target Budget</span> in {cityName}
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                  Hire Commercial Trucks at{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-500">
+                    Your Target Budget
+                  </span>{" "}
+                  in {cityName}
                 </h1>
 
-                {/* GEO ANSWER TARGET PARAGRAPH FOR AI SEARCH / LLMs */}
-                <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 text-sm md:text-base leading-relaxed">
-                  <p>
-                    In <strong className="text-white">{cityName}</strong>, GoMyTruck Assisted Truck Booking enables shippers, manufacturers, and traders to post freight loads with their preferred budget. Regional transport agents coordinate directly with verified vehicle owners to fulfill shipments at competitive market rates, backed by a 25% advance lock, OTP-based physical loading verification, and zero hidden broker markups.
-                  </p>
+                {/* GEO ANSWER TARGET — readable on white */}
+                <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-xl">
+                  In <strong className="text-slate-900">{cityName}</strong>, GoMyTruck Assisted Truck Booking lets shippers, manufacturers, and traders post freight loads with their preferred budget. Verified transport agents in {cityName} coordinate with vehicle owners to fulfill shipments at competitive rates — backed by 25% advance lock and OTP physical loading verification.
+                </p>
+
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-green-100">
+                  <div className="space-y-1">
+                    <div className="text-2xl font-black text-green-600">25%</div>
+                    <div className="text-xs text-slate-500">Advance Lock-In</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-2xl font-black text-slate-900">100%</div>
+                    <div className="text-xs text-slate-500">Verified Driver & RC</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-2xl font-black text-green-600">OTP</div>
+                    <div className="text-xs text-slate-500">Physical Loading Safe</div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800/80">
-                  <div className="space-y-1">
-                    <div className="text-2xl font-black text-green-400">25%</div>
-                    <div className="text-xs text-slate-400">Advance Lock-In</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-2xl font-black text-white">100%</div>
-                    <div className="text-xs text-slate-400">Verified Driver & RC</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-2xl font-black text-green-400">OTP</div>
-                    <div className="text-xs text-slate-400">Physical Loading Safe</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 text-xs text-slate-400 pt-2">
-                  <a href="tel:6291957542" className="flex items-center gap-1.5 hover:text-white transition-colors">
-                    <PhoneCall size={14} className="text-green-400" />
+                <div className="flex items-center gap-4 text-xs text-slate-500 pt-2">
+                  <a href="tel:6291957542" className="flex items-center gap-1.5 hover:text-slate-800 transition-colors">
+                    <PhoneCall size={14} className="text-green-600" />
                     <span>Freight Desk: 6291957542</span>
                   </a>
-                  <span>•</span>
-                  <span>Average response time: 20 mins</span>
+                  <span className="text-slate-300">•</span>
+                  <span>Avg. response: 20 mins</span>
                 </div>
               </div>
 
@@ -404,7 +409,7 @@ export default function AssistedTruckBookingPage() {
         </section>
 
         {/* TRUST ROW */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 border-b border-slate-100">
           <TrustBadgeRow />
         </div>
 
@@ -483,18 +488,18 @@ export default function AssistedTruckBookingPage() {
         </section>
 
         {/* BOTTOM CTA */}
-        <section className="bg-gradient-to-r from-slate-900 to-slate-950 text-white py-14 border-t border-slate-800">
+        <section className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-14">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-              Looking for a Reliable Truck in {cityName}?
+              Need a Truck in {cityName} at Your Budget?
             </h2>
-            <p className="text-slate-300 max-w-2xl mx-auto text-sm md:text-base">
-              Post your cargo requirements today and let our verified network of transport agents handle the sourcing.
+            <p className="text-green-100 max-w-2xl mx-auto text-sm md:text-base">
+              Post your cargo requirements today and let our verified network of transport agents handle the sourcing — at your target rate, with OTP-protected loading.
             </p>
             <div className="pt-2">
               <a
                 href="tel:6291957542"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-bold bg-green-500 hover:bg-green-600 text-white shadow-xl transition-all"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-bold bg-white text-green-700 hover:bg-green-50 shadow-xl transition-all"
               >
                 <PhoneCall size={18} />
                 <span>Call Freight Desk: 6291957542</span>

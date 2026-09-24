@@ -20,6 +20,7 @@ export function AuthProvider({ children }) {
   // A queue of callbacks waiting for authentication
   const [authCallback, setAuthCallback] = useState(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginRole, setLoginRole] = useState('CUSTOMER');
 
   const fetchUser = useCallback(async (token) => {
     try {
@@ -165,7 +166,18 @@ export function AuthProvider({ children }) {
    * If logged in, fires callback immediately.
    * If not logged in, opens the login modal and fires callback upon success.
    */
-  const requireAuth = (callback) => {
+  const openLoginModal = (role = 'CUSTOMER') => {
+    setLoginRole(role);
+    setIsLoginModalOpen(true);
+  };
+
+  /**
+   * Procedural hook to demand authentication before an action.
+   * If logged in, fires callback immediately.
+   * If not logged in, opens the login modal and fires callback upon success.
+   */
+  const requireAuth = (callback, role = 'CUSTOMER') => {
+    if (role) setLoginRole(role);
     if (accessToken && user) {
       callback(accessToken, user);
     } else if (accessToken && !user) {
@@ -186,11 +198,12 @@ export function AuthProvider({ children }) {
 
   const closeLoginModal = () => {
     setIsLoginModalOpen(false);
+    setLoginRole('CUSTOMER');
     setAuthCallback(null); // Clear pending action on cancel
   };
 
   return (
-    <AuthContext.Provider value={{ user, accessToken, login, logout, requireAuth, isLoginModalOpen, setIsLoginModalOpen, closeLoginModal }}>
+    <AuthContext.Provider value={{ user, accessToken, login, logout, requireAuth, isLoginModalOpen, setIsLoginModalOpen, closeLoginModal, loginRole, setLoginRole, openLoginModal }}>
       {children}
     </AuthContext.Provider>
   );

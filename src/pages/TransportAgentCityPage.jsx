@@ -1,24 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useLocation, Link, Navigate } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from "react";
+import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import { 
-  Users, ShieldCheck, CheckCircle2, ArrowRight, PhoneCall, 
-  IndianRupee, Briefcase, Zap, HelpCircle, ChevronDown, ChevronUp, 
-  MapPin, Building, Star, Award, Clock, Truck, ShieldAlert
+  CheckCircle2, ArrowRight, PhoneCall, 
+  IndianRupee, Zap, ChevronDown, ChevronUp, 
+  MapPin, Clock, Truck
 } from "lucide-react";
 import SEOHead from "../seo/SEOHead";
 import TrustBadgeRow from "../components/TrustBadgeRow";
 import { SEO_CITIES } from "../lib/cities";
 import { useCity } from "../context/CityContext";
 import { useAuth } from "../context/AuthContext";
+import { generateCityFaqs } from "../lib/locationFaqHelper";
 
 export default function TransportAgentCityPage() {
   const { city } = useParams();
   const location = useLocation();
-  const { currentCity, setCity } = useCity();
-  const { user, requireAuth, setIsLoginModalOpen } = useAuth();
+  const navigate = useNavigate();
+  const { setCity } = useCity();
+  const { user, requireAuth } = useAuth();
   const [openFaq, setOpenFaq] = useState(null);
   const [tripsPerDay, setTripsPerDay] = useState(3);
 
+  // Scroll to top whenever city URL param changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [city]);
@@ -33,16 +36,17 @@ export default function TransportAgentCityPage() {
         state: "India"
       });
 
+  // Sync global CityContext so navbar city pill shows correct city — but only when it differs
   useEffect(() => {
-    if (!isNational && cityConfig && currentCity?.slug !== cityConfig.slug) {
+    if (!isNational && cityConfig?.slug) {
       setCity({
         name: cityConfig.name,
         slug: cityConfig.slug,
         state: cityConfig.state || "India",
         region: cityConfig.state || "India",
-      }, true);
+      }, false); // false = do NOT replace URL (we already have the correct URL)
     }
-  }, [cityConfig, currentCity?.slug, setCity, isNational]);
+  }, [city]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const cityName = cityConfig.name;
   const stateName = cityConfig.state || "India";
@@ -52,37 +56,70 @@ export default function TransportAgentCityPage() {
 
   const handleRegister = () => {
     if (user?.role === "MIDDLEMAN") {
-      window.location.href = "/agent/loads";
+      navigate("/agent/loads");
     } else {
-      requireAuth((token, userData) => {
-        window.location.href = "/agent/loads";
+      requireAuth(() => {
+        navigate("/agent/loads");
       });
     }
   };
 
   const estimatedMonthlyIncome = tripsPerDay * 500 * 26; // ₹500 avg bounty * 26 working days
 
-  const pageFaqs = [
+  // ── Dynamic, hyper-local FAQs (same system as the 26K PSEO pages) ──────────
+  const cityFaqData = useMemo(() => generateCityFaqs(cityConfig, "truck-booking"), [city]);
+  const agentSpecificFaqs = [
     {
       question: `Who can become a GoMyTruck Transport Agent in ${cityName}?`,
-      answer: `Any individual, transport broker, booking agent, fleet coordinator, or commission agent with knowledge of the local transport market in ${cityName} can register. No vehicle ownership or capital investment is required. You only need a smartphone, valid Aadhaar/PAN for KYC, and connections with local truck drivers.`
+      answer: `Any individual, transport broker, booking agent, fleet coordinator, or commission agent with knowledge of the local transport market in ${cityName} can register. No vehicle ownership or capital investment is required. You only need a smartphone, valid Aadhaar/PAN for KYC, and connections with local truck drivers in ${cityName}.`
     },
     {
-      question: `How does the GoMyTruck Transport Agent bounty system work?`,
-      answer: `GoMyTruck posts live shipper cargo loads in ${cityName} with preferred budgets. Agents source a verified driver and vehicle RC. Once the customer pays the 25% advance and the driver verifies the physical loading OTP at the pickup site, your flat-fee bounty is confirmed and credited to your ledger for manual bank settlement by GoMyTruck Operations.`
+      question: `How does the GoMyTruck Transport Agent bounty system work in ${cityName}?`,
+      answer: `GoMyTruck posts live shipper cargo loads in ${cityName} with preferred budgets. As an agent in ${cityName}, you source a verified driver and vehicle RC. Once the customer pays the 25% advance and the driver verifies the physical loading OTP at the pickup site in ${cityName}, your flat-fee bounty (₹300–₹1,500 per trip) is confirmed and credited to your ledger for bank settlement by GoMyTruck Operations.`
     },
     {
       question: `Is there any upfront fee or deposit to join as an agent in ${cityName}?`,
-      answer: `No. Joining as a GoMyTruck Digital Transport Agent is 100% free with zero registration fees, zero security deposits, and zero hardware requirements.`
+      answer: `No. Joining as a GoMyTruck Digital Transport Agent in ${cityName} is 100% free with zero registration fees, zero security deposits, and zero hardware requirements. You earn only when a load is physically confirmed.`
     },
     {
       question: `How are bounties paid out to Transport Agents in ${cityName}?`,
-      answer: `Once physical loading is confirmed via OTP between driver and shipper, bounties become eligible immediately. GoMyTruck operations reviews and manually settles your accumulated earnings directly to your verified bank account via NEFT/IMPS.`
+      answer: `Once physical loading is confirmed via OTP between driver and shipper in ${cityName}, bounties become eligible immediately. GoMyTruck operations reviews and manually settles your accumulated earnings directly to your verified bank account via NEFT/IMPS, typically within the week.`
     },
-    {
-      question: `What types of commercial trucks can I source in ${cityName}?`,
-      answer: `You can source all commercial vehicles registered on GoMyTruck: 3-Wheelers, Tata Ace (Chota Hathi), 8ft Bolero Pickup, 14ft/17ft/19ft/22ft Eicher trucks, and 32ft Multi-Axle Containers for both intracity and intercity routes originating in ${cityName}.`
-    }
+    ...cityFaqData.faqs.slice(0, 3), // Pull city-specific transport FAQs dynamically
+  ];
+
+  // ── Dynamic local hub list from locationFaqHelper's city areas map ──────────
+  const CITY_AREAS_MAP = {
+    kolkata: ["Burrabazar", "Park Street", "Dum Dum", "Taratala Industrial Estate", "New Town IT Hub", "Salt Lake Sector V"],
+    bengaluru: ["Peenya Industrial Area", "Bommasandra KIADB", "Electronic City Phase 2", "Whitefield Tech Cluster", "Yeshwanthpur Goods Terminal"],
+    hyderabad: ["Sanath Nagar Industrial Area", "Jeedimetla SIDCO", "Kattedan Industrial Estate", "Medchal Logistics Zone", "Cherlapally Freight Station"],
+    mumbai: ["Andheri MIDC", "Kanjurmarg Warehousing", "Bhiwandi Logistics Hub", "APMC Vashi", "Bandra Kurla Complex"],
+    chennai: ["Ambattur Industrial Estate", "Guindy Industrial Area", "Oragadam Auto Cluster", "Ennore Port Corridor", "Sriperumbudur Manufacturing Hub"],
+    delhi: ["Okhla Phase 1-3", "Mayapuri Scrap Hub", "Narela Industrial Area", "Bawana DSIIDC", "Patparganj Industrial Estate"],
+    "new-delhi": ["Okhla Phase 1-3", "Mayapuri Scrap Hub", "Narela Industrial Area", "Bawana DSIIDC", "Patparganj Industrial Estate"],
+    pune: ["Chakan MIDC Phase 1-4", "Bhosari Industrial Belt", "Hinjawadi IT Park", "Pimpri Industrial Zone", "Hadapsar Estate"],
+    ahmedabad: ["Changodar GIDC", "Sanand Automotive Hub", "Naroda GIDC", "Vatva Chemical Zone", "Odhav Industrial Area"],
+    surat: ["Sachin GIDC", "Pandesara Textile Zone", "Hazira Industrial Area", "Udhna Estate", "Katargam Hub"],
+    visakhapatnam: ["Autonagar", "Gajuwaka Steel Zone", "Visakhapatnam Port Trust", "Duvvada SEZ", "Madhurawada IT Corridor"],
+    patna: ["Patliputra Industrial Area", "Fatuha Industrial Estate", "Anisabad Mandi Zone", "Boring Road Commercial Hub", "Danapur Logistics"],
+    jaipur: ["Sitapura Industrial Area", "Vishwakarma Industrial (VKI)", "Bagru RIICO Zone", "Mansarovar Transport Nagar", "Jhotwara Hub"],
+    lucknow: ["Transport Nagar", "Amausi KGIDC", "Chinhat Industrial Area", "Sarojini Nagar Commercial", "Talkatora Zone"],
+    indore: ["Pithampur Auto Cluster", "Sanwer Road Industrial", "Dewas Naka Goods Terminal", "Palasia Commercial Hub"],
+    bhopal: ["Mandideep Industrial Area", "Govindpura MIDC", "Hoshangabad Road Corridor", "Bairagarh Logistics"],
+    nagpur: ["MIHAN SEZ", "Hingna MIDC", "Butibori Industrial Estate", "Kamptee Road Hub", "Wadi Transport Nagar"],
+    coimbatore: ["SIDCO Phase 1-2", "Ganapathy Industrial", "Peelamedu Air Cargo Zone", "Saravanampatti Tech Cluster"],
+    kochi: ["Willingdon Island Port", "Kalamassery Industrial", "Eloor Petrochemical Belt", "Aluva Transit Hub"],
+    bhubaneswar: ["Mancheswar Industrial Estate", "Chandaka IDCO SEZ", "Rasulgarh Commercial", "Patia IT Corridor"],
+  };
+  const localAreas = CITY_AREAS_MAP[cityConfig.slug] || [
+    `${cityName} Central Transport Nagar`,
+    `${cityName} APMC Wholesale Mandi`,
+    `${cityName} Industrial Estate / SEZ`,
+    `${cityName} Logistics & Warehousing Park`,
+    `${cityName} Highway Freight Terminal`,
+    `${cityName} Rail Goods Yard Hub`,
+    `${cityName} Heavy Vehicle Parking Zone`,
+    `${cityName} Inter-State Bypass Junction`
   ];
 
   const jsonLd = [
@@ -131,7 +168,7 @@ export default function TransportAgentCityPage() {
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      "mainEntity": pageFaqs.map((faq) => ({
+      "mainEntity": agentSpecificFaqs.map((faq) => ({
         "@type": "Question",
         "name": faq.question,
         "acceptedAnswer": {
@@ -152,94 +189,101 @@ export default function TransportAgentCityPage() {
         jsonLd={jsonLd}
       />
 
-      <div className="bg-slate-50 min-h-screen text-slate-800">
-        {/* HERO SECTION */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white pt-12 pb-20 md:pt-16 md:pb-24 border-b border-slate-800">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#6DBE45_1px,transparent_1px)] [background-size:16px_16px]"></div>
-          
+      <div className="bg-white min-h-screen text-slate-800">
+        {/* HERO SECTION — white/light mode, navbar-safe top offset */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-white via-green-50/40 to-emerald-50/60 pt-28 pb-16 md:pt-32 md:pb-20 mt-[68px] border-b border-green-100">
+          {/* Subtle dot grid background */}
+          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#6DBE45_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
+
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            {/* Breadcrumb */}
-            <nav className="flex items-center space-x-2 text-xs text-slate-400 mb-6">
-              <Link to="/" className="hover:text-green-400">Home</Link>
-              <span>/</span>
-              <Link to="/partners/transport-agents" className="hover:text-green-400">Transport Agents</Link>
+            {/* Breadcrumb — dark text on white */}
+            <nav className="flex items-center space-x-2 text-xs text-slate-500 mb-8">
+              <Link to="/" className="hover:text-green-600 transition-colors">Home</Link>
+              <span className="text-slate-300">/</span>
+              <Link to="/partners/transport-agents" className="hover:text-green-600 transition-colors">Transport Agents</Link>
               {!isNational && (
                 <>
-                  <span>/</span>
-                  <span className="text-slate-200">{cityName}</span>
+                  <span className="text-slate-300">/</span>
+                  <span className="text-slate-800 font-semibold">{cityName}</span>
                 </>
               )}
             </nav>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              {/* LEFT: Headline + GEO paragraph + CTAs */}
               <div className="lg:col-span-7 space-y-6">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs md:text-sm font-semibold">
-                  <Zap size={15} />
-                  <span>Pan-India Transport Agent Network • {cityName}</span>
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-green-100 border border-green-200 text-green-700 text-xs md:text-sm font-semibold">
+                  <Zap size={14} className="fill-green-600 text-green-600" />
+                  <span>Pan-India Transport Agent Network · {cityName}</span>
                 </div>
 
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                  Become a Verified <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300">Transport Agent</span> in {cityName}
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                  Become a Verified{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-500">
+                    Transport Agent
+                  </span>{" "}
+                  in {cityName}
                 </h1>
 
-                {/* GEO ANSWER TARGET PARAGRAPH FOR AI ENGINE CITATIONS */}
-                <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 text-sm md:text-base leading-relaxed">
-                  <p>
-                    In <strong className="text-white">{cityName}</strong>, GoMyTruck's Digital Transport Agent Network empowers local transport coordinators, commission agents, and logistics brokers to fulfill active customer loads. By sourcing verified commercial trucks matching shippers' preferred budgets, agents earn guaranteed flat-fee bounties on every physically loaded vehicle with zero capital investment and complete operational transparency.
-                  </p>
-                </div>
+                {/* GEO ANSWER TARGET — visible on white, readable */}
+                <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl">
+                  In <strong className="text-slate-900">{cityName}</strong>, GoMyTruck's Digital Transport Agent Network empowers local transport coordinators, commission agents, and logistics brokers to fulfill active customer loads. Earn guaranteed flat-fee bounties (₹300–₹1,500) on every physically loaded vehicle — zero capital investment required.
+                </p>
 
-                <div className="flex flex-wrap gap-4 pt-2">
+                {/* CTAs */}
+                <div className="flex flex-wrap gap-4">
                   <button
                     onClick={handleRegister}
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-base font-bold bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/25 transition-all transform hover:-translate-y-0.5"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-base font-bold bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/20 transition-all transform hover:-translate-y-0.5"
                   >
                     <span>Register as Transport Agent</span>
                     <ArrowRight size={18} />
                   </button>
                   <a
                     href="tel:6291957542"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm transition-colors"
                   >
-                    <PhoneCall size={18} />
+                    <PhoneCall size={16} className="text-green-600" />
                     <span>Help: 6291957542</span>
                   </a>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-800/80">
+                {/* Stats row */}
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-green-100">
                   <div>
-                    <div className="text-2xl font-black text-white">₹0</div>
-                    <div className="text-xs text-slate-400 mt-1">Upfront Investment</div>
+                    <div className="text-2xl font-black text-slate-900">₹0</div>
+                    <div className="text-xs text-slate-500 mt-1">Upfront Investment</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-black text-green-400">₹300 - ₹1,500</div>
-                    <div className="text-xs text-slate-400 mt-1">Bounty Per Loaded Trip</div>
+                    <div className="text-2xl font-black text-green-600">₹300–₹1,500</div>
+                    <div className="text-xs text-slate-500 mt-1">Bounty Per Loaded Trip</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-black text-white">100%</div>
-                    <div className="text-xs text-slate-400 mt-1">OTP Verified Milestones</div>
+                    <div className="text-2xl font-black text-slate-900">OTP</div>
+                    <div className="text-xs text-slate-500 mt-1">Verified Milestones</div>
                   </div>
                 </div>
               </div>
 
-              {/* EARNINGS CALCULATOR CARD */}
+              {/* RIGHT: Earnings Calculator Card */}
               <div className="lg:col-span-5">
-                <div className="bg-slate-900/95 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative">
-                  <div className="flex items-center justify-between pb-6 border-b border-slate-800">
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -translate-y-12 translate-x-12 pointer-events-none" />
+                  <div className="flex items-center justify-between pb-5 border-b border-slate-100 relative z-10">
                     <div>
-                      <h3 className="text-lg font-bold text-white">Agent Income Calculator</h3>
-                      <p className="text-xs text-slate-400 mt-0.5">Projected earnings in {cityName}</p>
+                      <h3 className="text-lg font-bold text-slate-900">Agent Income Calculator</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">Projected earnings in {cityName}</p>
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-400">
+                    <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center text-green-600">
                       <IndianRupee size={22} />
                     </div>
                   </div>
 
-                  <div className="space-y-6 pt-6">
+                  <div className="space-y-5 pt-5 relative z-10">
                     <div>
                       <div className="flex justify-between text-sm mb-2 font-medium">
-                        <span className="text-slate-300">Loads Sourced Per Day:</span>
-                        <span className="text-green-400 font-bold text-base">{tripsPerDay} Loads</span>
+                        <span className="text-slate-600">Loads Sourced Per Day:</span>
+                        <span className="text-green-600 font-bold text-base">{tripsPerDay} Loads</span>
                       </div>
                       <input
                         type="range"
@@ -247,48 +291,48 @@ export default function TransportAgentCityPage() {
                         max="10"
                         value={tripsPerDay}
                         onChange={(e) => setTripsPerDay(Number(e.target.value))}
-                        className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-green-500"
+                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-green-600"
                       />
-                      <div className="flex justify-between text-[11px] text-slate-500 mt-1">
+                      <div className="flex justify-between text-[11px] text-slate-400 mt-1">
                         <span>1 Load</span>
                         <span>5 Loads</span>
                         <span>10 Loads</span>
                       </div>
                     </div>
 
-                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 space-y-3">
-                      <div className="flex justify-between text-xs text-slate-400">
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
+                      <div className="flex justify-between text-xs text-slate-500">
                         <span>Average Flat Bounty</span>
-                        <span className="text-slate-200 font-semibold">₹500 / Trip</span>
+                        <span className="text-slate-700 font-semibold">₹500 / Trip</span>
                       </div>
-                      <div className="flex justify-between text-xs text-slate-400">
+                      <div className="flex justify-between text-xs text-slate-500">
                         <span>Working Days / Month</span>
-                        <span className="text-slate-200 font-semibold">26 Days</span>
+                        <span className="text-slate-700 font-semibold">26 Days</span>
                       </div>
-                      <div className="border-t border-slate-800 pt-2 flex justify-between items-baseline">
-                        <span className="text-sm font-bold text-white">Estimated Monthly Income:</span>
-                        <span className="text-2xl font-black text-green-400">₹{estimatedMonthlyIncome.toLocaleString("en-IN")}</span>
+                      <div className="border-t border-slate-200 pt-2 flex justify-between items-baseline">
+                        <span className="text-sm font-bold text-slate-900">Est. Monthly Income:</span>
+                        <span className="text-2xl font-black text-green-600">₹{estimatedMonthlyIncome.toLocaleString("en-IN")}</span>
                       </div>
                     </div>
 
-                    <div className="text-xs text-slate-400 space-y-2">
+                    <div className="text-xs text-slate-500 space-y-2">
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 size={14} className="text-green-400 flex-shrink-0" />
+                        <CheckCircle2 size={13} className="text-green-500 flex-shrink-0" />
                         <span>Instant notification for open loads in {cityName}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 size={14} className="text-green-400 flex-shrink-0" />
-                        <span>Manual weekly bank settlement direct from Operations</span>
+                        <CheckCircle2 size={13} className="text-green-500 flex-shrink-0" />
+                        <span>Manual weekly bank settlement from GoMyTruck Operations</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 size={14} className="text-green-400 flex-shrink-0" />
+                        <CheckCircle2 size={13} className="text-green-500 flex-shrink-0" />
                         <span>Driver app onboarding retention micro-bonuses</span>
                       </div>
                     </div>
 
                     <button
                       onClick={handleRegister}
-                      className="w-full py-3.5 px-4 rounded-xl text-center text-sm font-bold bg-green-500 hover:bg-green-600 text-white transition-colors"
+                      className="w-full py-3.5 px-4 rounded-xl text-center text-sm font-bold bg-green-600 hover:bg-green-700 text-white transition-colors"
                     >
                       Start Sourcing Loads Today
                     </button>
@@ -300,9 +344,10 @@ export default function TransportAgentCityPage() {
         </section>
 
         {/* TRUST ROW */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 border-b border-slate-100">
           <TrustBadgeRow />
         </div>
+
 
         {/* HOW IT WORKS SECTION */}
         <section className="py-16 md:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -371,16 +416,7 @@ export default function TransportAgentCityPage() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {[
-                `${cityName} Central Transport Nagar`,
-                `${cityName} APMC Wholesale Mandi`,
-                `${cityName} Industrial Estate / SEZ`,
-                `${cityName} Logistics & Warehousing Park`,
-                `${cityName} Highway Freight Terminal`,
-                `${cityName} Rail Goods Yard Hub`,
-                `${cityName} Heavy Vehicle Parking Zone`,
-                `${cityName} Inter-State Bypass Junction`
-              ].map((hub, idx) => (
+              {localAreas.map((hub, idx) => (
                 <div key={idx} className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-100 text-sm text-slate-700">
                   <MapPin size={16} className="text-green-600 flex-shrink-0" />
                   <span className="truncate font-medium">{hub}</span>
@@ -398,7 +434,7 @@ export default function TransportAgentCityPage() {
           </div>
 
           <div className="space-y-4">
-            {pageFaqs.map((faq, index) => {
+            {agentSpecificFaqs.map((faq, index) => {
               const isOpen = openFaq === index;
               return (
                 <div key={index} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">

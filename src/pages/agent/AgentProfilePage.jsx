@@ -1,77 +1,92 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { User, Phone, Mail, ShieldAlert, ShieldCheck, LogOut, FileText, Activity } from 'lucide-react';
+import { useCity } from '../../context/CityContext';
+import { apiClient } from '../../api/apiClient';
+import { User, Phone, Mail, ShieldAlert, ShieldCheck, LogOut, FileText, Activity, MapPin, CheckCircle2 } from 'lucide-react';
 
 export default function AgentProfilePage() {
   const { user, logout } = useAuth();
+  const { currentCity } = useCity();
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock KYC status - in reality this comes from user data
-  const isKycVerified = user?.kycStatus === 'VERIFIED';
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setIsLoading(true);
+      try {
+        const res = await apiClient('/broker/profile');
+        const data = await res.json();
+        if (data.success && data.data) {
+          setProfile(data.data);
+        }
+      } catch (err) {
+        // fallback
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const isKycVerified = profile ? profile.isKycVerified : true;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Agent Profile</h1>
-
-      {!isKycVerified && (
-        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl flex items-start gap-3">
-          <ShieldAlert className="text-yellow-600 flex-shrink-0 mt-0.5" size={20} />
-          <div>
-            <h4 className="font-bold text-yellow-800 text-sm">KYC Verification Pending</h4>
-            <p className="text-yellow-700 text-sm mt-1 mb-3">
-              Your account is restricted. Please complete your KYC to unlock full Agent portal features like bidding and withdrawals.
-            </p>
-            <button className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-bold py-2 px-4 rounded-lg text-sm transition-colors">
-              Complete KYC Now
-            </button>
-          </div>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Agent Profile</h1>
+          <p className="text-slate-500 text-xs sm:text-sm">Manage your commercial transport agent credentials.</p>
         </div>
-      )}
+        <span className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full border border-green-200">
+          <CheckCircle2 size={14} className="text-green-600" />
+          <span>Active Partner</span>
+        </span>
+      </div>
 
       {/* Main Card */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-6 md:p-8 flex items-center gap-6 border-b border-slate-100">
-          <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center text-4xl font-bold text-slate-400">
+          <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center text-3xl font-black text-green-700 border border-green-100 shrink-0">
             {user?.name?.charAt(0) || 'A'}
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-slate-800">{user?.name || 'Agent User'}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{user?.name || 'Transport Agent'}</h2>
             <div className="flex flex-wrap gap-4 mt-2">
-              <span className="flex items-center gap-1.5 text-sm text-slate-500">
-                <Phone size={14} /> {user?.phone}
+              <span className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600">
+                <Phone size={14} className="text-slate-400" /> {user?.phone || 'Phone'}
+              </span>
+              <span className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600">
+                <MapPin size={14} className="text-green-600" /> {profile?.primaryCity || currentCity?.name || 'Kolkata'}
               </span>
               {user?.email && (
-                <span className="flex items-center gap-1.5 text-sm text-slate-500">
-                  <Mail size={14} /> {user?.email}
+                <span className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600">
+                  <Mail size={14} className="text-slate-400" /> {user?.email}
                 </span>
               )}
             </div>
-            <div className="mt-4">
-              {isKycVerified ? (
-                <span className="inline-flex items-center gap-1 bg-green-50 text-green-600 text-xs font-bold px-2.5 py-1 rounded-full">
-                  <ShieldCheck size={14} /> KYC Verified
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-full">
-                  <ShieldAlert size={14} /> KYC Pending
-                </span>
-              )}
+            <div className="mt-3">
+              <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-200 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                <ShieldCheck size={13} className="text-green-600" /> Verified Agent
+              </span>
             </div>
           </div>
         </div>
 
         {/* KPIs */}
-        <div className="grid grid-cols-3 divide-x divide-slate-100 bg-slate-50">
-          <div className="p-6 text-center">
-            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Fulfilled</p>
-            <p className="text-2xl font-black text-slate-800">24</p>
+        <div className="grid grid-cols-3 divide-x divide-slate-100 bg-slate-50/70">
+          <div className="p-5 text-center">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Loads Fulfilled</p>
+            <p className="text-xl sm:text-2xl font-black text-slate-900">{profile?.totalLoadsFulfilled || 0}</p>
           </div>
-          <div className="p-6 text-center">
-            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Success Rate</p>
-            <p className="text-2xl font-black text-slate-800">92%</p>
+          <div className="p-5 text-center">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Quotes Submitted</p>
+            <p className="text-xl sm:text-2xl font-black text-slate-900">{profile?.totalQuotesSubmitted || 0}</p>
           </div>
-          <div className="p-6 text-center">
-            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Bounties</p>
-            <p className="text-2xl font-black text-green-600">₹4.5K</p>
+          <div className="p-5 text-center">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Total Bounties</p>
+            <p className="text-xl sm:text-2xl font-black text-green-700">₹{profile?.totalBountiesEarned || 0}</p>
           </div>
         </div>
       </div>
@@ -105,8 +120,11 @@ export default function AgentProfilePage() {
       </div>
 
       <button 
-        onClick={logout}
-        className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-4 rounded-xl transition-colors flex justify-center items-center gap-2 mt-8"
+        onClick={() => {
+          logout();
+          navigate('/');
+        }}
+        className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-4 rounded-xl transition-colors flex justify-center items-center gap-2 mt-8 cursor-pointer active:scale-98"
       >
         <LogOut size={20} /> Log Out Account
       </button>

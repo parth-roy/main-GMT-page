@@ -137,7 +137,22 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
     const pathParts = location.pathname.split("/").filter(Boolean);
     const isKnownLocation = (slug) => ALL_LOCATIONS.some((c) => c.slug === slug);
 
-    if (pathParts.length === 1 && isKnownLocation(pathParts[0])) {
+    // ── Pillar 4: Transport Agent city pages ─────────────────────────────────
+    if (
+      pathParts[0] === "partners" &&
+      pathParts[1] === "transport-agents" &&
+      pathParts.length >= 2
+    ) {
+      navigate(`/partners/transport-agents/${citySlug}`);
+    // ── Pillar 4: Assisted Truck Booking city pages ──────────────────────────
+    } else if (
+      pathParts[0] === "services" &&
+      pathParts[1] === "assisted-truck-booking" &&
+      pathParts.length >= 2
+    ) {
+      navigate(`/services/assisted-truck-booking/${citySlug}`);
+    // ── Standard PSEO city-slug-first patterns ───────────────────────────────
+    } else if (pathParts.length === 1 && isKnownLocation(pathParts[0])) {
       navigate(`/${citySlug}`);
     } else if (pathParts.length === 2 && isKnownLocation(pathParts[0])) {
       navigate(`/${citySlug}/${pathParts[1]}`);

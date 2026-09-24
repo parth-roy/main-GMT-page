@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from "react"
-import { Menu, X, ChevronRight, ChevronDown, PhoneCall, LogIn, LogOut, Truck, Package, Building2, Users, ArrowRight, Zap } from "lucide-react"
-import { useLocation, Link } from "react-router-dom"
+import { Menu, X, ChevronRight, ChevronDown, PhoneCall, LogIn, LogOut, Truck, Package, Building2, Users, ArrowRight, Zap, Briefcase } from "lucide-react"
+import { useLocation, Link, useNavigate } from "react-router-dom"
 import AppDownloadModal from "./AppDownloadModal"
 import CitySelectorModal from "./CitySelectorModal"
 import { useAuth } from "../context/AuthContext"
@@ -62,9 +62,23 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
   const [activeDropdown, setActiveDropdown] = useState(null) // "shippers" | "transporters" | null
 
   const { currentCity } = useCity()
-  const { user, accessToken, logout, setIsLoginModalOpen } = useAuth()
+  const { user, accessToken, logout, setIsLoginModalOpen, openLoginModal } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
   const dropdownRef = useRef(null)
+
+  const handleAgentClick = (e) => {
+    if (e && e.preventDefault) e.preventDefault()
+    if (isLoggedIn) {
+      navigate('/agent/loads')
+    } else {
+      if (openLoginModal) {
+        openLoginModal('MIDDLEMAN')
+      } else {
+        setIsLoginModalOpen(true)
+      }
+    }
+  }
 
   const shippersMenu = useMemo(() => {
     const isKolkata = currentCity?.slug === "kolkata"
@@ -137,6 +151,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
   const handleLogout = () => {
     logout()
     setIsOpen(false)
+    navigate('/')
   }
 
   const simpleNavItems = [
@@ -318,11 +333,14 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               )}
 
               <button
-                onClick={onOpenEstimate}
-                className="btn-ripple bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-4 py-1.5 rounded-lg shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 active:scale-95 transition-all flex items-center gap-1.5"
+                type="button"
+                onClick={handleAgentClick}
+                className="btn-ripple bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-sm px-4 py-1.5 rounded-lg shadow-md shadow-emerald-600/25 hover:shadow-emerald-600/35 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+                title="GMT Agent Portal"
               >
-                <span className="relative z-10 whitespace-nowrap">Get Estimate</span>
-                <ChevronRight size={16} className="relative z-10" />
+                <Briefcase size={15} className="relative z-10 text-emerald-100" />
+                <span className="relative z-10 whitespace-nowrap">GMT Agent</span>
+                <ChevronRight size={15} className="relative z-10 text-emerald-200" />
               </button>
 
               <button
@@ -438,8 +456,17 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               <PhoneCall size={16} className="text-brand-600" />
               <span>Talk to Drivers</span>
             </Link>
-            <button onClick={() => { setIsOpen(false); onOpenEstimate() }} className="btn-ripple bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm py-3 px-4 rounded-lg shadow-md shadow-brand-500/20 active:scale-98 transition-all">
-              <span className="relative z-10">Get Estimate</span>
+            <button
+              type="button"
+              onClick={(e) => {
+                setIsOpen(false)
+                handleAgentClick(e)
+              }}
+              className="btn-ripple bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-sm py-3 px-4 rounded-lg shadow-md shadow-emerald-600/25 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Briefcase size={16} className="relative z-10 text-emerald-100" />
+              <span className="relative z-10">GMT Agent</span>
+              <ChevronRight size={16} className="relative z-10 text-emerald-200" />
             </button>
             {isLoggedIn ? (
               <button onClick={handleLogout} className="flex items-center justify-center gap-2 border border-rose-200 bg-rose-50 text-rose-600 font-bold py-3 rounded-lg text-sm hover:bg-rose-100 active:scale-98 transition-all cursor-pointer">

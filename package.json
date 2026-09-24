@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node generate-sitemap.js && npm run build:client && npm run build:ssr && npm run prerender && npm run validate:seo",
+    "build:dev": "npm run build:client && npm run build:ssr",
     "build:client": "vite build",
     "build:ssr": "vite build --ssr src/entry-server.jsx --outDir dist-ssr",
     "prerender": "node --max-old-space-size=4096 scripts/prerender.js",

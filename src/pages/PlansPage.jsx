@@ -69,7 +69,7 @@ export default function PlansPage() {
               GoMyTruck Partner Plans
             </h1>
             <p className="text-lg md:text-xl lg:text-xl xl:text-2xl text-gray-200 leading-relaxed mb-12 drop-shadow-sm font-medium opacity-95">
-              We built GoMyTruck to revolutionize logistics by offering 0 - 5% commission loads 
+              We built GoMyTruck to revolutionize logistics by offering 5 - 10% commission loads 
               (the lowest commission logistics platform) and direct earnings for our partners. To sustain this promise and keep our 
               technology running smoothly, we are launching the GoMyTruck Partner Subscription. 
               By paying a small, predictable fee, you help us cover essential platform costs 
@@ -79,7 +79,7 @@ export default function PlansPage() {
             <ul className="space-y-6 md:space-y-6">
               <li className="flex items-center text-white">
                 <Check className="text-[#00d084] mr-4 drop-shadow-sm" size={28} strokeWidth={3} />
-                <span className="font-bold text-lg md:text-xl lg:text-xl xl:text-2xl drop-shadow-sm tracking-wide">0 - 5% Lowest Commission</span>
+                <span className="font-bold text-lg md:text-xl lg:text-xl xl:text-2xl drop-shadow-sm tracking-wide">5 - 10% Lowest Commission</span>
               </li>
               <li className="flex items-center text-white">
                 <Check className="text-[#00d084] mr-4 drop-shadow-sm" size={28} strokeWidth={3} />

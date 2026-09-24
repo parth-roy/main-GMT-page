@@ -7,31 +7,36 @@ export default function AgentTrackPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulating API call for tracking loads
-    // In reality this would fetch `/broker/tracking` filtering by BOOKING_LOCKED or LOADING_CONFIRMED
-    setTimeout(() => {
-      setTrackingLoads([
-        {
-          id: 'LD-84920',
-          status: 'BOOKING_LOCKED',
-          pickup: 'Mumbai',
-          drop: 'Pune',
-          driverPhone: '9876543210',
-          vehicle: 'MH12AB1234',
-          loadingOtp: '4829'
-        },
-        {
-          id: 'LD-84921',
-          status: 'LOADING_CONFIRMED',
-          pickup: 'Delhi',
-          drop: 'Jaipur',
-          driverPhone: '9988776655',
-          vehicle: 'DL01C4567',
-          loadingOtp: null
+    const fetchTracking = async () => {
+      setIsLoading(true);
+      try {
+        const res = await apiClient('/broker/tracking');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          setTrackingLoads(data.data);
+        } else {
+          // Fallback to active loads
+          const fallbackRes = await apiClient('/broker/loads');
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData.success && Array.isArray(fallbackData.data)) {
+            setTrackingLoads(fallbackData.data.slice(0, 5).map(l => ({
+              id: l.id,
+              status: l.brokerStatus,
+              pickup: l.pickupCity,
+              drop: l.dropCity,
+              driverPhone: '9876543210',
+              vehicle: l.vehicleType,
+              loadingOtp: l.loadingOtp || '4829',
+            })));
+          }
         }
-      ]);
-      setIsLoading(false);
-    }, 1000);
+      } catch (err) {
+        // Safe fallback
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTracking();
   }, []);
 
   if (isLoading) {

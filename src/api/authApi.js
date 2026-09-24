@@ -13,11 +13,18 @@ export async function sendOtp(phone, role = 'CUSTOMER') {
   return json;
 }
 
-export async function verifyOtp(phone, otp, intendedRole = 'CUSTOMER') {
+export async function verifyOtp(phone, otp, intendedRole = 'CUSTOMER', name = '', email = '') {
   const res = await fetch(`${BASE_URL}/auth/verify-otp`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone, otp, intendedRole }),
+    body: JSON.stringify({
+      phone,
+      otp,
+      intendedRole,
+      role: intendedRole,
+      ...(name ? { name } : {}),
+      ...(email ? { email } : {}),
+    }),
   });
   const json = await res.json();
   if (!res.ok || !json.success) {
