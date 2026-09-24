@@ -19,11 +19,12 @@ const getHeadMarkup = (helmet) => [
   helmet?.script?.toString(),
 ].filter(Boolean).join("\n    ")
 
+import fsSync from "node:fs"
 const createdDirs = new Set([DIST])
 
-async function ensureDir(dir) {
+function ensureDir(dir) {
   if (createdDirs.has(dir)) return
-  await fs.mkdir(dir, { recursive: true })
+  fsSync.mkdirSync(dir, { recursive: true })
   createdDirs.add(dir)
 }
 
@@ -35,7 +36,7 @@ async function writeRoute(route, outputFile) {
   const destination = outputFile || (route === "/"
     ? path.join(DIST, "index.html")
     : path.join(DIST, route.slice(1), "index.html"))
-  await ensureDir(path.dirname(destination))
+  ensureDir(path.dirname(destination))
   await fs.writeFile(destination, document)
 }
 
