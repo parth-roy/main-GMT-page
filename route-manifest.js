@@ -476,7 +476,21 @@ SEO_CITIES.slice(300).forEach(city => {
   });
 });
 
-export const NOINDEX_ROUTES = ["/delete-account"]
+// --- PILLAR 4: PAN-INDIA GIG-BROKER & ASSISTED TRUCK BOOKING BROADCAST ENGINE (922 CITIES) ---
+
+// Supply-Side Transport Agent Network (National Hub + 922 City Hubs)
+addRoute('/partners/transport-agents');
+SEO_CITIES.forEach(city => {
+  addRoute(`/partners/transport-agents/${city.slug}`);
+});
+
+// Demand-Side Assisted Truck Booking (National Hub + 922 City Hubs)
+addRoute('/services/assisted-truck-booking');
+SEO_CITIES.forEach(city => {
+  addRoute(`/services/assisted-truck-booking/${city.slug}`);
+});
+
+export const NOINDEX_ROUTES = ["/delete-account", "/agent", "/agent/loads", "/agent/post", "/agent/track", "/agent/wallet", "/agent/profile"]
 
 export const PRERENDER_ROUTES = [...INDEXABLE_ROUTES, ...NOINDEX_ROUTES]
 

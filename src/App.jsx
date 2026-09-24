@@ -1,5 +1,5 @@
 import React, { useState, Suspense, lazy } from "react"
-import { Routes, Route, useNavigate, Navigate } from "react-router-dom"
+import { Routes, Route, useNavigate, Navigate, useLocation } from "react-router-dom"
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
 import GlobalFABs from "./components/GlobalFABs"
@@ -60,6 +60,16 @@ const CityVehiclePage = lazy(() => import("./pages/CityVehiclePage"))
 const RouteVehiclePage = lazy(() => import("./pages/RouteVehiclePage"))
 const DriverLoadHubPage = lazy(() => import("./pages/DriverLoadHubPage"))
 const CargoReturnLoadPage = lazy(() => import("./pages/CargoReturnLoadPage"))
+const TransportAgentCityPage = lazy(() => import("./pages/TransportAgentCityPage"))
+const AssistedTruckBookingPage = lazy(() => import("./pages/AssistedTruckBookingPage"))
+
+const AgentLoadsPage = lazy(() => import("./pages/agent/AgentLoadsPage"))
+const AgentPostPage = lazy(() => import("./pages/agent/AgentPostPage"))
+const AgentTrackPage = lazy(() => import("./pages/agent/AgentTrackPage"))
+const AgentWalletPage = lazy(() => import("./pages/agent/AgentWalletPage"))
+const AgentProfilePage = lazy(() => import("./pages/agent/AgentProfilePage"))
+const MiddlemanLayout = lazy(() => import("./components/middleman/MiddlemanLayout"))
+const ProtectedAgentRoute = lazy(() => import("./components/middleman/ProtectedAgentRoute"))
 
 // A simple premium spinner for Suspense fallback
 const PageLoader = () => (
@@ -75,6 +85,9 @@ export default function App() {
   const [isSelectServiceOpen, setIsSelectServiceOpen] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
   const navigate = useNavigate()
+  const location = useLocation()
+
+  const isAgentRoute = location.pathname.startsWith('/agent')
 
   const handleOpenEstimate = () => {
     // Open the upgraded 2-step GetEstimateModal (selects vehicle + enters route + hits API)
@@ -119,13 +132,31 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col font-sans pb-20 md:pb-0">
       <RouteAnalytics />
-      <Navbar
-        onOpenEstimate={handleOpenEstimate}
-        onScrollToSection={handleScrollToSection}
-      />
+      
+      {!isAgentRoute && (
+        <Navbar
+          onOpenEstimate={handleOpenEstimate}
+          onScrollToSection={handleScrollToSection}
+        />
+      )}
+      
       <main className="flex-grow">
         <Suspense fallback={<PageLoader />}>
           <Routes>
+            <Route path="/agent/*" element={
+              <ProtectedAgentRoute>
+                <MiddlemanLayout>
+                  <Routes>
+                    <Route path="loads" element={<AgentLoadsPage />} />
+                    <Route path="post" element={<AgentPostPage />} />
+                    <Route path="track" element={<AgentTrackPage />} />
+                    <Route path="wallet" element={<AgentWalletPage />} />
+                    <Route path="profile" element={<AgentProfilePage />} />
+                  </Routes>
+                </MiddlemanLayout>
+              </ProtectedAgentRoute>
+            } />
+
             <Route path="/" element={
               <Home
                 selectedService={selectedService}
@@ -317,6 +348,22 @@ export default function App() {
             
             <Route path="/delete-account" element={<DeleteAccountPage />} />
 
+            {/* AGENT (TRANSPORT CONNECTOR / MIDDLEMAN) ROUTES */}
+            <Route path="/agent" element={<Navigate to="/agent/loads" replace />} />
+            <Route path="/agent/loads" element={<ProtectedAgentRoute><MiddlemanLayout><AgentLoadsPage /></MiddlemanLayout></ProtectedAgentRoute>} />
+            <Route path="/agent/post" element={<ProtectedAgentRoute><MiddlemanLayout><AgentPostPage /></MiddlemanLayout></ProtectedAgentRoute>} />
+            <Route path="/agent/track" element={<ProtectedAgentRoute><MiddlemanLayout><AgentTrackPage /></MiddlemanLayout></ProtectedAgentRoute>} />
+            <Route path="/agent/wallet" element={<ProtectedAgentRoute><MiddlemanLayout><AgentWalletPage /></MiddlemanLayout></ProtectedAgentRoute>} />
+            <Route path="/agent/profile" element={<ProtectedAgentRoute><MiddlemanLayout><AgentProfilePage /></MiddlemanLayout></ProtectedAgentRoute>} />
+
+            {/* PAN-INDIA TRANSPORT AGENT NETWORK (SUPPLY) */}
+            <Route path="/partners/transport-agents" element={<TransportAgentCityPage />} />
+            <Route path="/partners/transport-agents/:city" element={<TransportAgentCityPage />} />
+
+            {/* PAN-INDIA ASSISTED TRUCK BOOKING (DEMAND) */}
+            <Route path="/services/assisted-truck-booking" element={<AssistedTruckBookingPage />} />
+            <Route path="/services/assisted-truck-booking/:city" element={<AssistedTruckBookingPage />} />
+
             {/* PROGRAMMATIC SEO & GEO TEMPLATE ROUTES */}
             <Route path="/:city/truck-booking/:vehicle" element={<CityVehiclePage />} />
             <Route path="/transport/:route/:vehicle" element={<RouteVehiclePage />} />
@@ -347,8 +394,8 @@ export default function App() {
           </Routes>
         </Suspense>
       </main>
-      <Footer onScrollToSection={handleScrollToSection} />
-
+      {!isAgentRoute && <Footer onScrollToSection={handleScrollToSection} />}
+      
       <Suspense fallback={null}>
         {/* Upgraded 2-step GetEstimateModal: selects service → fills route → calls live API */}
         {isSelectServiceOpen && (
@@ -361,7 +408,7 @@ export default function App() {
       </Suspense>
 
       {/* Global Floating Action Buttons for WhatsApp and Booking */}
-      <GlobalFABs onOpenEstimate={handleOpenEstimate} />
+      {!isAgentRoute && <GlobalFABs onOpenEstimate={handleOpenEstimate} />}
       
       {/* Global Authentication Modal */}
       <LoginModal />

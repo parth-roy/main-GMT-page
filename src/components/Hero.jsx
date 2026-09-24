@@ -121,7 +121,7 @@ export default function Hero({
           </p>
 
           <p className="mt-2.5 sm:mt-3 text-sm sm:text-base text-brand-200 font-bold italic" lang="hi-Latn">
-            Saaman aapka, transport hamara
+            Aasaan zariya, transport ka
           </p>
         </div>
 

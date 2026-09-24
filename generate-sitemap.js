@@ -9,6 +9,12 @@ const __dirname = path.dirname(__filename);
 const BASE_URL = 'https://gomytruck.com';
 
 function getCategory(route) {
+  if (route.startsWith('/partners/transport-agents')) {
+    return 'transport-agents';
+  }
+  if (route.startsWith('/services/assisted-truck-booking')) {
+    return 'assisted-booking';
+  }
   if (route.startsWith('/routes/') || route.startsWith('/intercity/') || route.startsWith('/local-transport/') || route.startsWith('/transport/')) {
     return 'routes';
   }
@@ -55,7 +61,9 @@ function generateSitemaps() {
     vehicles: [],
     'driver-loads': [],
     cargo: [],
-    resources: []
+    resources: [],
+    'transport-agents': [],
+    'assisted-booking': []
   };
 
   INDEXABLE_ROUTES.forEach(route => {

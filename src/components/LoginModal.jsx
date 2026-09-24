@@ -1,15 +1,23 @@
 import React, { useState, useRef, useEffect } from "react"
-import { X, User, Phone, Mail, Check, Loader2 } from "lucide-react"
+import { X, User, Phone, Mail, Check, Loader2, LogOut } from "lucide-react"
 import { sendOtp, verifyOtp } from "../api/authApi"
 
 import { useAuth } from "../context/AuthContext"
 
+const ROLES = [
+  { id: 'CUSTOMER', label: '🚚 Customer / Shipper' },
+  { id: 'MIDDLEMAN', label: '🤝 Transport Agent' },
+  { id: 'DRIVER', label: '🚛 Driver / Fleet Owner' },
+  { id: 'BUSINESS', label: '🏢 B2B Business' },
+];
+
 export default function LoginModal() {
-  const { isLoginModalOpen, closeLoginModal, login } = useAuth()
+  const { isLoginModalOpen, closeLoginModal, login, user, logout } = useAuth()
   
   if (!isLoginModalOpen) return null
 
   const [step, setStep] = useState(1) // 1: Login, 2: OTP
+  const [registrationFor, setRegistrationFor] = useState('CUSTOMER')
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
@@ -21,6 +29,7 @@ export default function LoginModal() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [devOtp, setDevOtp] = useState("")
+  const [showRoleInfo, setShowRoleInfo] = useState(false)
 
   // Focus first input on OTP step
   useEffect(() => {
@@ -97,7 +106,7 @@ export default function LoginModal() {
     setIsLoading(true)
     const otpCode = otp.join("")
     try {
-      const data = await verifyOtp(phone, otpCode)
+      const data = await verifyOtp(phone, otpCode, registrationFor)
       const token = data?.accessToken || data?.tokens?.access?.token || data?.token
       if (token) {
         const userData = {
@@ -108,8 +117,15 @@ export default function LoginModal() {
           whatsappOptIn: whatsapp,
         }
         await login(token, userData)
+        
+        if (registrationFor === 'MIDDLEMAN' && userData.role !== 'MIDDLEMAN') {
+          setShowRoleInfo(true)
+        } else {
+          closeLoginModal()
+        }
+      } else {
+        closeLoginModal()
       }
-      closeLoginModal()
     } catch (err) {
       setError(err.message)
     } finally {
@@ -137,16 +153,80 @@ export default function LoginModal() {
             <X size={20} />
           </button>
 
-          {step === 1 ? (
+          {showRoleInfo ? (
+            <div className="mt-4 md:mt-8 flex-grow flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                <Check size={32} className="text-blue-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-800 mb-4">Login Successful!</h2>
+              <div className="p-4 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-xl text-sm mb-6">
+                To activate Transport Agent access, complete KYC in your profile.
+              </div>
+              <button 
+                onClick={closeLoginModal}
+                className="bg-[#1e5eff] hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg active:scale-95"
+              >
+                Continue
+              </button>
+            </div>
+          ) : user ? (
+            <div className="mt-4 md:mt-8 flex-grow flex flex-col items-center justify-center text-center">
+              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                <User size={40} className="text-slate-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-800 mb-2">You're signed in as</h2>
+              <p className="text-xl font-medium text-[#1e5eff] mb-8">{user.name || "Customer"}</p>
+              
+              <div className="flex gap-4 w-full">
+                <button 
+                  onClick={closeLoginModal}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all active:scale-95"
+                >
+                  Close
+                </button>
+                <button 
+                  onClick={() => {
+                    logout()
+                    setStep(1)
+                  }}
+                  className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <LogOut size={18} /> Sign Out
+                </button>
+              </div>
+            </div>
+          ) : step === 1 ? (
             <div className="mt-4 md:mt-8 flex-grow">
               <h2 className="text-3xl font-extrabold text-[#112a46] flex items-center gap-2 mb-2">
                 Welcome! <span className="text-2xl">👋</span>
               </h2>
-              <p className="text-sm text-slate-500 mb-8">
+              <p className="text-sm text-slate-500 mb-6">
                 Sign in or make an account to complete your order with us.
               </p>
 
               <form onSubmit={handleLoginSubmit} className="space-y-4">
+                
+                {/* Role Selector */}
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">I am a...</label>
+                  <div className="flex flex-wrap gap-2">
+                    {ROLES.map(role => (
+                      <button
+                        key={role.id}
+                        type="button"
+                        onClick={() => setRegistrationFor(role.id)}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                          registrationFor === role.id 
+                            ? 'bg-green-500 text-white shadow-md' 
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {role.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Name Field */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -158,7 +238,7 @@ export default function LoginModal() {
                     required
                     value={name}
                     onChange={e => setName(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                   />
                 </div>
 
@@ -177,7 +257,7 @@ export default function LoginModal() {
                       const val = e.target.value.replace(/\D/g, '').slice(0, 10);
                       setPhone(val);
                     }}
-                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                   />
                 </div>
 
@@ -191,12 +271,12 @@ export default function LoginModal() {
                     placeholder="Enter your email (optional)"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                   />
                 </div>
 
                 {/* Checkbox */}
-                <label className="flex items-center gap-3 cursor-pointer mt-6 group">
+                <label className="flex items-center gap-3 cursor-pointer mt-4 group">
                   <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${whatsapp ? 'bg-purple-600 border-purple-600' : 'border-2 border-slate-300 group-hover:border-purple-400 bg-white'}`}>
                     {whatsapp && <Check size={14} className="text-white" strokeWidth={3} />}
                   </div>
@@ -216,7 +296,7 @@ export default function LoginModal() {
                 )}
 
                 {/* Bottom Fixed-ish Section */}
-                <div className="mt-12 md:absolute md:bottom-12 md:left-12 md:right-12">
+                <div className="mt-8 md:absolute md:bottom-8 md:left-12 md:right-12">
                   <p className="text-xs text-slate-500 text-center mb-4">
                     By proceeding, you agree to the <a href="/legal/terms-conditions" target="_blank" rel="noopener noreferrer" className="font-bold text-blue-600 hover:underline">terms of services</a> and <a href="/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="font-bold text-blue-600 hover:underline">privacy policy</a>
                   </p>
