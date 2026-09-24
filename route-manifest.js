@@ -490,7 +490,7 @@ SEO_CITIES.forEach(city => {
   addRoute(`/services/assisted-truck-booking/${city.slug}`);
 });
 
-export const NOINDEX_ROUTES = ["/delete-account", "/agent", "/agent/loads", "/agent/post", "/agent/track", "/agent/wallet", "/agent/profile"]
+export const NOINDEX_ROUTES = ["/delete-account", "/agent/loads", "/agent/post", "/agent/track", "/agent/wallet", "/agent/profile"]
 
 export const PRERENDER_ROUTES = [...INDEXABLE_ROUTES, ...NOINDEX_ROUTES]
 

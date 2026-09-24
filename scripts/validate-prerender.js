@@ -63,6 +63,8 @@ const sitemaps = [
   "sitemap-driver-loads.xml",
   "sitemap-cargo.xml",
   "sitemap-resources.xml",
+  "sitemap-transport-agents.xml",
+  "sitemap-assisted-booking.xml",
 ]
 
 let allSitemapContent = ""

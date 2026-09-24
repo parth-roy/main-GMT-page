@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Loader2, AlertTriangle, ArrowLeft } from 'lucide-react';
+
+import SEOHead from '../../seo/SEOHead';
 
 export default function ProtectedAgentRoute({ children }) {
   const { user, accessToken, requireAuth } = useAuth();
   const [isInitializing, setIsInitializing] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     // If we're fully loaded, or there's definitively no token on mount
@@ -32,9 +35,21 @@ export default function ProtectedAgentRoute({ children }) {
     return () => clearTimeout(timer);
   }, [user, accessToken, requireAuth]);
 
+  // Always include SEO tags for the NOINDEX routes during SSR
+  const agentSeo = (
+    <SEOHead 
+      title="Transport Agent Portal" 
+      description="Manage your transport agency, quote on loads, and track your wallet via the GoMyTruck Agent Portal." 
+      canonical={location.pathname}
+      noIndex={true} 
+    />
+  );
+
   if (isInitializing) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
+        {agentSeo}
+        <h1 className="sr-only">Transport Agent Portal</h1>
         <Loader2 size={40} className="animate-spin text-green-500 mb-4" />
         <p className="text-slate-500">Verifying access...</p>
       </div>
