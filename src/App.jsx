@@ -350,11 +350,6 @@ export default function App() {
 
             {/* AGENT (TRANSPORT CONNECTOR / MIDDLEMAN) ROUTES */}
             <Route path="/agent" element={<Navigate to="/agent/loads" replace />} />
-            <Route path="/agent/loads" element={<ProtectedAgentRoute><MiddlemanLayout><AgentLoadsPage /></MiddlemanLayout></ProtectedAgentRoute>} />
-            <Route path="/agent/post" element={<ProtectedAgentRoute><MiddlemanLayout><AgentPostPage /></MiddlemanLayout></ProtectedAgentRoute>} />
-            <Route path="/agent/track" element={<ProtectedAgentRoute><MiddlemanLayout><AgentTrackPage /></MiddlemanLayout></ProtectedAgentRoute>} />
-            <Route path="/agent/wallet" element={<ProtectedAgentRoute><MiddlemanLayout><AgentWalletPage /></MiddlemanLayout></ProtectedAgentRoute>} />
-            <Route path="/agent/profile" element={<ProtectedAgentRoute><MiddlemanLayout><AgentProfilePage /></MiddlemanLayout></ProtectedAgentRoute>} />
 
             {/* PAN-INDIA TRANSPORT AGENT NETWORK (SUPPLY) */}
             <Route path="/partners/transport-agents" element={<TransportAgentCityPage />} />
