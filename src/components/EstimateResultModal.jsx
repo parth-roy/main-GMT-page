@@ -23,6 +23,7 @@ const SERVICE_VEHICLE_FILTER = {
 }
 import { useAuth } from "../context/AuthContext"
 import GoodsTypeModal from "./GoodsTypeModal"
+import BookingPersonaStep from "./BookingPersonaStep"
 
 /**
  * EstimateResultModal
@@ -88,45 +89,66 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
   const handleBookNowClick = async () => {
     requireAuth(async () => {
       if (!selectedGoods && estimateData.service !== "packers") {
-        setShowGoodsModal(true)
+        setShowGoodsModal(true);
       } else {
-        setBookingError("")
-        setBookingLoading(true)
-        try {
-          const payload = {
-            vehicleType: selectedVehicleType,
-            pickupLat: estimateData.pickupLat,
-            pickupLng: estimateData.pickupLng,
-            pickupAddress: estimateData.pickupAddress,
-            stops: [{
-              latitude: estimateData.dropLat,
-              longitude: estimateData.dropLng,
-              address: estimateData.dropAddress,
-            }],
-            hasLoadingService: false,
-            estimatedFare: Number(liveEstimate.totalFare ?? currentFare),
-            estimatedDistanceKm: liveEstimate.estimatedDistanceKm,
-            ...selectedGoods,
-          }
-          const draft = await createBooking(payload)
-          const data = await confirmBooking(draft.id)
-          setCrn(data.bookingNumber)
-          setBookingId(data.id)
-          setBookingState('SEARCHING')
-          trackBookingSubmitted(data.id, selectedVehicleType)
-        } catch (err) {
-          const msg = err.message || "";
-          if (msg.toLowerCase().includes("token") || msg.toLowerCase().includes("unauthorized") || msg.toLowerCase().includes("jwt")) {
-            setBookingError("Session expired. Please click Book Now again to log in and confirm your request.");
-          } else {
-            setBookingError(msg);
-          }
-        } finally {
-          setBookingLoading(false)
-        }
+        setBookingState("PERSONA");
       }
-    });
-  }
+    }, "CUSTOMER", true);
+  };
+
+  const handleConfirmPersonaBooking = async ({ persona, urgency, truckCount, contractDuration }) => {
+    setBookingError("");
+    setBookingLoading(true);
+    try {
+      let slaExpiresAt = null;
+      const now = Date.now();
+      if (urgency === "UNDER_2_HOURS") {
+        slaExpiresAt = new Date(now + 2 * 60 * 60 * 1000).toISOString();
+      } else if (urgency === "UNDER_4_HOURS") {
+        slaExpiresAt = new Date(now + 4 * 60 * 60 * 1000).toISOString();
+      } else if (urgency === "UNDER_24_HOURS") {
+        slaExpiresAt = new Date(now + 24 * 60 * 60 * 1000).toISOString();
+      } else if (urgency === "TWO_DAYS") {
+        slaExpiresAt = new Date(now + 48 * 60 * 60 * 1000).toISOString();
+      }
+
+      const payload = {
+        vehicleType: selectedVehicleType,
+        pickupLat: estimateData.pickupLat,
+        pickupLng: estimateData.pickupLng,
+        pickupAddress: estimateData.pickupAddress,
+        stops: [{
+          latitude: estimateData.dropLat,
+          longitude: estimateData.dropLng,
+          address: estimateData.dropAddress,
+        }],
+        hasLoadingService: false,
+        estimatedFare: Number(liveEstimate.totalFare ?? currentFare),
+        estimatedDistanceKm: liveEstimate.estimatedDistanceKm,
+        ...selectedGoods,
+        bookingPersona: persona,
+        truckCount: truckCount || 1,
+        contractDuration: contractDuration || undefined,
+        urgencyWindow: urgency,
+        slaExpiresAt,
+      };
+      const draft = await createBooking(payload);
+      const data = await confirmBooking(draft.id);
+      setCrn(data.bookingNumber);
+      setBookingId(data.id);
+      setBookingState("SEARCHING");
+      trackBookingSubmitted(data.id, selectedVehicleType);
+    } catch (err) {
+      const msg = err.message || "";
+      if (msg.toLowerCase().includes("token") || msg.toLowerCase().includes("unauthorized") || msg.toLowerCase().includes("jwt")) {
+        setBookingError("Session expired. Please click Book Now again to log in and confirm your request.");
+      } else {
+        setBookingError(msg);
+      }
+    } finally {
+      setBookingLoading(false);
+    }
+  };
 
   const allowedTypes = SERVICE_VEHICLE_FILTER[estimateData.service]
   const filteredVehicles = allowedTypes
@@ -169,7 +191,7 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
             <X size={18} />
           </button>
 
-          {bookingState === 'INITIAL' ? (
+          {bookingState === 'INITIAL' || bookingState === 'PERSONA' ? (
             <>
               {/* LEFT COLUMN: Address Details & (if logged in) Fare Breakdown */}
               <div className="w-full md:w-1/2 p-6 sm:p-8 md:p-10 border-b md:border-b-0 md:border-r border-slate-200 overflow-y-auto custom-scrollbar">
@@ -250,7 +272,13 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
 
               {/* RIGHT COLUMN: Select Vehicle */}
               <div className="w-full md:w-1/2 bg-slate-50/50 flex flex-col max-h-[90vh]">
-                {estimateData.service === "packers" ? (
+                {bookingState === "PERSONA" ? (
+                  <BookingPersonaStep
+                    isLoading={bookingLoading}
+                    onConfirm={handleConfirmPersonaBooking}
+                    onCancel={() => setBookingState("INITIAL")}
+                  />
+                ) : estimateData.service === "packers" ? (
                   <div className="flex-grow flex flex-col justify-center p-6 sm:p-8 text-center items-center h-full">
                     <div className="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
                       <Package size={36} className="text-brand-600" />
@@ -582,6 +610,7 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
               helperCount: goods.laborRequired ? goods.laborersCount : undefined,
             })
             setLiveEstimate(estimate)
+            setBookingState("PERSONA")
           } catch (error) {
             setBookingError(error.message || "Could not update the estimate.")
           } finally {

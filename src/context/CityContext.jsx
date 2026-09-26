@@ -78,13 +78,13 @@ export function resolveCityConfig(rawCityName, rawStateName) {
   if (!rawCityName) return null;
   const clean = rawCityName.trim().toLowerCase();
 
-  // Try exact slug or name match
   const matched = SEO_CITIES.find(
     (c) =>
       c.name.toLowerCase() === clean ||
       c.slug.toLowerCase() === clean ||
       c.name.toLowerCase().includes(clean) ||
-      clean.includes(c.name.toLowerCase())
+      clean.includes(c.name.toLowerCase()) ||
+      (c.aliases && c.aliases.some((a) => a.toLowerCase() === clean))
   );
 
   if (matched) {

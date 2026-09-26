@@ -129,7 +129,7 @@ export default function TruckHero({ city, setCity }) {
             <span className="text-brand-200 font-bold text-sm tracking-wide">Only 5% Commission — No Broker Margin</span>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-white tracking-tight leading-tight max-w-4xl drop-shadow-xl">
-            Online Mini Truck Booking in {city}
+            Online Truck Booking in {city}
           </h1>
           <p className="mt-6 text-lg md:text-xl text-slate-200 font-medium leading-relaxed max-w-3xl drop-shadow-md">
             Enter the route and goods details, review the current estimate, and confirm a request. Vehicle assignment and timing depend on serviceability and partner availability.

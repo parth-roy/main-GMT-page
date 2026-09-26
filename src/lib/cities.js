@@ -2445,9 +2445,10 @@ export const SEO_CITIES = [
     "state": "West Bengal"
   },
   {
-    "name": "Barrackpur",
+    "name": "Barrackpore (Barrackpur)",
     "slug": "barrackpur",
-    "state": "West Bengal"
+    "state": "West Bengal",
+    "aliases": ["barrackpore", "barrackpur"]
   },
   {
     "name": "Santipur",
@@ -2477,7 +2478,8 @@ export const SEO_CITIES = [
   {
     "name": "North Barrackpur",
     "slug": "north-barrackpur",
-    "state": "West Bengal"
+    "state": "West Bengal",
+    "aliases": ["north barrackpore", "north barrackpur", "barrackpore", "barrackpur"]
   },
   {
     "name": "Raniganj",

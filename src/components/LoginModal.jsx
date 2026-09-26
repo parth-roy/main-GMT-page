@@ -12,8 +12,14 @@ const ROLES = [
   { id: 'BUSINESS', label: '🏢 B2B Business' },
 ];
 
+const BOOKING_ROLES = [
+  { id: 'CUSTOMER', label: '🚚 Individual Customer' },
+  { id: 'BUSINESS', label: '🏢 Enterprise Owner' },
+  { id: 'CONTRACTUAL', label: '📋 Contractual Basis' },
+];
+
 export default function LoginModal() {
-  const { isLoginModalOpen, closeLoginModal, login, user, logout, loginRole } = useAuth()
+  const { isLoginModalOpen, closeLoginModal, login, user, logout, loginRole, bookingIntent } = useAuth()
   const navigate = useNavigate()
 
   const [step, setStep] = useState(1) // 1: Login, 2: OTP
@@ -133,8 +139,8 @@ export default function LoginModal() {
         await login(token, userData)
         closeLoginModal()
         
-        // Auto-redirect to dedicated GMT Agent portal if logged in as agent
-        if (isAgent) {
+        // Auto-redirect to agent portal ONLY if NOT in booking flow
+        if (isAgent && !bookingIntent) {
           navigate('/agent/loads')
         }
       } else {
@@ -150,7 +156,7 @@ export default function LoginModal() {
   // ALL hooks are declared unconditionally above!
   if (!isLoginModalOpen) return null
 
-  const isAgentModal = registrationFor === 'MIDDLEMAN'
+  const isAgentModal = !bookingIntent && registrationFor === 'MIDDLEMAN'
 
   return (
     <div className="fixed inset-0 z-[350] flex items-center justify-center p-4 sm:p-6 md:p-10">
@@ -228,7 +234,7 @@ export default function LoginModal() {
               <p className="text-xl font-medium text-green-600 mb-6">{user.name || "Customer"}</p>
               
               <div className="flex flex-col gap-3 w-full max-w-sm">
-                {(user.role === 'MIDDLEMAN' || registrationFor === 'MIDDLEMAN') && (
+                {!bookingIntent && (user.role === 'MIDDLEMAN' || registrationFor === 'MIDDLEMAN') && (
                   <button 
                     onClick={() => {
                       closeLoginModal()
@@ -237,6 +243,14 @@ export default function LoginModal() {
                     className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-emerald-600/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <span>Go to Agent Dashboard</span>
+                  </button>
+                )}
+                {bookingIntent && (
+                  <button 
+                    onClick={closeLoginModal}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-blue-600/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <span>Continue Booking Flow</span>
                   </button>
                 )}
                 <div className="flex gap-4 w-full">
@@ -312,7 +326,7 @@ export default function LoginModal() {
                     <div>
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">I am a...</label>
                       <div className="flex flex-wrap gap-2">
-                        {ROLES.map(role => (
+                        {(bookingIntent ? BOOKING_ROLES : ROLES).map(role => (
                           <button
                             key={role.id}
                             type="button"

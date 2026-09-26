@@ -198,12 +198,12 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
     const q = searchQuery.trim().toLowerCase();
 
     return ALL_LOCATIONS.filter((item) => {
-      // Search matching across name, state, and slug
       const matchesSearch = !q || (
         item.name.toLowerCase().includes(q) ||
         (item.state && item.state.toLowerCase().includes(q)) ||
         item.slug.includes(q) ||
-        (item.tag && item.tag.toLowerCase().includes(q))
+        (item.tag && item.tag.toLowerCase().includes(q)) ||
+        (item.aliases && item.aliases.some((a) => a.toLowerCase().includes(q)))
       );
 
       if (!matchesSearch) return false;

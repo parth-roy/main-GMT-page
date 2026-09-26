@@ -28,11 +28,43 @@ const BUDGET_FILTER_OPTIONS = [
   { value: 'ABOVE_35K', label: '₹35,000+' },
 ];
 
+const INDIAN_STATES_SET = new Set([
+  'andhra pradesh', 'arunachal pradesh', 'assam', 'bihar', 'chhattisgarh',
+  'goa', 'gujarat', 'haryana', 'himachal pradesh', 'jharkhand', 'karnataka',
+  'kerala', 'madhya pradesh', 'maharashtra', 'manipur', 'meghalaya', 'mizoram',
+  'nagaland', 'odisha', 'orissa', 'punjab', 'rajasthan', 'sikkim', 'tamil nadu',
+  'telangana', 'tripura', 'uttar pradesh', 'uttarakhand', 'uttaranchal', 'west bengal',
+  'delhi', 'new delhi', 'chandigarh', 'puducherry', 'pondicherry'
+]);
+
+function formatCityDisplay(cityName, address) {
+  if (cityName && !INDIAN_STATES_SET.has(cityName.toLowerCase().trim()) && cityName.toLowerCase().trim() !== 'india') {
+    return cityName;
+  }
+  if (!address) return cityName || 'India';
+  const parts = address.split(',').map((p) => p.trim()).filter(Boolean);
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const raw = parts[i];
+    const cleaned = raw.replace(/\b\d{6}\b/g, '').replace(/[\d-]/g, '').trim();
+    const lower = cleaned.toLowerCase();
+    if (!lower || lower === 'india' || INDIAN_STATES_SET.has(lower)) continue;
+    if (cleaned.length >= 2 && cleaned.length <= 40) return cleaned;
+  }
+  const fallback = parts[0]?.replace(/\b\d{6}\b/g, '').trim();
+  return fallback || cityName || 'India';
+}
+
 export default function AgentLoadsPage() {
   const [loads, setLoads] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Filtration State
   const [filterMode, setFilterMode] = useState('city'); // 'city' | 'all'
@@ -81,6 +113,15 @@ export default function AgentLoadsPage() {
       }
     };
   }, []);
+
+  // Active loads filtered by SLA countdown (expired loads disappear from agent view)
+  const visibleLoads = useMemo(() => {
+    return loads.filter(load => {
+      if (!load.slaExpiresAt) return true;
+      const expiry = new Date(load.slaExpiresAt).getTime();
+      return expiry > currentTime;
+    });
+  }, [loads, currentTime]);
 
   // Fetch Loads with Robust Filters
   const fetchLoads = useCallback(async (showRefreshing = false) => {
@@ -418,7 +459,7 @@ export default function AgentLoadsPage() {
               )}
             </span>
             <span className="text-slate-300">•</span>
-            <span className="font-bold text-emerald-700">{loads.length} loads available</span>
+            <span className="font-bold text-emerald-700">{visibleLoads.length} loads available</span>
           </div>
 
           {activeFiltersCount > 0 && (
@@ -475,7 +516,7 @@ export default function AgentLoadsPage() {
             Try Again
           </button>
         </div>
-      ) : loads.length === 0 ? (
+      ) : visibleLoads.length === 0 ? (
         /* Empty State */
         <div className="bg-white py-16 px-6 text-center rounded-3xl shadow-xs border border-slate-200 max-w-lg mx-auto space-y-5">
           <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto border border-emerald-100">
@@ -528,12 +569,12 @@ export default function AgentLoadsPage() {
         /* Loads Grid */
         <div>
           <div className="flex justify-between items-center text-xs font-semibold text-slate-500 mb-3 px-1">
-            <span>Showing {loads.length} requirements available for sourcing</span>
+            <span>Showing {visibleLoads.length} requirements available for sourcing</span>
             <span className="hidden sm:inline-block">25% Advance Protected • Fraud-Free OTP Loading</span>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {loads.map(load => {
+            {visibleLoads.map(load => {
               const formattedBudget = load.customerBudget
                 ? `₹${Number(load.customerBudget).toLocaleString('en-IN')}`
                 : 'Market Rate';
@@ -548,22 +589,62 @@ export default function AgentLoadsPage() {
                   className="bg-white rounded-3xl shadow-xs border border-slate-200/90 overflow-hidden hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between"
                 >
                   <div className="p-5 space-y-4">
-                    {/* Header: Vehicle & Status Badge */}
-                    <div className="flex justify-between items-start">
-                      <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-xl">
-                        <Truck size={14} className="text-emerald-600" />
-                        <span>{vehicleLabel}</span>
+                    {/* Header: Vehicle, Persona & Status/Timer Badge */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between items-start">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-xl">
+                            <Truck size={14} className="text-emerald-600" />
+                            <span>{vehicleLabel}</span>
+                          </div>
+
+                          {/* Persona Badge */}
+                          {load.bookingPersona === "ENTERPRISE" && (
+                            <span className="text-[10px] font-black text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                              🏢 Enterprise {load.truckCount > 1 ? `(${load.truckCount} Trucks)` : ""}
+                            </span>
+                          )}
+                          {load.bookingPersona === "CONTRACTUAL" && (
+                            <span className="text-[10px] font-black text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                              📋 Contractual
+                            </span>
+                          )}
+                        </div>
+                        
+                        {load.isUrgent ? (
+                          <span className="text-[11px] font-black text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                            <Clock size={11} className="text-rose-600 animate-pulse" /> URGENT LOAD
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                            {load.sourceBookingId ? "DIRECT BOOKING" : "OPEN LOAD"}
+                          </span>
+                        )}
                       </div>
-                      
-                      {load.isUrgent ? (
-                        <span className="text-[11px] font-black text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                          <Clock size={11} className="text-rose-600 animate-pulse" /> URGENT LOAD
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
-                          {load.sourceBookingId ? 'DIRECT BOOKING' : 'OPEN LOAD'}
-                        </span>
-                      )}
+
+                      {/* SLA Live Running Countdown Timer */}
+                      {load.slaExpiresAt && (() => {
+                        const remaining = Math.max(0, new Date(load.slaExpiresAt).getTime() - currentTime);
+                        const hours = Math.floor(remaining / 3600000);
+                        const mins = Math.floor((remaining % 3600000) / 60000);
+                        const secs = Math.floor((remaining % 60000) / 1000);
+                        const timeStr = `${hours > 0 ? `${hours}h ` : ""}${String(mins).padStart(2, "0")}m ${String(secs).padStart(2, "0")}s left`;
+                        return (
+                          <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-amber-300/80 shadow-xs">
+                            <div className="flex items-center gap-1.5 text-xs font-black text-amber-800">
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                              </span>
+                              <Clock size={12} className="text-amber-600" />
+                              <span className="tracking-tight">SLA Timer:</span>
+                            </div>
+                            <span className="font-mono text-xs font-black text-amber-900 bg-white/80 px-2 py-0.5 rounded-md border border-amber-200">
+                              ⏱️ {timeStr}
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     {/* Route: Pickup & Drop */}
@@ -572,8 +653,8 @@ export default function AgentLoadsPage() {
                         <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 mt-1 shrink-0 shadow-xs" />
                         <div className="min-w-0 flex-1">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pickup</p>
-                          <p className="font-bold text-slate-900 text-sm truncate" title={load.pickupCity}>
-                            {load.pickupCity}
+                          <p className="font-bold text-slate-900 text-sm truncate" title={formatCityDisplay(load.pickupCity, load.pickupAddress)}>
+                            {formatCityDisplay(load.pickupCity, load.pickupAddress)}
                           </p>
                           <p className="text-[11px] text-slate-500 truncate" title={load.pickupAddress}>
                             {load.pickupAddress}
@@ -585,8 +666,8 @@ export default function AgentLoadsPage() {
                         <div className="w-2.5 h-2.5 rounded-full bg-orange-500 mt-1 shrink-0 shadow-xs" />
                         <div className="min-w-0 flex-1">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Destination</p>
-                          <p className="font-bold text-slate-900 text-sm truncate" title={load.dropCity}>
-                            {load.dropCity}
+                          <p className="font-bold text-slate-900 text-sm truncate" title={formatCityDisplay(load.dropCity, load.dropAddress)}>
+                            {formatCityDisplay(load.dropCity, load.dropAddress)}
                           </p>
                           <p className="text-[11px] text-slate-500 truncate" title={load.dropAddress}>
                             {load.dropAddress}

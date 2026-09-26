@@ -21,6 +21,7 @@ export function AuthProvider({ children }) {
   const [authCallback, setAuthCallback] = useState(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginRole, setLoginRole] = useState('CUSTOMER');
+  const [bookingIntent, setBookingIntent] = useState(false);
 
   const fetchUser = useCallback(async (token) => {
     try {
@@ -166,8 +167,9 @@ export function AuthProvider({ children }) {
    * If logged in, fires callback immediately.
    * If not logged in, opens the login modal and fires callback upon success.
    */
-  const openLoginModal = (role = 'CUSTOMER') => {
+  const openLoginModal = (role = 'CUSTOMER', isForBooking = false) => {
     setLoginRole(role);
+    setBookingIntent(isForBooking);
     setIsLoginModalOpen(true);
   };
 
@@ -199,11 +201,12 @@ export function AuthProvider({ children }) {
   const closeLoginModal = () => {
     setIsLoginModalOpen(false);
     setLoginRole('CUSTOMER');
+    setBookingIntent(false);
     setAuthCallback(null); // Clear pending action on cancel
   };
 
   return (
-    <AuthContext.Provider value={{ user, accessToken, login, logout, requireAuth, isLoginModalOpen, setIsLoginModalOpen, closeLoginModal, loginRole, setLoginRole, openLoginModal }}>
+    <AuthContext.Provider value={{ user, accessToken, login, logout, requireAuth, isLoginModalOpen, setIsLoginModalOpen, closeLoginModal, loginRole, setLoginRole, openLoginModal, bookingIntent, setBookingIntent }}>
       {children}
     </AuthContext.Provider>
   );
