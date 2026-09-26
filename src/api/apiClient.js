@@ -14,9 +14,15 @@ export const apiClient = async (endpoint, options = {}) => {
   const token = (getAuthToken && getAuthToken()) || (typeof window !== 'undefined' ? localStorage.getItem('vahan_access_token') : null);
 
   const headers = {
-    "Content-Type": "application/json",
     ...options.headers,
   };
+
+  // Only default to application/json if body is not FormData and Content-Type not explicitly provided
+  if (typeof FormData !== 'undefined' && options.body instanceof FormData) {
+    delete headers["Content-Type"];
+  } else if (!headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
