@@ -23,10 +23,10 @@ export default function SupportPage() {
     {
       icon: Mail,
       title: 'Email Support',
-      detail: 'hello@parthertech.com',
+      detail: 'admin@gomytruck.com',
       sub: 'Response time varies with enquiry volume',
       color: 'bg-emerald-50 text-emerald-600',
-      action: 'mailto:hello@parthertech.com'
+      action: 'mailto:admin@gomytruck.com'
     },
     {
       icon: LifeBuoy,

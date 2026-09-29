@@ -194,7 +194,7 @@ export default function Footer({ onScrollToSection }) {
             <h4 className="text-gray-300 font-bold text-xs mb-3">Registered Office:</h4>
             <p>© 2026 Parther Technologies Private Limited (GoMyTruck)</p>
             <p>Chiriyamore, Barrackpore, North 24 Parganas, West Bengal, 700120, India</p>
-            <p className="mt-3 text-gray-400 font-medium">Email: <a href="mailto:hello@parthertech.com" className="hover:text-gray-300 transition-colors">hello@parthertech.com</a></p>
+            <p className="mt-3 text-gray-400 font-medium">Email: <a href="mailto:admin@gomytruck.com" className="hover:text-gray-300 transition-colors">admin@gomytruck.com</a></p>
             <p className="mt-2 text-gray-600">
               GoMyTruck connects customers with independent logistics partners. Coverage, assignment, price and service scope are confirmed for each booking.
             </p>

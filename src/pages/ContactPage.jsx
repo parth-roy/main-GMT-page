@@ -18,7 +18,7 @@ const localBusinessSchema = {
   '@type': 'LocalBusiness',
   name: 'GoMyTruck',
   telephone: '+916291957542',
-  email: 'hello@parthertech.com',
+  email: 'admin@gomytruck.com',
   url: 'https://gomytruck.com',
   address: {
     '@type': 'PostalAddress',
@@ -245,13 +245,13 @@ export default function ContactPage() {
                   </p>
                 </div>
                 <a
-                  href="mailto:hello@parthertech.com"
+                  href="mailto:admin@gomytruck.com"
                   className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 px-6 text-base shadow-md shadow-slate-800/30 hover:shadow-slate-800/50 transition-all duration-200 group-hover:scale-[1.02]"
                 >
                   <Mail size={20} />
                   Email Us
                 </a>
-                <p className="text-xs text-slate-400">hello@parthertech.com</p>
+                <p className="text-xs text-slate-400">admin@gomytruck.com</p>
               </div>
             </div>
           </div>
@@ -321,8 +321,8 @@ export default function ContactPage() {
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Email</p>
-                <a href="mailto:hello@parthertech.com" className="text-white font-semibold hover:text-brand-300 transition-colors text-sm">
-                  hello@parthertech.com
+                <a href="mailto:admin@gomytruck.com" className="text-white font-semibold hover:text-brand-300 transition-colors text-sm">
+                  admin@gomytruck.com
                 </a>
               </div>
             </div>

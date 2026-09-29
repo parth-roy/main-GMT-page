@@ -21,7 +21,7 @@ const jsonLd = [
       name: 'GoMyTruck',
       url: 'https://gomytruck.com',
       telephone: '+916291957542',
-      email: 'hello@parthertech.com',
+      email: 'admin@gomytruck.com',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Chiriyamore, Barrackpore',

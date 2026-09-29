@@ -106,7 +106,7 @@ export default function LocalTransportPage() {
       '@type': 'Organization',
       name: 'GoMyTruck – GoMyTruck',
       telephone: '+916291957542',
-      email: 'hello@parthertech.com',
+      email: 'admin@gomytruck.com',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Chiriyamore, Barrackpore',
