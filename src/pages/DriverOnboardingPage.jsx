@@ -212,10 +212,17 @@ export default function DriverOnboardingPage() {
       return;
     }
 
-    // Form inputs verified - open ₹99 payment modal
+    /*
+    // Form inputs verified - open ₹99 payment modal (Temporarily commented out)
     setIsPaymentModalOpen(true);
+    */
+
+    // Direct onboarding without payment
+    submitOnboardingDirectly();
   };
 
+  /*
+  // ── PAYMENT FUNCTIONALITIES (TEMPORARILY COMMENTED OUT) ──
   // 1. Razorpay Live Checkout (₹99)
   const handlePayWithRazorpay = async () => {
     setPaymentError("");
@@ -339,6 +346,93 @@ export default function DriverOnboardingPage() {
     try {
       const data = new FormData();
 
+      const resolvedCity = formData.city || givenLocation?.district || givenLocation?.address || "";
+      const resolvedState = formData.state || givenLocation?.state || "";
+
+      const locationKeys = new Set([
+        "city", "state",
+        "givenAddress", "givenStreet", "givenDistrict", "givenState", "givenPincode", "givenLat", "givenLng",
+        "autoAddress", "autoStreet", "autoDistrict", "autoState", "autoPincode", "autoLat", "autoLng"
+      ]);
+
+      Object.keys(formData).forEach((key) => {
+        if (!locationKeys.has(key) && formData[key] !== null && formData[key] !== undefined) {
+          data.set(key, String(formData[key]));
+        }
+      });
+
+      data.set("city", resolvedCity);
+      data.set("state", resolvedState);
+
+      if (givenLocation) {
+        if (givenLocation.address) data.set("givenAddress", givenLocation.address);
+        if (givenLocation.street) data.set("givenStreet", givenLocation.street);
+        if (givenLocation.district) data.set("givenDistrict", givenLocation.district);
+        if (givenLocation.state) data.set("givenState", givenLocation.state);
+        if (givenLocation.pincode) data.set("givenPincode", givenLocation.pincode);
+        if (givenLocation.lat) data.set("givenLat", String(givenLocation.lat));
+        if (givenLocation.lng) data.set("givenLng", String(givenLocation.lng));
+      }
+
+      if (autoLocation) {
+        if (autoLocation.address) data.set("autoAddress", autoLocation.address);
+        if (autoLocation.street) data.set("autoStreet", autoLocation.street);
+        if (autoLocation.district) data.set("autoDistrict", autoLocation.district);
+        if (autoLocation.state) data.set("autoState", autoLocation.state);
+        if (autoLocation.pincode) data.set("autoPincode", autoLocation.pincode);
+        if (autoLocation.lat) data.set("autoLat", String(autoLocation.lat));
+        if (autoLocation.lng) data.set("autoLng", String(autoLocation.lng));
+      }
+
+      Object.keys(files).forEach((key) => {
+        if (files[key]) {
+          data.set(key, files[key]);
+        }
+      });
+
+      Object.keys(paymentDetails).forEach((key) => {
+        if (paymentDetails[key] !== undefined && paymentDetails[key] !== null) {
+          data.set(key, String(paymentDetails[key]));
+        }
+      });
+
+      const API_BASE =
+        import.meta.env.VITE_API_URL || "https://api.gomytruck.com/api/v1";
+      const response = await fetch(
+        `${API_BASE}/form-driver-leads/onboard-with-payment`,
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+
+      const json = await response.json();
+      if (!response.ok || !json.success) {
+        throw new Error(
+          json.message || "Failed to submit registration. Please try again."
+        );
+      }
+
+      setIsPaymentModalOpen(false);
+      setSuccessData(json.data);
+      setStatus("success");
+    } catch (error) {
+      console.error("Submission Error:", error);
+      setPaymentError(error.message || "An unexpected error occurred.");
+    } finally {
+      setIsPaying(false);
+    }
+  };
+  */
+
+  // Submits onboarding payload directly without payment
+  const submitOnboardingDirectly = async () => {
+    setStatus("submitting");
+    setErrorMessage("");
+
+    try {
+      const data = new FormData();
+
       // Resolve city and state cleanly
       const resolvedCity = formData.city || givenLocation?.district || givenLocation?.address || "";
       const resolvedState = formData.state || givenLocation?.state || "";
@@ -389,17 +483,10 @@ export default function DriverOnboardingPage() {
         }
       });
 
-      // Append payment details
-      Object.keys(paymentDetails).forEach((key) => {
-        if (paymentDetails[key] !== undefined && paymentDetails[key] !== null) {
-          data.set(key, String(paymentDetails[key]));
-        }
-      });
-
       const API_BASE =
         import.meta.env.VITE_API_URL || "https://api.gomytruck.com/api/v1";
       const response = await fetch(
-        `${API_BASE}/form-driver-leads/onboard-with-payment`,
+        `${API_BASE}/form-driver-leads`,
         {
           method: "POST",
           body: data,
@@ -413,14 +500,13 @@ export default function DriverOnboardingPage() {
         );
       }
 
-      setIsPaymentModalOpen(false);
       setSuccessData(json.data);
       setStatus("success");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       console.error("Submission Error:", error);
-      setPaymentError(error.message || "An unexpected error occurred.");
-    } finally {
-      setIsPaying(false);
+      setErrorMessage(error.message || "An unexpected error occurred.");
+      setStatus("error");
     }
   };
 
@@ -450,18 +536,29 @@ export default function DriverOnboardingPage() {
             <CheckCircle className="w-10 h-10" />
           </div>
 
+          {/*
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black uppercase tracking-wider mb-2">
             <Crown className="w-3.5 h-3.5 text-amber-500" />
             <span>Registration & Payment Verified</span>
+          </div>
+          */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black uppercase tracking-wider mb-2">
+            <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Registration Submitted Successfully</span>
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">
             Welcome to GoMyTruck! 🚚
           </h2>
 
+          {/*
           <p className="text-sm text-slate-600 mb-6">
             Congratulations <strong>{formData.name}</strong>! Your driver profile
             and ₹99 onboarding payment are verified.
+          </p>
+          */}
+          <p className="text-sm text-slate-600 mb-6">
+            Congratulations <strong>{formData.name}</strong>! Your driver profile registration has been submitted successfully.
           </p>
 
           {/* Active 90-Day Premium Membership Box */}
@@ -547,6 +644,7 @@ export default function DriverOnboardingPage() {
                 />
                 <span>90-Day Verified Premium Driver Membership</span>
               </div>
+              {/*
               <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
                 One-Time Onboarding Fee:{" "}
                 <span className="underline decoration-yellow-300 underline-offset-4 font-extrabold">
@@ -557,6 +655,15 @@ export default function DriverOnboardingPage() {
                 Pay ₹99 to activate your <strong>90-Day Premium Membership</strong>.
                 Get priority commercial loads dispatched in your registered operating
                 hub with <strong>0% broker deductions</strong> for 90 days!
+              </p>
+              */}
+              <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
+                Free Driver Onboarding &amp; Verification
+              </h2>
+              <p className="text-xs sm:text-sm text-amber-100 font-medium leading-relaxed max-w-xl">
+                Join India's verified truck network with <strong>Free Onboarding</strong>.
+                Get priority commercial loads dispatched in your registered operating
+                hub with <strong>0% broker deductions</strong>!
               </p>
             </div>
 
@@ -699,33 +806,41 @@ export default function DriverOnboardingPage() {
                   : "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 shadow-amber-300/80"
               }`}
             >
-              {status === "submitting" || isPaying ? (
+              {status === "submitting" ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
                   <span>Processing Registration...</span>
                 </>
               ) : (
                 <>
+                  {/*
                   <Zap className="w-5 h-5 fill-current animate-bounce shrink-0" />
                   <span>Proceed to Verification & ₹99 Onboarding Payment</span>
+                  <ArrowRight className="w-5 h-5 shrink-0" />
+                  */}
+                  <CheckCircle className="w-5 h-5 shrink-0" />
+                  <span>Submit Driver Registration</span>
                   <ArrowRight className="w-5 h-5 shrink-0" />
                 </>
               )}
             </button>
+            {/*
             <p className="text-center text-xs text-slate-500 mt-2.5 flex items-center justify-center gap-1.5 font-medium">
               <Lock className="w-3.5 h-3.5 text-emerald-600" />
               <span>One-time ₹99 onboarding fee · Includes 90-Day Verified Premium Driver Membership</span>
             </p>
+            */}
           </div>
         </form>
       </div>
     </div>
 
-      {/* ── DUAL PAYMENT MODAL (RAZORPAY LIVE + STATIC ₹99 UPI QR) ── */}
+      {/* ── DUAL PAYMENT MODAL (TEMPORARILY COMMENTED OUT FOR FREE ONBOARDING) ──
+// ── DUAL PAYMENT MODAL (RAZORPAY LIVE + STATIC ₹99 UPI QR) ──
       {isPaymentModalOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/85 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
           <div className="relative w-full max-w-md sm:max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col animate-in zoom-in-95 duration-200">
-            {/* Header */}
+            // Header
             <div className="pt-6 px-6 pb-4 border-b border-slate-100 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 text-left relative">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-black tracking-wide uppercase text-amber-900 bg-amber-200/80 px-3 py-1 rounded-full mb-1.5 shadow-2xs">
                 <Crown className="w-3.5 h-3.5 text-amber-700" />
@@ -750,7 +865,7 @@ export default function DriverOnboardingPage() {
               </button>
             </div>
 
-            {/* Payment Method Tabs */}
+            // Payment Method Tabs
             <div className="grid grid-cols-2 p-2 bg-slate-100/90 border-b border-slate-200 text-xs font-black">
               <button
                 type="button"
@@ -785,9 +900,9 @@ export default function DriverOnboardingPage() {
               </button>
             </div>
 
-            {/* Modal Body */}
+            // Modal Body
             <div className="p-5 sm:p-6 overflow-y-auto space-y-4 max-h-[75vh] custom-scrollbar text-left">
-              {/* Membership Benefits Breakdown Card */}
+              // Membership Benefits Breakdown Card
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
                 <div className="flex justify-between items-center text-slate-900 font-black text-sm">
                   <span>90-Day Premium Driver Membership</span>
@@ -809,7 +924,7 @@ export default function DriverOnboardingPage() {
                 </div>
               </div>
 
-              {/* Error Message */}
+              // Error Message
               {paymentError && (
                 <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2 animate-in fade-in">
                   <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
@@ -817,7 +932,7 @@ export default function DriverOnboardingPage() {
                 </div>
               )}
 
-              {/* TAB 1: RAZORPAY LIVE CHECKOUT */}
+              // TAB 1: RAZORPAY LIVE CHECKOUT
               {paymentTab === "RAZORPAY" && (
                 <div className="space-y-4 pt-1">
                   <div className="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200 text-xs text-amber-900 space-y-1">
@@ -850,7 +965,7 @@ export default function DriverOnboardingPage() {
                 </div>
               )}
 
-              {/* TAB 2: STATIC UPI QR CODE */}
+              // TAB 2: STATIC UPI QR CODE
               {paymentTab === "QR" && (
                 <div className="space-y-4 pt-1">
                   <div className="text-center">
@@ -858,7 +973,7 @@ export default function DriverOnboardingPage() {
                       Scan with any UPI App (GPay, PhonePe, Paytm, BHIM)
                     </p>
 
-                    {/* QR Code Container */}
+                    // QR Code Container
                     <div className="w-48 h-48 mx-auto p-2 bg-white rounded-2xl border-2 border-dashed border-slate-300 shadow-inner flex items-center justify-center">
                       {qrCodeUrl ? (
                         <img
@@ -874,7 +989,7 @@ export default function DriverOnboardingPage() {
                       )}
                     </div>
 
-                    {/* UPI ID Pill & Copy Button */}
+                    // UPI ID Pill & Copy Button
                     <div className="mt-3 inline-flex items-center gap-2 bg-slate-100 border border-slate-300 rounded-full px-3 py-1 text-xs">
                       <span className="text-slate-500 font-semibold">UPI ID:</span>
                       <span className="font-mono font-bold text-slate-900">rzppay@icici</span>
@@ -893,7 +1008,7 @@ export default function DriverOnboardingPage() {
                     </div>
                   </div>
 
-                  {/* UTR Input Form */}
+                  // UTR Input Form
                   <form onSubmit={handleConfirmUtrPayment} className="space-y-3 pt-2 border-t border-slate-200">
                     <div>
                       <label className="block text-xs font-bold text-slate-800 mb-1">
@@ -935,7 +1050,7 @@ export default function DriverOnboardingPage() {
                 </div>
               )}
 
-              {/* Security Badge */}
+              // Security Badge
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
                 <span className="flex items-center gap-1.5 font-medium">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
@@ -947,6 +1062,7 @@ export default function DriverOnboardingPage() {
           </div>
         </div>
       )}
+      ── END DUAL PAYMENT MODAL ── */}
     </>
   );
 }
