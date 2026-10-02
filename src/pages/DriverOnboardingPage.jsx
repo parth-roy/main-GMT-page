@@ -7,7 +7,6 @@ import {
   CheckCircle,
   Crown,
   CreditCard,
-  QrCode,
   Copy,
   Check,
   AlertCircle,

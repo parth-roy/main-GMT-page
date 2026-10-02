@@ -512,17 +512,17 @@ export default function AgentPostPage() {
             </p>
           </div>
 
-          {/* Agent Bounty Card */}
+          {/* Agent Commission Card */}
           <div className="shrink-0 self-center bg-gradient-to-b from-emerald-50 via-emerald-50/80 to-emerald-100/60 border border-emerald-300 rounded-2xl p-4 sm:px-6 sm:py-4 text-center shadow-xs flex flex-col items-center justify-center min-w-[150px] sm:min-w-[170px]">
             <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100/90 text-emerald-800 border border-emerald-200/80 mb-1">
               <Zap size={11} className="text-emerald-700 fill-emerald-600" />
-              <span>Agent Bounty</span>
+              <span>Agent Commission</span>
             </div>
-            <div className="text-3xl sm:text-4xl font-black text-emerald-900 tracking-tight font-sans my-0.5">
-              ₹100
+            <div className="text-2xl sm:text-3xl font-black text-emerald-900 tracking-tight font-sans my-0.5">
+              Up to 1–5%
             </div>
             <span className="text-[11px] font-semibold text-emerald-700 whitespace-nowrap">
-              Credited upon loading
+              On trip completion
             </span>
           </div>
         </div>

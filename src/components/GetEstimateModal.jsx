@@ -1,7 +1,9 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { X, ArrowRight, Truck, Bike, Package, ChevronDown, Loader2, AlertCircle, Shield, CheckCircle } from "lucide-react"
 import { geocodeAddress, fetchEstimate, fetchVehicles, SERVICE_TO_VEHICLE_TYPE } from "../api/pricingApi"
 import { trackEstimateRequested, trackLead } from "../utils/analytics"
+import { lockScroll, unlockScroll } from "../utils/scrollLock"
 import EstimateResultModal from "./EstimateResultModal"
 import AddressAutocomplete from "./AddressAutocomplete"
 
@@ -19,6 +21,19 @@ const SERVICES = [
 export default function GetEstimateModal({ isOpen, onClose, onSelectService }) {
   const [step, setStep] = useState(1)
   const [selectedService, setSelectedService] = useState(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      lockScroll()
+    } else {
+      unlockScroll()
+    }
+    return () => {
+      if (isOpen) {
+        unlockScroll()
+      }
+    }
+  }, [isOpen])
 
   // Form fields for step 2
   const [pickup, setPickup] = useState("")
@@ -119,9 +134,9 @@ export default function GetEstimateModal({ isOpen, onClose, onSelectService }) {
     setError("")
   }
 
-  if (!isOpen) return null
+  if (!isOpen || typeof document === "undefined") return null
 
-  return (
+  return createPortal(
     <>
       {/* Estimate full detail modal (shown after submit) */}
       {showEstimate && estimateResult && (
@@ -133,7 +148,7 @@ export default function GetEstimateModal({ isOpen, onClose, onSelectService }) {
       )}
 
       {/* Service selection / form modal */}
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto" data-modal-portal="true">
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={onClose}></div>
 
         <div className="relative bg-white rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden z-10 flex flex-col md:flex-row min-h-[580px] md:min-h-[550px]">
@@ -303,6 +318,7 @@ export default function GetEstimateModal({ isOpen, onClose, onSelectService }) {
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   )
 }

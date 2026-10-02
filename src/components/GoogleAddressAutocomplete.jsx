@@ -6,7 +6,7 @@ import { trackBeginBooking } from "../utils/analytics"
 const GOOGLE_MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY || 'AIzaSyDd_ernLIpHcBlFmVf-x4n3l8mtjjOL90c';
 let googleMapsScriptPromise = null;
 
-function getGoogleMaps() {
+export function getGoogleMaps() {
   if (window.google && window.google.maps) {
     return Promise.resolve(window.google.maps);
   }
@@ -24,17 +24,39 @@ function getGoogleMaps() {
   return googleMapsScriptPromise;
 }
 
+// Module-level in-memory caches to save Google Maps API billing costs
+const predictionCache = new Map();
+const placeDetailsCache = new Map();
+const geocodingCache = new Map();
+
+function setBoundedCache(cache, key, value, limit = 150) {
+  if (cache.size >= limit) {
+    const firstKey = cache.keys().next().value;
+    cache.delete(firstKey);
+  }
+  cache.set(key, value);
+}
+
 export async function geocodeGoogleAddress(address) {
+  const normKey = (address || "").trim().toLowerCase();
+  if (!normKey) throw new Error("Empty address provided for geocoding.");
+  
+  if (geocodingCache.has(normKey)) {
+    return geocodingCache.get(normKey);
+  }
+
   const maps = await getGoogleMaps();
   const geocoder = new maps.Geocoder();
 
   return new Promise((resolve, reject) => {
     geocoder.geocode({ address: address, componentRestrictions: { country: "in" } }, (results, status) => {
       if (status === "OK" && results[0]) {
-        resolve({
+        const coords = {
           lat: results[0].geometry.location.lat(),
           lng: results[0].geometry.location.lng()
-        });
+        };
+        setBoundedCache(geocodingCache, normKey, coords);
+        resolve(coords);
       } else {
         reject(new Error(`Could not locate address: "${address}"`));
       }
@@ -79,15 +101,28 @@ export default function GoogleAddressAutocomplete({
       clearTimeout(debounceRef.current)
     }
 
-    if (!val.trim()) {
+    const trimmed = val.trim();
+    // Do not call API for empty or short queries (< 3 chars) to avoid noisy & costly calls
+    if (trimmed.length < 3) {
       setPredictions([])
       setIsOpen(false)
+      setLoading(false)
       return
+    }
+
+    // Check in-memory prediction cache first
+    const cacheKey = trimmed.toLowerCase();
+    if (predictionCache.has(cacheKey)) {
+      setPredictions(predictionCache.get(cacheKey));
+      setIsOpen(true);
+      setLoading(false);
+      return;
     }
 
     setLoading(true)
     setIsOpen(true)
 
+    // 450ms debounce saves ~50% of intermediate keystroke requests
     debounceRef.current = setTimeout(async () => {
       try {
         const maps = await getGoogleMaps();
@@ -100,18 +135,20 @@ export default function GoogleAddressAutocomplete({
         
         service.getPlacePredictions(
           {
-            input: val,
+            input: trimmed,
             sessionToken: sessionTokenRef.current,
             componentRestrictions: { country: "in" },
           },
           (results, status) => {
             if (status === maps.places.PlacesServiceStatus.OK && results) {
-              setPredictions(results.map(p => ({
+              const mapped = results.map(p => ({
                 placeId: p.place_id,
                 description: p.description,
                 mainText: p.structured_formatting?.main_text || p.description,
                 secondaryText: p.structured_formatting?.secondary_text || ""
-              })));
+              }));
+              setBoundedCache(predictionCache, cacheKey, mapped);
+              setPredictions(mapped);
             } else {
               setPredictions([]);
             }
@@ -123,13 +160,21 @@ export default function GoogleAddressAutocomplete({
         setPredictions([])
         setLoading(false)
       }
-    }, 300)
+    }, 450)
   }
 
   const handleSelect = async (prediction) => {
     setQuery(prediction.description)
     setIsOpen(false)
     setPredictions([])
+
+    // Check place details cache first
+    if (placeDetailsCache.has(prediction.placeId)) {
+      const cached = placeDetailsCache.get(prediction.placeId);
+      sessionTokenRef.current = null;
+      onAddressSelect(cached);
+      return;
+    }
 
     try {
       const maps = await getGoogleMaps();
@@ -140,18 +185,20 @@ export default function GoogleAddressAutocomplete({
       placesService.getDetails(
         {
           placeId: prediction.placeId,
-          fields: ['geometry', 'formatted_address'],
+          fields: ['geometry.location', 'formatted_address'],
           sessionToken: sessionTokenRef.current,
         },
         (place, status) => {
           // Reset after terminating the session — next search starts fresh
           sessionTokenRef.current = null;
           if (status === maps.places.PlacesServiceStatus.OK && place) {
-            onAddressSelect({
+            const result = {
               address: place.formatted_address || prediction.description,
               lat: place.geometry?.location?.lat() || null,
               lng: place.geometry?.location?.lng() || null,
-            });
+            };
+            setBoundedCache(placeDetailsCache, prediction.placeId, result);
+            onAddressSelect(result);
           } else {
             onAddressSelect({ address: prediction.description, lat: null, lng: null });
           }

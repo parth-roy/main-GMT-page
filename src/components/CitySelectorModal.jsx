@@ -5,6 +5,7 @@ import { Search, X, Navigation, Loader2, Anchor, Package, Check, Sparkles, Build
 import { SEO_CITIES } from "../lib/cities";
 import { CITY_HERO_IMAGES } from "../api/pricingApi";
 import { useCity } from "../context/CityContext";
+import { lockScroll, unlockScroll } from "../utils/scrollLock";
 
 const TOP_CITIES = [
   { name: "Mumbai", slug: "mumbai", image: "/cities/mumbai.webp" },
@@ -94,12 +95,14 @@ export default function CitySelectorModal({ isOpen, onClose, onCitySelect }) {
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      lockScroll();
     } else {
-      document.body.style.overflow = "auto";
+      unlockScroll();
     }
     return () => {
-      document.body.style.overflow = "auto";
+      if (isOpen) {
+        unlockScroll();
+      }
     };
   }, [isOpen]);
 

@@ -64,7 +64,7 @@ export default function TransportAgentCityPage() {
     }
   };
 
-  const estimatedMonthlyIncome = tripsPerDay * 500 * 26; // ₹500 avg bounty * 26 working days
+  const estimatedMonthlyIncome = Math.round(tripsPerDay * 450 * 26); // projected average commission per trip * 26 working days
 
   // ── Dynamic, hyper-local FAQs (same system as the 26K PSEO pages) ──────────
   const cityFaqData = useMemo(() => generateCityFaqs(cityConfig, "truck-booking"), [city]);
@@ -74,16 +74,16 @@ export default function TransportAgentCityPage() {
       answer: `Any individual, transport broker, booking agent, fleet coordinator, or commission agent with knowledge of the local transport market in ${cityName} can register. No vehicle ownership or capital investment is required. You only need a smartphone, valid Aadhaar/PAN for KYC, and connections with local truck drivers in ${cityName}.`
     },
     {
-      question: `How does the GoMyTruck Transport Agent bounty system work in ${cityName}?`,
-      answer: `GoMyTruck posts live shipper cargo loads in ${cityName} with preferred budgets. As an agent in ${cityName}, you source a verified driver and vehicle RC. Once the customer pays the 25% advance and the driver verifies the physical loading OTP at the pickup site in ${cityName}, your flat-fee bounty (₹300–₹1,500 per trip) is confirmed and credited to your ledger for bank settlement by GoMyTruck Operations.`
+      question: `How does the GoMyTruck Transport Agent commission system work in ${cityName}?`,
+      answer: `GoMyTruck posts live shipper cargo loads in ${cityName} with verified freight budgets. As an agent in ${cityName}, you assist by providing a confirmed driver and vehicle. On every successful trip completion assisted by your confirmed driver, you earn up to 1–5% commission based on the volume of loads you complete. If any load is under standard value, GoMyTruck provides a guaranteed compensation value so you are always fairly rewarded.`
     },
     {
       question: `Is there any upfront fee or deposit to join as an agent in ${cityName}?`,
-      answer: `No. Joining as a GoMyTruck Digital Transport Agent in ${cityName} is 100% free with zero registration fees, zero security deposits, and zero hardware requirements. You earn only when a load is physically confirmed.`
+      answer: `No. Joining as a GoMyTruck Digital Transport Agent in ${cityName} is 100% free with zero registration fees, zero security deposits, and zero hardware requirements. You earn commissions on every successfully completed trip assisted by your confirmed drivers.`
     },
     {
-      question: `How are bounties paid out to Transport Agents in ${cityName}?`,
-      answer: `Once physical loading is confirmed via OTP between driver and shipper in ${cityName}, bounties become eligible immediately. GoMyTruck operations reviews and manually settles your accumulated earnings directly to your verified bank account via NEFT/IMPS, typically within the week.`
+      question: `How and when are commissions paid out to Transport Agents in ${cityName}?`,
+      answer: `Commissions (up to 1–5%) are confirmed upon successful trip completion assisted by your confirmed driver. GoMyTruck operations reviews and settles your accumulated earnings directly to your verified bank account via NEFT/IMPS or UPI.`
     },
     ...cityFaqData.faqs.slice(0, 3), // Pull city-specific transport FAQs dynamically
   ];
@@ -135,8 +135,8 @@ export default function TransportAgentCityPage() {
     {
       "@context": "https://schema.org",
       "@type": "JobPosting",
-      "title": `Independent Transport Agent & Logistics Sourcing Partner - ${cityName}`,
-      "description": `Join GoMyTruck as an Independent Digital Transport Agent in ${cityName}. Source verified trucks for customer loads, coordinate pickup milestones, and earn attractive flat-fee bounties with 0% investment.`,
+      "title": `Independent Transport Agent & Logistics Partner - ${cityName}`,
+      "description": `Join GoMyTruck as an Independent Digital Transport Agent in ${cityName}. Connect verified drivers for customer loads, coordinate milestone completions, and earn up to 1–5% commission on every successfully completed trip with guaranteed low-value compensation and 0% investment.`,
       "datePosted": "2026-01-01",
       "validThrough": "2026-12-31",
       "employmentType": "CONTRACTOR",
@@ -182,10 +182,10 @@ export default function TransportAgentCityPage() {
   return (
     <>
       <SEOHead
-        title={`Transport Agent in ${cityName} | Earn Bounties Sourcing Trucks - GoMyTruck`}
-        description={`Become a verified GoMyTruck Transport Agent in ${cityName}. Match verified trucks with customer loads, earn guaranteed flat-fee bounties per loaded trip with zero investment.`}
+        title={`Transport Agent in ${cityName} | Earn Up to 1–5% Commission on Completed Trips - GoMyTruck`}
+        description={`Become a verified GoMyTruck Transport Agent in ${cityName}. Connect confirmed drivers with customer loads and earn up to 1–5% commission on every successful trip completion with zero investment.`}
         canonical={canonicalPath}
-        keywords={`transport agent ${cityName}, truck commission agent ${cityName}, freight booking agent ${cityName}, transport broker ${cityName}, logistics agent ${cityName}, become transport coordinator ${cityName}, truck sourcing bounty ${cityName}, GoMyTruck partner agent`}
+        keywords={`transport agent ${cityName}, truck commission agent ${cityName}, freight booking agent ${cityName}, transport broker ${cityName}, logistics agent ${cityName}, become transport coordinator ${cityName}, truck agent commission ${cityName}, GoMyTruck partner agent`}
         jsonLd={jsonLd}
       />
 
@@ -227,7 +227,7 @@ export default function TransportAgentCityPage() {
 
                 {/* GEO ANSWER TARGET — visible on white, readable */}
                 <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl">
-                  In <strong className="text-slate-900">{cityName}</strong>, GoMyTruck's Digital Transport Agent Network empowers local transport coordinators, commission agents, and logistics brokers to fulfill active customer loads. Earn guaranteed flat-fee bounties (₹300–₹1,500) on every physically loaded vehicle — zero capital investment required.
+                  In <strong className="text-slate-900">{cityName}</strong>, GoMyTruck's Digital Transport Agent Network empowers local transport coordinators, commission agents, and logistics brokers to fulfill active customer loads. Earn up to 1–5% commission on every successful trip completion assisted by your confirmed driver — with guaranteed compensation for low-value loads and zero capital investment required.
                 </p>
 
                 {/* CTAs */}
@@ -255,12 +255,12 @@ export default function TransportAgentCityPage() {
                     <div className="text-xs text-slate-500 mt-1">Upfront Investment</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-black text-green-600">₹300–₹1,500</div>
-                    <div className="text-xs text-slate-500 mt-1">Bounty Per Loaded Trip</div>
+                    <div className="text-2xl font-black text-green-600">Up to 1–5%</div>
+                    <div className="text-xs text-slate-500 mt-1">Commission On Completed Trips</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-black text-slate-900">OTP</div>
-                    <div className="text-xs text-slate-500 mt-1">Verified Milestones</div>
+                    <div className="text-2xl font-black text-slate-900">100%</div>
+                    <div className="text-xs text-slate-500 mt-1">Trip Completion Payout</div>
                   </div>
                 </div>
               </div>
@@ -302,8 +302,12 @@ export default function TransportAgentCityPage() {
 
                     <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
                       <div className="flex justify-between text-xs text-slate-500">
-                        <span>Average Flat Bounty</span>
-                        <span className="text-slate-700 font-semibold">₹500 / Trip</span>
+                        <span>Commission Structure</span>
+                        <span className="text-slate-700 font-semibold">Up to 1–5% / Completed Trip</span>
+                      </div>
+                      <div className="flex justify-between text-xs text-slate-500">
+                        <span>Low-Value Trip Protection</span>
+                        <span className="text-emerald-700 font-semibold">Guaranteed Compensation</span>
                       </div>
                       <div className="flex justify-between text-xs text-slate-500">
                         <span>Working Days / Month</span>
@@ -322,11 +326,11 @@ export default function TransportAgentCityPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 size={13} className="text-green-500 flex-shrink-0" />
-                        <span>Manual weekly bank settlement from GoMyTruck Operations</span>
+                        <span>Commissions released upon confirmed trip completion</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 size={13} className="text-green-500 flex-shrink-0" />
-                        <span>Driver app onboarding retention micro-bonuses</span>
+                        <span>Guaranteed compensation value on low-value loads</span>
                       </div>
                     </div>
 
@@ -395,9 +399,9 @@ export default function TransportAgentCityPage() {
               <div className="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center font-bold text-lg mb-4">
                 4
               </div>
-              <h3 className="font-bold text-slate-900 text-lg mb-2">OTP Loading & Bounty</h3>
+              <h3 className="font-bold text-slate-900 text-lg mb-2">Trip Completion & Commission Payout</h3>
               <p className="text-sm text-slate-600 leading-relaxed">
-                When the truck arrives and physically loads, the driver submits the shipper's 4-digit Loading OTP. Your flat bounty is confirmed for settlement!
+                When the trip is successfully completed with the assistance of your confirmed driver, your up to 1–5% commission is credited. If any load is under standard value, GoMyTruck adds guaranteed compensation!
               </p>
             </div>
           </div>

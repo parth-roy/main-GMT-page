@@ -204,11 +204,11 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               </div>
             </div>
 
-            {/* City Selector Badge Button */}
+            {/* City Selector Badge Button (Desktop only) */}
             <button
               type="button"
               onClick={() => setIsCityModalOpen(true)}
-              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border transition-all hover:scale-105 active:scale-95 cursor-pointer ml-1 ${
+              className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border transition-all hover:scale-105 active:scale-95 cursor-pointer ml-1 ${
                 isDarkTheme
                   ? "bg-white/10 border-white/20 text-white hover:bg-white/20"
                   : "bg-brand-100/80 border-brand-200 text-brand-900 hover:bg-brand-200/80 shadow-xs"
@@ -358,17 +358,17 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
             </div>
           </div>
 
-          {/* Mobile menu button & quick city select */}
-          <div className="lg:hidden flex items-center gap-2">
+          {/* Mobile menu button & quick city select (right side, left of caller) */}
+          <div className="lg:hidden flex items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={() => setIsCityModalOpen(true)}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-100 border border-brand-200 text-brand-800 text-xs font-bold"
-              title="Change City"
+              className="flex items-center gap-1 p-1.5 px-2 rounded-full bg-brand-100/90 hover:bg-brand-200/90 active:scale-95 border border-brand-200/80 text-brand-800 transition-all cursor-pointer shadow-2xs"
+              title={`Current City: ${currentCity?.name || "Kolkata"} (Tap to change)`}
+              aria-label={`Change City, current is ${currentCity?.name || "Kolkata"}`}
             >
-              <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" />
-              <span className="max-w-[80px] truncate">{currentCity?.name || "Kolkata"}</span>
-              <ChevronDown size={11} className="text-slate-400" />
+              <img src="/google-maps-icon.webp" alt="Location" width={20} height={20} className="w-5 h-5 object-contain shrink-0" />
+              <ChevronDown size={14} className="text-slate-600 shrink-0" />
             </button>
             <Link
               to="/direct-driver-contact?openModal=true"

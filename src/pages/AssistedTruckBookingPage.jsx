@@ -441,7 +441,7 @@ export default function AssistedTruckBookingPage() {
               </div>
               <h3 className="font-bold text-slate-900 text-lg mb-2">25% Advance Protection</h3>
               <p className="text-sm text-slate-600 leading-relaxed">
-                You only pay a 25% advance to lock in your truck. Driver earnings and agent bounties remain withheld until the vehicle is physically loaded.
+                You only pay a 25% advance to lock in your truck. Driver earnings and agent commissions remain securely escrowed until trip completion.
               </p>
             </div>
 

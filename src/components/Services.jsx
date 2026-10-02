@@ -182,7 +182,7 @@ export default function Services({ onSelectVehicle }) {
               <Sparkles size={12} className="text-brand-500" /> Estimated Fare
             </div>
             
-            <h4 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tighter whitespace-nowrap z-10">
+            <h4 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tighter break-words z-10">
               {getEstimatedPrice()}
             </h4>
             

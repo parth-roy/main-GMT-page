@@ -1,10 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Crown, Sparkles, Zap, ShieldCheck, CheckCircle2, X, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { lockScroll, unlockScroll } from '../../utils/scrollLock';
 
 export default function DriverPremiumWelcomeModal() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      lockScroll();
+    } else {
+      unlockScroll();
+    }
+    return () => {
+      if (isOpen) {
+        unlockScroll();
+      }
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!user) {
@@ -36,7 +51,7 @@ export default function DriverPremiumWelcomeModal() {
     setIsOpen(false);
   };
 
-  if (!isOpen || !user?.driverMembership) return null;
+  if (!isOpen || !user?.driverMembership || typeof document === 'undefined') return null;
 
   const { daysRemaining, endDate, plan } = user.driverMembership;
   const formattedEndDate = endDate ? new Date(endDate).toLocaleDateString('en-IN', {
@@ -45,8 +60,8 @@ export default function DriverPremiumWelcomeModal() {
     year: 'numeric'
   }) : '90 Days';
 
-  return (
-    <div className="fixed inset-0 z-[360] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+  return createPortal(
+    <div className="fixed inset-0 z-[360] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200" data-modal-portal="true">
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border-2 border-amber-300 overflow-hidden text-left animate-in zoom-in-95 duration-200">
         
         {/* Background Glowing Blobs */}
@@ -124,6 +139,7 @@ export default function DriverPremiumWelcomeModal() {
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

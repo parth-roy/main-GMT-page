@@ -11,7 +11,7 @@ export default function PartnerFAQ({ isFleetOwner = false }) {
   const faqs = [
     {
       q: "Is there any registration fee?",
-      a: "No, joining GoMyTruck is 100% free. We never ask for an upfront registration fee or security deposit from our driver partners."
+      a: "Driver registration on GoMyTruck is 100% free with zero security deposits. A nominal one-time ₹99 verification fee applies to activate your 90-Day Verified Premium Driver Membership, unlocking priority location loads and zero broker deductions."
     },
     {
       q: "What documents do I need to register?",

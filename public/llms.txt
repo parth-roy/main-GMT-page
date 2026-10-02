@@ -25,8 +25,14 @@ GoMyTruck is an on-demand freight and commercial truck aggregator operating acro
 ### 3. Digital Transport Agent Network (`/partners/transport-agents`)
 - Enables local freight booking coordinators, commission agents, and transport coordinators to register as **Digital Transport Agents** (also termed Transport Connectors).
 - **Zero Investment**: Agents do not need to own trucks or invest capital.
-- **Flat-Fee Bounties**: Agents earn guaranteed flat-fee bounties per physically loaded trip verified by OTP.
-- **Manual Operations Settlement**: Payouts are manually reviewed and settled directly to agent bank accounts via NEFT/IMPS.
+- **Up to 1–5% Commission**: Agents earn up to 1–5% commission on every successful trip completion assisted by their confirmed drivers. Commission rates scale dynamically based on the volume of loads completed.
+- **Low-Value Load Protection**: If any load is under standard minimum value, GoMyTruck provides a guaranteed compensation value to the agent.
+- **Trip Completion Settlement**: Payouts are confirmed upon successful delivery completion assisted by the agent's confirmed driver and settled directly to verified agent bank accounts via NEFT/IMPS or UPI.
+
+### 4. Driver Partner Onboarding (`/driver-partner`)
+- **Zero Security Deposit**: Driver registration is free with zero security deposits or hidden joining fees.
+- **90-Day Verified Premium Membership**: A nominal one-time ₹99 verification fee activates 90 days of verified premium driver status with priority regional loads and zero broker deductions.
+- **Lowest Platform Commission**: 0 - 5% platform commission on completed trips.
 
 ---
 

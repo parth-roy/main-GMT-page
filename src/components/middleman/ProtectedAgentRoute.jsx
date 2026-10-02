@@ -124,11 +124,11 @@ export default function ProtectedAgentRoute({ children }) {
             </button>
             
             <div className="pt-4 border-t border-slate-100 flex items-center justify-around text-[11px] font-semibold text-slate-500">
-              <span>⚡ 5-10% Commission</span>
+              <span>⚡ Up to 1–5% Commission</span>
               <span>•</span>
-              <span>🚛 Pan-India Loads</span>
+              <span>🚛 Trip Completion Payout</span>
               <span>•</span>
-              <span>💼 Daily Payouts</span>
+              <span>💼 Low-Value Protection</span>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import { X, ArrowRight, Download, Truck, Navigation, Users } from "lucide-react"
+import { lockScroll, unlockScroll } from "../utils/scrollLock"
 
 const APPS = [
   { 
@@ -33,11 +34,15 @@ export default function AppDownloadModal({ isOpen, onClose }) {
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden"
+      lockScroll()
     } else {
-      document.body.style.overflow = ""
+      unlockScroll()
     }
-    return () => { document.body.style.overflow = "" }
+    return () => {
+      if (isOpen) {
+        unlockScroll()
+      }
+    }
   }, [isOpen])
 
   if (!isOpen) return null

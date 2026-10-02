@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { User, Building2, FileText, Clock, ChevronRight, Truck } from 'lucide-react'
+import { User, Building2, FileText, Clock, ChevronRight, Truck, AlertCircle, Loader2 } from 'lucide-react'
 
 const PERSONA_OPTIONS = [
   {
@@ -50,8 +50,9 @@ const COLOR_MAP = {
  *   onConfirm({ persona, urgency, truckCount, contractDuration }) => void
  *   onCancel() => void
  *   isLoading: bool
+ *   error: string
  */
-export default function BookingPersonaStep({ onConfirm, onCancel, isLoading }) {
+export default function BookingPersonaStep({ onConfirm, onCancel, isLoading, error }) {
   const [persona, setPersona] = useState('INDIVIDUAL')
   const [urgency, setUrgency] = useState('FLEXIBLE')
   const [truckCount, setTruckCount] = useState(1)
@@ -66,7 +67,7 @@ export default function BookingPersonaStep({ onConfirm, onCancel, isLoading }) {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto custom-scrollbar">
+    <div className="flex flex-col h-full">
       <div className="p-6 sm:p-8 space-y-7">
         {/* Header */}
         <div>
@@ -189,13 +190,19 @@ export default function BookingPersonaStep({ onConfirm, onCancel, isLoading }) {
 
       {/* Sticky Footer */}
       <div className="sticky bottom-0 bg-white border-t border-slate-100 p-4 sm:p-6 mt-auto space-y-2.5">
+        {error && (
+          <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200">
+            <AlertCircle size={16} className="text-rose-600 shrink-0" />
+            <span className="leading-snug">{error}</span>
+          </div>
+        )}
         <button
           onClick={handleConfirm}
           disabled={isLoading}
           className="w-full bg-[#1e5eff] hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-blue-600/20 disabled:opacity-70 cursor-pointer text-sm"
         >
-          {isLoading ? <span className="animate-spin">⏳</span> : null}
-          {isLoading ? 'Placing your booking…' : 'Confirm & Place Booking'}
+          {isLoading && <Loader2 size={16} className="animate-spin text-white" />}
+          <span>{isLoading ? 'Placing your booking…' : 'Confirm & Place Booking'}</span>
         </button>
         <button
           onClick={onCancel}

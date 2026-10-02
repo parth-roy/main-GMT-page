@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { X, User, Phone, Mail, Check, Loader2, LogOut, Briefcase } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { sendOtp, verifyOtp } from "../api/authApi"
+import { lockScroll, unlockScroll } from "../utils/scrollLock"
 
 import { useAuth } from "../context/AuthContext"
 
@@ -36,6 +38,20 @@ export default function LoginModal() {
   const [error, setError] = useState("")
   const [devOtp, setDevOtp] = useState("")
   const [showRoleInfo, setShowRoleInfo] = useState(false)
+
+  // Lock background scroll and pin body
+  useEffect(() => {
+    if (isLoginModalOpen) {
+      lockScroll()
+    } else {
+      unlockScroll()
+    }
+    return () => {
+      if (isLoginModalOpen) {
+        unlockScroll()
+      }
+    }
+  }, [isLoginModalOpen])
 
   // Sync role when modal opens with a requested role (e.g. 'MIDDLEMAN')
   useEffect(() => {
@@ -154,12 +170,12 @@ export default function LoginModal() {
   }
 
   // ALL hooks are declared unconditionally above!
-  if (!isLoginModalOpen) return null
+  if (!isLoginModalOpen || typeof document === "undefined") return null
 
   const isAgentModal = !bookingIntent && registrationFor === 'MIDDLEMAN'
 
-  return (
-    <div className="fixed inset-0 z-[350] flex items-center justify-center p-4 sm:p-6 md:p-10">
+  return createPortal(
+    <div data-modal-portal="true" data-modal-open="true" className="fixed inset-0 z-[350] flex items-center justify-center p-4 sm:p-6 md:p-10 pointer-events-auto">
       <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={closeLoginModal}></div>
 
       <div className="relative bg-white rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden z-10 flex flex-col md:flex-row max-h-[92vh] my-auto">
@@ -181,19 +197,19 @@ export default function LoginModal() {
                 <Briefcase size={12} /> GMT Agent Network
               </span>
               <h3 className="text-xl sm:text-2xl font-black leading-tight text-white">
-                Earn 5-10% On Every Commercial Load
+                Earn Up to 1–5% On Every Completed Load
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Connect MSME shippers with verified fleet owners. Real-time load quotes, full trip tracking, and daily digital wallet settlements.
+                Earn up to 1–5% commission on every successful trip completion assisted by your confirmed drivers. Dynamic rates scale with your completed load volume, with guaranteed compensation for low-value trips.
               </p>
               <div className="pt-2 flex flex-col gap-1 text-[11px] text-slate-300 font-medium">
                 <div className="flex items-center gap-1.5">
                   <Check size={14} className="text-emerald-400 shrink-0" />
-                  <span>Pan-India Open Freight Marketplace</span>
+                  <span>Up to 1–5% Payout on Trip Completion</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Check size={14} className="text-emerald-400 shrink-0" />
-                  <span>Attach & Manage Multiple Trucks</span>
+                  <span>Low-Value Trip Compensation Protection</span>
                 </div>
               </div>
             </div>
@@ -488,6 +504,7 @@ export default function LoginModal() {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

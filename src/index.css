@@ -86,3 +86,23 @@
   scrollbar-width: none;
 }
 
+/* ── BULLETPROOF MODAL SCROLL FREEZING ── */
+html[data-modal-open="true"],
+body[data-modal-open="true"] {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+body[data-modal-open="true"] {
+  position: fixed !important;
+  width: 100% !important;
+  touch-action: none !important;
+}
+
+[data-modal-portal="true"],
+[role="dialog"] {
+  touch-action: auto !important;
+  overscroll-behavior: contain !important;
+}
+
+

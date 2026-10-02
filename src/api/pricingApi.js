@@ -153,6 +153,7 @@ export function getPersistedCity() {
  */
 export function setPersistedCity(name, slug) {
   if (typeof window === 'undefined' || !name) return;
+  if (name.toLowerCase() === 'new york') return;
   const city = {
     name,
     slug: slug || name.toLowerCase().replace(/[\s_]+/g, '-'),
@@ -169,6 +170,7 @@ export function setPersistedCity(name, slug) {
 /**
  * Detect approximate city from the user's IP address via ipwho.is (fast, zero CORS issues, free)
  * with ipapi.co as fallback.
+ * Strictly checks country_code === 'IN' to prevent foreign VPNs/crawlers from showing overseas cities.
  */
 async function detectCityFromIP() {
   try {
@@ -178,7 +180,7 @@ async function detectCityFromIP() {
     clearTimeout(timer);
     if (r.ok) {
       const data = await r.json();
-      if (data?.success && data?.city) return data.city;
+      if (data?.success && data?.country_code === 'IN' && data?.city) return data.city;
     }
   } catch {}
 
@@ -189,7 +191,7 @@ async function detectCityFromIP() {
     clearTimeout(timer);
     if (r.ok) {
       const data = await r.json();
-      if (data?.city) return data.city;
+      if (data?.country_code === 'IN' && data?.city) return data.city;
     }
   } catch {}
 
@@ -213,7 +215,7 @@ export async function detectCurrentCity() {
       const sessionRaw = sessionStorage.getItem('gomytruck_session_city');
       if (sessionRaw) {
         const parsed = JSON.parse(sessionRaw);
-        if (parsed?.name) return parsed.name;
+        if (parsed?.name && parsed.name.toLowerCase() !== 'new york') return parsed.name;
       }
     } catch {}
   }
@@ -245,7 +247,7 @@ export async function detectCurrentCity() {
             const matched = parts.find((p) =>
               SERVED_CITIES.some((c) => c.toLowerCase() === p.toLowerCase())
             );
-            resolve(matched || parts[1] || parts[0] || null);
+            resolve(matched || null);
           } else {
             resolve(null);
           }
@@ -258,21 +260,21 @@ export async function detectCurrentCity() {
     );
   });
 
-  if (geoCity) {
+  if (geoCity && geoCity.toLowerCase() !== 'new york') {
     setPersistedCity(geoCity);
     return geoCity;
   }
 
   // 3. Live IP-based detection fallback (if geolocation denied or unavailable)
   const ipCity = await detectCityFromIP();
-  if (ipCity) {
+  if (ipCity && ipCity.toLowerCase() !== 'new york') {
     setPersistedCity(ipCity);
     return ipCity;
   }
 
   // 4. Fallback to localStorage if present
   const persisted = getPersistedCity();
-  if (persisted?.name) return persisted.name;
+  if (persisted?.name && persisted.name.toLowerCase() !== 'new york') return persisted.name;
 
   // 5. Final fallback
   return 'Kolkata';

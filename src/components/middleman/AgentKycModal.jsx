@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, ShieldCheck, Camera, FileText, CreditCard, UploadCloud, 
   CheckCircle2, AlertTriangle, Loader2, Building2, MapPin, Eye, ExternalLink, RefreshCw
 } from 'lucide-react';
 import { apiClient } from '../../api/apiClient';
+import { lockScroll, unlockScroll } from '../../utils/scrollLock';
 
 export default function AgentKycModal({ isOpen, onClose, onSuccess, initialData = null }) {
   const [formData, setFormData] = useState({
@@ -62,7 +64,20 @@ export default function AgentKycModal({ isOpen, onClose, onSuccess, initialData 
     }
   }, [initialData]);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      lockScroll();
+    } else {
+      unlockScroll();
+    }
+    return () => {
+      if (isOpen) {
+        unlockScroll();
+      }
+    };
+  }, [isOpen]);
+
+  if (!isOpen || typeof document === 'undefined') return null;
 
   // Handle generic input change
   const handleChange = (e) => {
@@ -201,8 +216,8 @@ export default function AgentKycModal({ isOpen, onClose, onSuccess, initialData 
     return l.startsWith('blob:') || l.startsWith('data:') || l.includes('.jpg') || l.includes('.jpeg') || l.includes('.png') || l.includes('.webp');
   };
 
-  return (
-    <div className="fixed inset-0 z-[400] flex items-center justify-center p-3 sm:p-5 overflow-y-auto bg-slate-950/70 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 z-[400] flex items-center justify-center p-3 sm:p-5 overflow-y-auto bg-slate-950/70 backdrop-blur-sm" data-modal-portal="true">
       <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 my-auto flex flex-col max-h-[92vh]">
         
         {/* Header Banner */}
@@ -230,7 +245,7 @@ export default function AgentKycModal({ isOpen, onClose, onSuccess, initialData 
           </div>
           
           <p className="text-xs text-emerald-50/90 leading-relaxed mt-1">
-            Complete your KYC and banking credentials to activate load sourcing, quote on live consignments, and receive flat-fee bounties.
+            Complete your KYC and banking credentials to activate load sourcing, quote on live consignments, and receive up to 1–5% commission on completed trips.
           </p>
         </div>
 
@@ -627,7 +642,7 @@ export default function AgentKycModal({ isOpen, onClose, onSuccess, initialData 
             {activeTab === 'bank' && (
               <div className="space-y-4 text-xs">
                 <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl text-emerald-800 text-[11px] leading-relaxed">
-                  💡 <strong>Bounty Payout Readiness:</strong> When you connect matching trucks and verify physical loading with the 4-digit OTP, your flat-fee bounties are transferred to this bank account or UPI ID.
+                  💡 <strong>Commission Payout Readiness:</strong> When trips are successfully completed assisted by your confirmed drivers, your commissions (up to 1–5%) are transferred to this bank account or UPI ID.
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -727,6 +742,7 @@ export default function AgentKycModal({ isOpen, onClose, onSuccess, initialData 
         )}
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

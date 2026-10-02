@@ -187,7 +187,7 @@ export default function AgentProfilePage() {
             <p className="text-xl sm:text-2xl font-black text-slate-900">{profile?.totalQuotesSubmitted || 0}</p>
           </div>
           <div className="p-4 sm:p-5 text-center">
-            <p className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Bounties Earned</p>
+            <p className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Commission Earned</p>
             <p className="text-xl sm:text-2xl font-black text-emerald-700">₹{(profile?.totalBountiesEarned || 0).toLocaleString('en-IN')}</p>
           </div>
         </div>

@@ -41,7 +41,7 @@ export default function AgentWalletPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Agent Wallet</h1>
-          <p className="text-slate-500 text-sm">Manage your bounties and settlements.</p>
+          <p className="text-slate-500 text-sm">Manage your commissions and settlements.</p>
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export default function AgentWalletPage() {
 
         <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
           <div className="relative z-10">
-            <p className="text-slate-500 font-medium mb-1">Pending Bounties</p>
+            <p className="text-slate-500 font-medium mb-1">Pending Commissions</p>
             <h2 className="text-4xl font-black text-slate-800 flex items-center mb-4">
               <IndianRupee size={32} strokeWidth={3} /> {walletData.pendingBounties.toLocaleString('en-IN')}
             </h2>
