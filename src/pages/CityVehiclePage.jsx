@@ -8,11 +8,12 @@ import {
 import SEOHead from "../seo/SEOHead";
 import TrustBadgeRow from "../components/TrustBadgeRow";
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner";
-import { SEO_CITIES, CITY_ALIASES } from "../lib/cities";
+import { SEO_CITIES, CITY_ALIASES, getCityBySlug } from "../lib/cities";
 import { getVehicleBySlug, ALL_SEO_VEHICLES } from "../lib/vehicles";
 import { generateCityFaqs } from "../lib/locationFaqHelper";
 import { useCity } from "../context/CityContext";
 import CityMap from "../components/common/CityMap";
+import DynamicLocationHero from "../components/DynamicLocationHero";
 
 export default function CityVehiclePage() {
   const { city, vehicle: vehicleParam } = useParams();
@@ -31,7 +32,7 @@ export default function CityVehiclePage() {
     window.scrollTo(0, 0);
   }, [city, vehicleParam]);
 
-  const cityConfig = SEO_CITIES.find((c) => c.slug === city);
+  const cityConfig = getCityBySlug(city);
 
   useEffect(() => {
     if (cityConfig && currentCity?.slug !== cityConfig.slug) {
@@ -150,124 +151,17 @@ export default function CityVehiclePage() {
         jsonLd={jsonLd}
       />
 
-      {/* Hero Section */}
-      <section className="relative bg-slate-900 pt-32 pb-20 mt-[68px] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-950 opacity-95" />
-        <div className="absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumbs */}
-          <nav className="mb-6 flex items-center gap-2 text-xs sm:text-sm text-slate-400">
-            <Link to="/" className="hover:text-brand-400 transition-colors">Home</Link>
-            <span>/</span>
-            <Link to={`/${city}`} className="hover:text-brand-400 transition-colors">{cityName}</Link>
-            <span>/</span>
-            <span className="text-white font-semibold">{vehicle.shortName}</span>
-          </nav>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Content */}
-            <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/20 border border-brand-400/40 text-brand-300 text-xs font-bold tracking-wider uppercase mb-4">
-                <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" /> {cityName}, {state} · Verified Fleet
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
-                {vehicle.name} <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-emerald-400">in {cityName}</span>
-              </h1>
-
-              <p className="text-slate-300 text-base sm:text-lg leading-relaxed mb-6">
-                On-demand {vehicle.shortName} hire and goods transport across {cityName} and nearby industrial hubs. Upfront digital rates starting at ₹{vehicle.baseFare}, verified drivers, and zero broker markups.
-              </p>
-
-              {/* Quick Specs Pills */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <Weight size={13} className="text-brand-400" /> Max Payload
-                  </div>
-                  <div className="text-sm sm:text-base font-bold text-white">{vehicle.capacityKg} kg ({vehicle.capacityTons}T)</div>
-                </div>
-
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <Ruler size={13} className="text-brand-400" /> Deck Size
-                  </div>
-                  <div className="text-sm sm:text-base font-bold text-white">{vehicle.lengthFt} × {vehicle.widthFt} ft</div>
-                </div>
-
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <IndianRupee size={13} className="text-brand-400" /> Base Fare
-                  </div>
-                  <div className="text-sm sm:text-base font-bold text-emerald-400">₹{vehicle.baseFare}</div>
-                </div>
-
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <Clock size={13} className="text-brand-400" /> Per Km Rate
-                  </div>
-                  <div className="text-sm sm:text-base font-bold text-white">~₹{vehicle.perKmRate}/km</div>
-                </div>
-              </div>
-
-              {/* CTAs */}
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  to="/book-truck-online"
-                  state={{ selectedCity: cityName, vehicleType: vehicle.slug }}
-                  className="bg-brand-600 hover:bg-brand-500 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2"
-                >
-                  Book {vehicle.shortName} Now <ArrowRight size={18} />
-                </Link>
-
-                <Link
-                  to="/direct-driver-contact"
-                  className="bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold px-6 py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2"
-                >
-                  <Zap size={17} className="fill-slate-900" /> Get 10 Driver Numbers · ₹99
-                </Link>
-              </div>
-            </div>
-
-            {/* Right: Vehicle Card Preview */}
-            <div className="lg:col-span-5">
-              <div className="bg-slate-800/90 border border-slate-700 rounded-3xl p-6 shadow-2xl backdrop-blur-sm">
-                <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-900 flex items-center justify-center mb-5 border border-slate-700/60">
-                  <img
-                    src={vehicle.image}
-                    alt={`${vehicle.name} available in ${cityName}`}
-                    className="max-h-full max-w-full object-contain p-4 transition-transform hover:scale-105 duration-300"
-                    loading="eager"
-                  />
-                  <div className="absolute top-3 right-3 bg-emerald-500/90 backdrop-blur-xs text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-white animate-pulse" /> Active in {cityName}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center text-sm border-b border-slate-700 pb-2">
-                    <span className="text-slate-400">Category:</span>
-                    <span className="text-slate-200 font-semibold">{vehicle.category}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm border-b border-slate-700 pb-2">
-                    <span className="text-slate-400">Body Type:</span>
-                    <span className="text-slate-200 font-semibold">{vehicle.bodyType}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm border-b border-slate-700 pb-2">
-                    <span className="text-slate-400">Cargo Volume:</span>
-                    <span className="text-slate-200 font-semibold">~{vehicle.volumeCuFt} cu. ft.</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-400">Platform Commission:</span>
-                    <span className="text-emerald-400 font-bold">Flat 5% (Zero Broker Cut)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero: Light-Mode Homepage-Styled Architecture with 3 Buttons & Floating Card */}
+      <DynamicLocationHero
+        city={cityName}
+        slug={cityConfig?.slug}
+        state={state}
+        headline={`${vehicle.name} in ${cityName}`}
+        subheadline={`On-demand ${vehicle.shortName} hire and goods transport across ${cityName} and nearby industrial hubs. Upfront digital rates starting at ₹${vehicle.baseFare}, verified drivers, and zero broker markups.`}
+        badgeText={`${cityName}, ${state} · Verified ${vehicle.shortName} Fleet`}
+        pickupDefault={cityName}
+        defaultVehicle={vehicle.slug === "14ft-eicher" || vehicle.slug === "truck-14ft" || vehicle.slug === "truck-17ft" || vehicle.slug === "truck-20ft" ? "open_truck" : vehicle.slug === "32ft-container" || vehicle.slug === "container-32ft" ? "trailers" : "truck"}
+      />
 
       {/* Trust Badges */}
       <section className="bg-white px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto -mt-6 relative z-20">

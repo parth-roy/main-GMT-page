@@ -6,6 +6,7 @@ import GlobalFABs from "./components/GlobalFABs"
 import RouteAnalytics from "./components/RouteAnalytics"
 import LoginModal from "./components/LoginModal"
 import DriverPremiumWelcomeModal from "./components/driver/DriverPremiumWelcomeModal"
+import WhatsAppIntentModal from "./components/WhatsAppIntentModal"
 
 import Home from "./pages/Home"
 
@@ -411,6 +412,8 @@ export default function App() {
 
       {/* Driver 90-Day Premium Membership Welcome Alert */}
       <DriverPremiumWelcomeModal />
+
+      <WhatsAppIntentModal />
     </div>
   )
 }

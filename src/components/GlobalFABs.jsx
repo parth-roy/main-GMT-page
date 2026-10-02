@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { MessageCircle, PhoneCall, Truck, MoreHorizontal, X } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
+import { openGMTWhatsAppModal } from "./WhatsAppIntentModal"
 
 export default function GlobalFABs() {
   const { pathname } = useLocation()
@@ -81,12 +82,13 @@ export default function GlobalFABs() {
             }`}
           >
             {/* WhatsApp Floating Icon (20% bigger: w-14 h-14) */}
-            <a
-              href={whatsappLink}
+            <button
               data-analytics-context={`mobile-sticky-modal:${pathname}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setIsExpanded(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                setIsExpanded(false);
+                openGMTWhatsAppModal();
+              }}
               className="relative flex items-center justify-center w-14 h-14 active:scale-95 transition-transform"
               aria-label="WhatsApp Support"
               title="WhatsApp Support"
@@ -97,7 +99,7 @@ export default function GlobalFABs() {
                 alt="WhatsApp"
                 className="relative z-10 w-full h-full object-contain drop-shadow-xl scale-110"
               />
-            </a>
+            </button>
 
             {/* Talk to Drivers Floating Icon (20% bigger: w-14 h-14) */}
             <Link
@@ -147,27 +149,23 @@ export default function GlobalFABs() {
           >
             <PhoneCall size={20} /> Talk to Drivers
           </Link>
-          <a
-            href={whatsappLink}
+          <button
             data-analytics-context={`mobile-sticky:${pathname}`}
-            target="_blank"
-            rel="noopener noreferrer"
+            onClick={(e) => { e.preventDefault(); openGMTWhatsAppModal(); }}
             className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#0B6B2E] px-3 py-2.5 text-sm font-extrabold text-white active:scale-95 transition-transform"
             aria-label="Request a quote on WhatsApp"
           >
             <MessageCircle size={20} /> WhatsApp
-          </a>
+          </button>
         </div>
       )}
 
       {/* ── DESKTOP FABS (Unchanged) ── */}
       <div className="fixed bottom-8 right-8 z-50 hidden flex-col gap-4 items-end pointer-events-none md:flex">
         {/* WhatsApp FAB */}
-        <a
-          href={whatsappLink}
+        <button
           data-analytics-context={`desktop-fab:${pathname}`}
-          target="_blank"
-          rel="noopener noreferrer"
+          onClick={(e) => { e.preventDefault(); openGMTWhatsAppModal(); }}
           className="pointer-events-auto hover:-translate-y-1 transition-transform duration-300 flex items-center justify-center group relative drop-shadow-lg hover:drop-shadow-xl rounded-full"
           aria-label="Chat on WhatsApp"
           title="Chat on WhatsApp"
@@ -177,7 +175,7 @@ export default function GlobalFABs() {
           <span className="absolute right-full mr-4 bg-gray-900 text-white text-xs font-semibold py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap hidden sm:block">
             Chat on WhatsApp
           </span>
-        </a>
+        </button>
 
         {/* Book a Truck FAB */}
         <Link

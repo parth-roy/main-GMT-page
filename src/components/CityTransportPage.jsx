@@ -15,6 +15,7 @@ import CityMap from "./common/CityMap"
 import { useCity } from "../context/CityContext"
 import { ALL_SEO_VEHICLES } from "../lib/vehicles"
 import { POPULAR_CORRIDORS } from "../lib/corridors"
+import DynamicLocationHero from "./DynamicLocationHero"
 
 export default function CityTransportPage({
   city,
@@ -105,39 +106,14 @@ export default function CityTransportPage({
         jsonLd={mergedJsonLd}
       />
 
-      {/* Hero */}
-      <section className="relative bg-slate-900 pt-32 pb-24 mt-[68px] overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-brand-950" />
-          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-brand-900/40 to-transparent" />
-        </div>
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-300 text-xs font-bold tracking-widest uppercase mb-5">
-            <img src="/google-maps-icon.webp" alt="Location" width={14} height={14} className="w-3.5 h-3.5 object-contain shrink-0" /> Serving {city} &amp; Surrounding Hubs
-          </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold text-white tracking-tight leading-tight mb-6">
-            {headline || `Transport Services in ${city}`}
-          </h1>
-          <p className="text-slate-300 text-xl max-w-2xl mx-auto leading-relaxed mb-10">
-            {subheadline || `Request truck booking, pickup rental, or moving support in ${city}. Review route-based pricing and current partner availability before confirming.`}
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              to="/book-truck-online"
-              state={{ selectedCity: city }}
-              className="bg-brand-600 hover:bg-brand-500 text-white font-bold px-7 py-3.5 rounded-xl shadow-xl transition-all active:scale-95 flex items-center gap-2"
-            >
-              Book Transport in {city} <ArrowRight size={18} />
-            </Link>
-            <Link
-              to="/direct-driver-contact?openModal=true"
-              className="border border-white/30 text-white font-bold px-7 py-3.5 rounded-xl hover:bg-white/10 transition-colors flex items-center gap-2"
-            >
-              <PhoneCall size={16} /> Talk to Drivers
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Hero: Light-Mode Homepage-Styled Architecture with 3 Buttons & Floating Card */}
+      <DynamicLocationHero
+        city={city}
+        slug={slug}
+        state={state}
+        headline={headline}
+        subheadline={subheadline}
+      />
 
       <nav aria-label="Breadcrumb" className="border-b border-slate-200 bg-white">
         <ol className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center gap-2 text-sm text-slate-600">

@@ -6,6 +6,7 @@ import {
   Clock, Navigation, IndianRupee, Layers 
 } from "lucide-react";
 import SEOHead from "../seo/SEOHead";
+import DynamicLocationHero from "../components/DynamicLocationHero";
 import TrustBadgeRow from "../components/TrustBadgeRow";
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner";
 import { getCorridorBySlug, POPULAR_CORRIDORS } from "../lib/corridors";
@@ -169,135 +170,17 @@ export default function RouteVehiclePage() {
         noindex={isThinRoute}
       />
 
-      {/* Hero Section */}
-      <section className="relative bg-slate-900 pt-32 pb-20 mt-[68px] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-950 opacity-95" />
-        <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumbs */}
-          <nav className="mb-6 flex items-center gap-2 text-xs sm:text-sm text-slate-400">
-            <Link to="/" className="hover:text-brand-400 transition-colors">Home</Link>
-            <span>/</span>
-            <Link to="/intercity-transport" className="hover:text-brand-400 transition-colors">Intercity</Link>
-            <span>/</span>
-            <span className="text-white font-semibold">{originName} → {destName}</span>
-          </nav>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Content */}
-            <div className="lg:col-span-7">
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold tracking-wider uppercase">
-                  <Navigation size={13} /> {highway} · Route Corridor
-                </div>
-                {isDfcCorridor && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/40 text-blue-300 text-xs font-extrabold tracking-wider uppercase">
-                    <Sparkles size={13} className="text-blue-400" /> Dedicated Freight Corridor (DFC) Node
-                  </div>
-                )}
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
-                {originName} <span className="text-brand-400">to</span> {destName}{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-emerald-400">
-                  {pageHeadline}
-                </span>
-              </h1>
-
-              <p className="text-slate-300 text-base sm:text-lg leading-relaxed mb-6">
-                Direct intercity commercial freight service. Book full truck load (FTL) {vehicle.name} with live GPS trip tracking, verified highway drivers, and guaranteed dispatch SLAs.
-              </p>
-
-              {/* Route Corridor Quick Metrics */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <Navigation size={13} className="text-emerald-400" /> Total Distance
-                  </div>
-                  <div className="text-base sm:text-lg font-bold text-white">{distanceKm} km</div>
-                </div>
-
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <Clock size={13} className="text-emerald-400" /> Transit Time
-                  </div>
-                  <div className="text-base sm:text-lg font-bold text-white">~{transitHours} Hours</div>
-                </div>
-
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <Layers size={13} className="text-emerald-400" /> Est. Tolls
-                  </div>
-                  <div className="text-base sm:text-lg font-bold text-white">₹{estimatedTolls}</div>
-                </div>
-
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <IndianRupee size={13} className="text-emerald-400" /> Est. Freight
-                  </div>
-                  <div className="text-base sm:text-lg font-bold text-emerald-400">₹{estimatedFreight.toLocaleString("en-IN")}</div>
-                </div>
-              </div>
-
-              {/* Dual Action Buttons */}
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  to="/book-truck-online"
-                  state={{ pickup: originName, drop: destName, vehicleType: vehicle.slug }}
-                  className="bg-brand-600 hover:bg-brand-500 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2"
-                >
-                  Book {vehicle.shortName} on This Route <ArrowRight size={18} />
-                </Link>
-
-                <Link
-                  to="/direct-driver-contact"
-                  className="bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold px-6 py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2"
-                >
-                  <Zap size={17} className="fill-slate-900 animate-bounce" /> Call 10 Verified {vehicle.shortName} · ₹99 (Save ₹1,500+)
-                </Link>
-              </div>
-            </div>
-
-            {/* Right: Route Estimate Card */}
-            <div className="lg:col-span-5">
-              <div className="bg-slate-800/90 border border-slate-700 rounded-3xl p-6 shadow-2xl backdrop-blur-sm">
-                <div className="flex items-center justify-between border-b border-slate-700 pb-4 mb-4">
-                  <div>
-                    <span className="text-xs font-bold text-brand-400 uppercase tracking-wider">Route Fare Estimate</span>
-                    <h3 className="text-lg font-bold text-white mt-0.5">{originName} → {destName}</h3>
-                  </div>
-                  <span className="text-xs bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full font-medium">{vehicle.shortName}</span>
-                </div>
-
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between text-slate-300">
-                    <span>Base Fare + Distance ({distanceKm} km):</span>
-                    <span className="font-semibold text-white">₹{(distanceKm * vehicle.perKmRate).toLocaleString("en-IN")}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-300">
-                    <span>National Highway Tolls ({highway}):</span>
-                    <span className="font-semibold text-white">₹{estimatedTolls}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-300">
-                    <span>Platform Fee (Flat 5%):</span>
-                    <span className="text-emerald-400 font-semibold">Included (No broker cut)</span>
-                  </div>
-                  <div className="pt-3 border-t border-slate-700 flex justify-between items-center text-base">
-                    <span className="font-bold text-white">Estimated Total:</span>
-                    <span className="font-black text-xl text-emerald-400">₹{estimatedFreight.toLocaleString("en-IN")}</span>
-                  </div>
-                </div>
-
-                {/* Backhaul Return Load Alert */}
-                <div className="mt-5 p-3.5 rounded-xl bg-amber-500/10 border border-amber-400/30 text-amber-200 text-xs leading-relaxed">
-                  <span className="font-bold text-amber-400">⚡ Save up to 30% on Return Loads:</span> Trucks returning from {destName} to {originName} are available from <strong>₹{backhaulFreight.toLocaleString("en-IN")}</strong>.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero: Light-Mode Homepage-Styled Architecture with 3 Buttons & Floating Card */}
+      <DynamicLocationHero
+        city={originName}
+        state={highway ? `${highway} Route Corridor` : "India"}
+        headline={`${originName} to ${destName} ${vehicle.name} Transport`}
+        subheadline={`Direct intercity commercial freight service. Book full truck load (FTL) ${vehicle.name} with live GPS trip tracking, verified highway drivers, and guaranteed dispatch SLAs.`}
+        badgeText={`${highway} · Route Corridor — ${distanceKm} km`}
+        pickupDefault={originName}
+        dropDefault={destName}
+        defaultVehicle={vehicle.slug === "14ft-eicher" || vehicle.slug === "truck-14ft" || vehicle.slug === "truck-17ft" || vehicle.slug === "truck-20ft" ? "open_truck" : vehicle.slug === "32ft-container" || vehicle.slug === "container-32ft" ? "trailers" : "truck"}
+      />
 
       {/* Trust Badges */}
       <section className="bg-white px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto -mt-6 relative z-20">

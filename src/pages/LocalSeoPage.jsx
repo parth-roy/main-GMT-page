@@ -7,6 +7,7 @@ import DirectDriverContactBanner from "../components/common/DirectDriverContactB
 import { useCity } from "../context/CityContext"
 import { SEO_CITIES } from "../lib/cities"
 import CityMap from "../components/common/CityMap"
+import DynamicLocationHero from "../components/DynamicLocationHero";
 
 const pages = {
   kolkata: {
@@ -624,21 +625,14 @@ export default function LocalSeoPage({ pageKey }) {
         </ol>
       </nav>
 
-      <header className="bg-slate-950 text-white py-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-brand-300 font-bold uppercase tracking-widest text-sm mb-4">{page.eyebrow}</p>
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight max-w-4xl">{page.h1}</h1>
-          <p className="mt-6 text-lg sm:text-xl text-slate-200 leading-relaxed max-w-3xl">{page.intro}</p>
-          <div className="mt-5 inline-flex items-center gap-2 bg-brand-700/30 border border-brand-500/40 rounded-full px-4 py-1.5">
-            <BadgePercent size={16} className="text-brand-300" />
-            <span className="text-brand-300 font-black text-sm">Only 5% Commission — No Broker Margin</span>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link to="/book-truck-online" className="min-h-12 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 font-bold flex items-center gap-2">Get Instant Estimate <ArrowRight size={18} /></Link>
-            <Link to="/direct-driver-contact?openModal=true" className="min-h-12 px-6 py-3 rounded-xl border border-white/40 hover:bg-white/10 font-bold flex items-center gap-2"><Phone size={18} /> Talk to Drivers</Link>
-          </div>
-        </div>
-      </header>
+      {/* Hero: Light-Mode Homepage-Styled Architecture with 3 Buttons & Floating Card */}
+      <DynamicLocationHero
+        city={page.eyebrow?.split(" ")[0] || "Kolkata"}
+        headline={page.h1}
+        subheadline={page.intro}
+        badgeText={`${page.eyebrow} — Only 5% Commission`}
+        pickupDefault={page.eyebrow?.split(" ")[0] || "Kolkata"}
+      />
 
       {/* Return Load CTA — shown on route pages (canonical starts with /routes/) */}
       {page.canonical?.startsWith("/routes/") && (

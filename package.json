@@ -9,7 +9,7 @@
     "build:dev": "npm run build:client && npm run build:ssr",
     "build:client": "vite build",
     "build:ssr": "vite build --ssr src/entry-server.jsx --outDir dist-ssr",
-    "prerender": "node --max-old-space-size=4096 scripts/prerender.js",
+    "prerender": "node --expose-gc --max-old-space-size=4096 scripts/prerender.js",
     "validate:seo": "node scripts/validate-prerender.js",
     "preview": "vite preview"
   },

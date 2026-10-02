@@ -29,15 +29,19 @@ function ensureDir(dir) {
 }
 
 async function writeRoute(route, outputFile) {
-  const { html, helmet } = await render(route)
-  const headMarkup = getHeadMarkup(helmet)
-  const document = `${templateHeadParts[0]}<!--app-head-start-->\n    ${headMarkup}\n    <!--app-head-end-->${templateBodyParts[0]}<div id="root">${html}</div>${templateBodyParts[1]}`
+  try {
+    const { html, helmet } = await render(route)
+    const headMarkup = getHeadMarkup(helmet)
+    const document = `${templateHeadParts[0]}<!--app-head-start-->\n    ${headMarkup}\n    <!--app-head-end-->${templateBodyParts[0]}<div id="root">${html}</div>${templateBodyParts[1]}`
 
-  const destination = outputFile || (route === "/"
-    ? path.join(DIST, "index.html")
-    : path.join(DIST, route.slice(1), "index.html"))
-  ensureDir(path.dirname(destination))
-  await fs.writeFile(destination, document)
+    const destination = outputFile || (route === "/"
+      ? path.join(DIST, "index.html")
+      : path.join(DIST, route.slice(1), "index.html"))
+    ensureDir(path.dirname(destination))
+    await fs.writeFile(destination, document)
+  } catch (err) {
+    console.error(`[prerender] Error on ${route}:`, err?.message || err)
+  }
 }
 
 const BATCH_SIZE = 64
@@ -49,6 +53,9 @@ for (let i = 0; i < PRERENDER_ROUTES.length; i += BATCH_SIZE) {
   completed += chunk.length
   if (completed - lastLogged >= 500 || completed === PRERENDER_ROUTES.length) {
     lastLogged = completed
+    if (global.gc) {
+      global.gc()
+    }
     console.log(`Prerendered ${completed} / ${PRERENDER_ROUTES.length} routes...`)
   }
 }

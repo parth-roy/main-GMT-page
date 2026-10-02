@@ -6,9 +6,10 @@ import {
   Zap, Bell, Briefcase, PhoneCall, Sparkles 
 } from "lucide-react";
 import SEOHead from "../seo/SEOHead";
+import DynamicLocationHero from "../components/DynamicLocationHero";
 import TrustBadgeRow from "../components/TrustBadgeRow";
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner";
-import { SEO_CITIES } from "../lib/cities";
+import { SEO_CITIES, getCityBySlug } from "../lib/cities";
 import { getVehicleBySlug, ALL_SEO_VEHICLES } from "../lib/vehicles";
 import { useCity } from "../context/CityContext";
 
@@ -156,113 +157,17 @@ export default function DriverLoadHubPage() {
         jsonLd={jsonLd}
       />
 
-      {/* Hero Section */}
-      <section className="relative bg-slate-900 pt-32 pb-20 mt-[68px] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950/80 opacity-95" />
-        <div className="absolute inset-0 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="mb-6 flex items-center gap-2 text-xs sm:text-sm text-slate-400">
-            <Link to="/" className="hover:text-brand-400 transition-colors">Home</Link>
-            <span>/</span>
-            <Link to="/driver-partner" className="hover:text-brand-400 transition-colors">Driver Partner</Link>
-            <span>/</span>
-            <span className="text-white font-semibold">{cityName} {vehicle.shortName}</span>
-          </nav>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Content */}
-            <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold tracking-wider uppercase mb-4">
-                <Zap size={13} className="fill-current" /> Driver Supply &amp; Vehicle Attachment Funnel
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
-                {vehicle.name} Loads <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">in {cityName}</span>
-              </h1>
-
-              <p className="text-slate-300 text-base sm:text-lg leading-relaxed mb-6">
-                Connect directly with businesses and retail shippers across {cityName}. Attach your {vehicle.shortName} for a flat <strong>₹99 90-day subscription</strong>. 0% broker commission on direct customer deals.
-              </p>
-
-              {/* Driver Key Benefits */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="text-xs text-slate-400 mb-1">Platform Brokerage</div>
-                  <div className="text-base sm:text-lg font-black text-emerald-400">0% Commission</div>
-                </div>
-
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="text-xs text-slate-400 mb-1">Subscription Validity</div>
-                  <div className="text-base sm:text-lg font-black text-white">90 Days (₹99)</div>
-                </div>
-
-                <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3">
-                  <div className="text-xs text-slate-400 mb-1">Trip Payments</div>
-                  <div className="text-base sm:text-lg font-black text-white">Direct to Driver</div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  to="/fleet-partner-registration"
-                  className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-8 py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2 text-base"
-                >
-                  <Zap size={18} className="fill-current" /> Attach Your {vehicle.shortName} · ₹99
-                </Link>
-
-                <Link
-                  to="/direct-driver-contact"
-                  className="border border-white/30 text-white font-bold px-6 py-4 rounded-xl hover:bg-white/10 transition-colors flex items-center gap-2 text-sm"
-                >
-                  <PhoneCall size={16} /> Shipper: Hire Drivers Directly
-                </Link>
-              </div>
-            </div>
-
-            {/* Right: Driver Card */}
-            <div className="lg:col-span-5">
-              <div className="bg-slate-800/90 border border-slate-700 rounded-3xl p-6 shadow-2xl backdrop-blur-sm">
-                <div className="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="text-amber-400" size={18} />
-                    <span className="font-bold text-white text-sm">Typical Load Demand</span>
-                  </div>
-                  <span className="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active in {cityName}
-                  </span>
-                </div>
-
-                {/* Sample Demand Profiles List */}
-                <div className="space-y-3">
-                  {sampleDemandProfiles.map((load, idx) => (
-                    <div key={idx} className="bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 hover:border-amber-500/50 transition-colors">
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="text-xs font-bold text-white leading-snug">{load.title}</h4>
-                        <span className="text-xs font-black text-emerald-400 shrink-0 ml-2">{load.estEarning}</span>
-                      </div>
-                      <div className="flex justify-between items-center text-[11px] text-slate-400">
-                        <span className="flex items-center gap-1"><img src="/google-maps-icon.webp" alt="Location" width={11} height={11} className="w-3 h-3 object-contain shrink-0" /> {load.location}</span>
-                        <span className="text-slate-400 font-medium">{load.cadence}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-slate-700 text-center">
-                  <Link
-                    to="/fleet-partner-registration"
-                    className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center justify-center gap-1"
-                  >
-                    Attach Vehicle &amp; Access Demand <ArrowRight size={13} />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero: Light-Mode Homepage-Styled Architecture with 3 Buttons & Floating Card */}
+      <DynamicLocationHero
+        city={cityName}
+        slug={cityConfig?.slug}
+        state={state}
+        headline={`${vehicle.name} Loads in ${cityName}`}
+        subheadline={`Find daily commercial loads, factory dispatches, and return trips for ${vehicle.name} across ${cityName} and industrial corridors.`}
+        badgeText={`${cityName}, ${state} · Daily ${vehicle.shortName} Loads`}
+        pickupDefault={cityName}
+        defaultVehicle={vehicle.slug === "14ft-eicher" || vehicle.slug === "truck-14ft" || vehicle.slug === "truck-17ft" || vehicle.slug === "truck-20ft" ? "open_truck" : vehicle.slug === "32ft-container" || vehicle.slug === "container-32ft" ? "trailers" : "truck"}
+      />
 
       {/* Trust Badges */}
       <section className="bg-white px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto -mt-6 relative z-20">

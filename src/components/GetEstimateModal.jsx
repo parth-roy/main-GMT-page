@@ -105,7 +105,7 @@ export default function GetEstimateModal({ isOpen, onClose, onSelectService }) {
       trackLead("Get Estimate Modal", selectedService)
 
       // Save as a lead in backend with role 'Estimate' so it shows in admin
-      fetch("https://api-test.gomytruck.com/api/v1/leads", {
+      fetch("https://api.gomytruck.com/api/v1/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -113,6 +113,10 @@ export default function GetEstimateModal({ isOpen, onClose, onSelectService }) {
           phone: phone,
           city: pickup,
           role: "Estimate",
+          // Structured fields for Google Sheet columns
+          dropCity: drop,
+          serviceType: selectedService,
+          weight: weight || '',
           notes: `Pickup: ${pickup}, Drop: ${drop}, Service: ${selectedService}, Weight: ${weight || "N/A"}`
         })
       }).catch(err => console.warn("Failed to save estimate lead", err))

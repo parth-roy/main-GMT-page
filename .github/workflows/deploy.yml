@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - name: Deploy to Droplet via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -16,13 +17,26 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          command_timeout: 90m
+          command_timeout: 180m
           script: |
             set -e
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            # Ensure swap is active on droplet to prevent Linux kernel OOM Killer during large-scale prerendering
+            if [ $(swapon --show | wc -l) -le 1 ]; then
+              if [ ! -f /swapfile ]; then
+                fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048
+                chmod 600 /swapfile
+                mkswap /swapfile
+                echo '/swapfile none swap sw 0 0' >> /etc/fstab || true
+              fi
+              swapon /swapfile || true
+            fi
+
             cd /var/www/vahan
             git fetch origin main
             git reset --hard origin/main
             npm install
             npm run build
+

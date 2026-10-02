@@ -4579,3 +4579,29 @@ export const CITY_ALIASES = {
   "suryapet-ts": "suryapet",
   "adilabad-ts": "adilabad",
 };
+
+/**
+ * Retrieve city config by slug with automatic alias resolution and dynamic fallback
+ * for industrial clusters, SEZs, and industrial corridors.
+ */
+export function getCityBySlug(slug) {
+  if (!slug) return null;
+  const clean = String(slug).toLowerCase().trim();
+  const canonical = CITY_ALIASES[clean] || clean;
+
+  const found = SEO_CITIES.find(c => c.slug === canonical);
+  if (found) return found;
+
+  // Dynamic fallback for unlisted industrial hubs, ports, and clusters
+  const formattedName = canonical
+    .replace(/-industrial$/i, " Industrial Area")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, l => l.toUpperCase());
+
+  return {
+    name: formattedName,
+    slug: canonical,
+    state: "India",
+    isFallback: true,
+  };
+}
