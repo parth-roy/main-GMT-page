@@ -31,7 +31,8 @@ for (const route of [...INDEXABLE_ROUTES, ...NOINDEX_ROUTES]) {
 
   if (!/<title\b[^>]*>[^<]{8,}<\/title>/i.test(html)) errors.push(`${route}: missing or short title`)
   if (!description || description.length < 50) errors.push(`${route}: missing or short description`)
-  if (canonical !== expectedCanonical) errors.push(`${route}: canonical is ${canonical || "missing"}`)
+  const isCanonicalValid = canonical === expectedCanonical || (route === "/" && (canonical === baseUrl || canonical === `${baseUrl}/`))
+  if (!isCanonicalValid) errors.push(`${route}: canonical is ${canonical || "missing"}`)
   if (h1Count !== 1) errors.push(`${route}: expected one H1, found ${h1Count}`)
   if (/Page Not Found/i.test(html)) errors.push(`${route}: rendered the 404 component`)
 

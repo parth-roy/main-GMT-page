@@ -98,9 +98,11 @@ const DEFAULT_GLOBAL_SCHEMA = {
 };
 
 const toAbsoluteUrl = (value, fallback = BASE_URL) => {
-  if (!value) return fallback
+  if (!value) return `${BASE_URL}/`
   const url = /^https?:\/\//i.test(value) ? value : `${BASE_URL}${value.startsWith("/") ? value : '/' + value}`
-  // Strictly enforce consistent URL format without trailing slash (unless root domain)
+  // Preserve trailing slash for root domain (https://gomytruck.com/)
+  if (url === `${BASE_URL}/` || url === BASE_URL) return `${BASE_URL}/`
+  // Strictly enforce consistent URL format without trailing slash for non-root paths
   return url.replace(/(https?:\/\/[^/]+.*?)\/+$/, "$1")
 }
 
