@@ -452,19 +452,30 @@ export default function RouteVehiclePage() {
               </h3>
               <p className="text-xs text-slate-500 mb-4">Other frequent freight routes originating from {originName}</p>
               <div className="space-y-2.5">
-                {(POPULAR_CORRIDORS.filter(c => (c.originSlug === corridor.originSlug || c.destSlug === corridor.originSlug) && c.slug !== corridor.slug).slice(0, 3).concat([
-                  { slug: `${corridor.originSlug}-to-delhi`, originName, destName: "Delhi", highway: "NH Trunk Axis", distanceKm: 420 },
-                  { slug: `${corridor.originSlug}-to-mumbai`, originName, destName: "Mumbai", highway: "Western Highway", distanceKm: 650 }
-                ])).slice(0, 3).map((sc, i) => (
-                  <Link
-                    key={i}
-                    to={`/transport/${sc.slug}/${vehicle.slug}`}
-                    className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-brand-400 text-xs font-semibold text-slate-800 transition-colors"
-                  >
-                    <span>{sc.originName || originName} → {sc.destName}</span>
-                    <span className="text-brand-600 font-bold flex items-center gap-1">Rates <ArrowRight size={12} /></span>
-                  </Link>
-                ))}
+                {(() => {
+                  const directCorridors = POPULAR_CORRIDORS.filter(c => 
+                    (c.originSlug === corridor.originSlug || c.destSlug === corridor.originSlug) && c.slug !== corridor.slug
+                  );
+                  const displayCorridors = directCorridors.length >= 3
+                    ? directCorridors.slice(0, 3)
+                    : [
+                        ...directCorridors,
+                        ...POPULAR_CORRIDORS.filter(c => c.slug !== corridor.slug && !directCorridors.some(dc => dc.slug === c.slug))
+                      ].slice(0, 3);
+                  return displayCorridors.map((sc, i) => (
+                    <Link
+                      key={sc.slug || i}
+                      to={`/transport/${sc.slug}/${vehicle.slug}`}
+                      className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-brand-400 text-xs font-semibold text-slate-800 transition-colors"
+                    >
+                      <div>
+                        <span className="font-semibold text-slate-800">{sc.originName} → {sc.destName}</span>
+                        <span className="block text-[10px] text-slate-400 font-normal">{sc.distanceKm} km · {sc.highway}</span>
+                      </div>
+                      <span className="text-brand-600 font-bold flex items-center gap-1">Rates <ArrowRight size={12} /></span>
+                    </Link>
+                  ));
+                })()}
               </div>
             </div>
           </div>

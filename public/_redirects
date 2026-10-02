@@ -1,0 +1,56 @@
+# Host canonicalization
+https://www.gomytruck.com/* https://gomytruck.com/:splat 301!
+
+# Legacy route migrations
+/transport-services-kolkata    /kolkata/truck-booking        301
+/truck-booking-kolkata         /kolkata/truck-booking        301
+/truck-booking-in-kolkata      /kolkata/truck-booking        301
+/transport-services-barrackpore /barrackpore/truck-booking    301
+/truck-booking-barrackpore     /barrackpore/truck-booking    301
+/truck-booking-in-barrackpore  /barrackpore/truck-booking    301
+/mini-truck-booking-kolkata    /kolkata/mini-truck-booking   301
+/mini-truck-booking-in-kolkata /kolkata/mini-truck-booking   301
+/pickup-truck-booking-kolkata  /kolkata/pickup-truck-booking 301
+/pickup-truck-booking-in-kolkata /kolkata/pickup-truck-booking 301
+/kolkata/pickup-truck-rent     /kolkata/pickup-truck-booking 301
+/goods-transport-kolkata       /kolkata/goods-transport      301
+/goods-transport-in-kolkata    /kolkata/goods-transport      301
+/goods-transport-services-kolkata /kolkata/goods-transport   301
+/tata-ace-booking-kolkata      /kolkata/tata-ace-booking     301
+/goods-transport-barrackpore   /barrackpore/goods-transport  301
+/local-transport               /local-transport/kolkata      301
+/local-transport-kolkata       /local-transport/kolkata      301
+/local-transport-in-kolkata    /local-transport/kolkata      301
+/local-transport-services-kolkata /local-transport/kolkata   301
+/intercity-transport           /intercity/kolkata            301
+/intercity-transport-from-kolkata /intercity/kolkata         301
+/transport-service-for-msmes   /services/transport-for-msmes 301
+/commercial-goods-transport    /services/commercial-goods-transport 301
+/fleet-partner-registration-india /fleet-partner-registration 301
+/services/fleet-partner-registration-india /fleet-partner-registration 301
+/terms                         /legal/terms                  301
+/terms-conditions              /legal/terms                  301
+/legal/terms-conditions        /legal/terms                  301
+
+# Canonical city redirects for legacy -ts aliases
+/warangal-ts                   /warangal                     301
+/warangal-ts/*                 /warangal/:splat              301
+/karimnagar-ts                 /karimnagar                   301
+/karimnagar-ts/*               /karimnagar/:splat            301
+/nizamabad-ts                  /nizamabad                    301
+/nizamabad-ts/*                /nizamabad/:splat             301
+/khammam-ts                    /khammam                      301
+/khammam-ts/*                  /khammam/:splat               301
+/ramagundam-ts                 /ramagundam                   301
+/ramagundam-ts/*               /ramagundam/:splat            301
+/mahbubnagar-ts                /mahbubnagar                  301
+/mahbubnagar-ts/*              /mahbubnagar/:splat           301
+/nalgonda-ts                   /nalgonda                     301
+/nalgonda-ts/*                 /nalgonda/:splat              301
+/suryapet-ts                   /suryapet                     301
+/suryapet-ts/*                 /suryapet/:splat              301
+/adilabad-ts                   /adilabad                     301
+/adilabad-ts/*                 /adilabad/:splat              301
+
+# Unknown URLs return 404
+/*                             /404.html                     404

@@ -231,20 +231,26 @@ export default function TransportAgentCityPage() {
                 </p>
 
                 {/* CTAs */}
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-3.5 items-center">
                   <button
                     onClick={handleRegister}
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-base font-bold bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/20 transition-all transform hover:-translate-y-0.5"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-base font-bold bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/20 transition-all transform hover:-translate-y-0.5 cursor-pointer"
                   >
                     <span>Register as Transport Agent</span>
                     <ArrowRight size={18} />
                   </button>
+                  <button
+                    onClick={handleRegister}
+                    className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-bold bg-white hover:bg-slate-50 text-green-700 border-2 border-green-600 shadow-sm transition-all cursor-pointer"
+                  >
+                    <span>Existing Agent Login →</span>
+                  </button>
                   <a
                     href="tel:6291957542"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-base font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm transition-colors"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
                   >
                     <PhoneCall size={16} className="text-green-600" />
-                    <span>Help: 6291957542</span>
+                    <span>Support: 6291957542</span>
                   </a>
                 </div>
 
@@ -404,6 +410,35 @@ export default function TransportAgentCityPage() {
                 When the trip is successfully completed with the assistance of your confirmed driver, your up to 1–5% commission is credited. If any load is under standard value, GoMyTruck adds guaranteed compensation!
               </p>
             </div>
+          </div>
+
+          {/* ₹1,00,000 Illustrative Settlement Breakdown */}
+          <div className="mt-12 bg-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl max-w-4xl mx-auto">
+            <div className="text-center max-w-xl mx-auto mb-6">
+              <span className="text-xs uppercase font-bold tracking-wider text-green-400">Transparent Settlement Example</span>
+              <h3 className="text-xl sm:text-2xl font-bold mt-1 text-white">How a ₹1,00,000 Shipment Is Settled</h3>
+              <p className="text-xs sm:text-sm text-slate-400 mt-1">Clear breakdown showing driver payout, agent commission, and platform operations share.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-slate-800/90 rounded-2xl p-4 border border-slate-700/80 text-center">
+                <span className="text-xs text-slate-400 font-medium">Driver / Fleet Payout</span>
+                <p className="text-2xl font-black text-white mt-1">₹90,000</p>
+                <span className="text-[11px] text-emerald-400 font-semibold">90% of Freight Value</span>
+              </div>
+              <div className="bg-green-950/60 rounded-2xl p-4 border border-green-500/40 text-center shadow-lg shadow-green-500/10">
+                <span className="text-xs text-green-300 font-semibold">Agent Commission</span>
+                <p className="text-2xl font-black text-green-400 mt-1">₹1,000</p>
+                <span className="text-[11px] text-green-300 font-bold">1% of Shipment Value</span>
+              </div>
+              <div className="bg-slate-800/90 rounded-2xl p-4 border border-slate-700/80 text-center">
+                <span className="text-xs text-slate-400 font-medium">GoMyTruck Operations</span>
+                <p className="text-2xl font-black text-white mt-1">₹9,000</p>
+                <span className="text-[11px] text-slate-400">Platform Share</span>
+              </div>
+            </div>
+            <p className="text-[11px] text-slate-400 text-center mt-4">
+              * Agent commission is calculated on eligible shipment freight value upon successful trip completion assisted by your confirmed driver.
+            </p>
           </div>
         </section>
 

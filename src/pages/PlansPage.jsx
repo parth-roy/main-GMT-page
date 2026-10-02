@@ -1,6 +1,6 @@
 import React, { useState } from "react"
-import { Helmet } from "react-helmet-async"
 import { ChevronDown, ChevronUp, Check } from "lucide-react"
+import SEOHead from "../seo/SEOHead"
 
 export default function PlansPage() {
   const [openFaq, setOpenFaq] = useState(0)
@@ -46,10 +46,12 @@ export default function PlansPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Helmet>
-        <title>GoMyTruck | Partner Plans</title>
-        <meta name="description" content="GoMyTruck Subscription Plan for partners. 0 - 5% lowest commission platform with direct payments." />
-      </Helmet>
+      <SEOHead
+        title="Partner Subscription Plans | GoMyTruck"
+        description="Transparent GoMyTruck subscription plan for commercial drivers and fleet owners. Minimum commission platform with direct daily earnings."
+        canonical="/plans"
+        keywords="GoMyTruck partner plan, truck driver subscription, freight marketplace plans, low commission logistics"
+      />
 
       {/* Header Section */}
       <section className="bg-[#262833] relative min-h-[95vh] lg:min-h-[100vh] flex items-center border-t border-brand-500 overflow-hidden pt-32 pb-48 lg:pb-32 mt-16 lg:mt-0">

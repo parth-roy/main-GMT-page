@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, useLocation, Navigate } from "react-router-dom";
 import CityTransportPage from "../components/CityTransportPage";
-import { SEO_CITIES } from "../lib/cities";
+import { SEO_CITIES, CITY_ALIASES } from "../lib/cities";
 import { useCity } from "../context/CityContext";
 
 export default function DynamicSeoPage({ serviceType }) {
   const { city } = useParams();
+  const location = useLocation();
   const { currentCity, setCity } = useCity();
+
+  // Redirect legacy / duplicate aliases (e.g. /warangal-ts -> /warangal)
+  const canonicalCity = CITY_ALIASES[city];
+  if (canonicalCity) {
+    const targetPath = location.pathname.replace(new RegExp(`^/${city}(/|$)`), `/${canonicalCity}$1`);
+    return <Navigate to={targetPath} replace />;
+  }
   
   const [seoData, setSeoData] = useState(null);
   const [loading, setLoading] = useState(true);

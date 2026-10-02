@@ -635,7 +635,7 @@ export default function Hero({
   return (
     <>
       {/* ── HERO ──────────────────────────────────────── */}
-      <section className="relative min-h-[75vh] sm:min-h-[85vh] pt-24 sm:pt-28 pb-16 sm:pb-48 md:pb-52 lg:pb-56 flex flex-col justify-center items-center bg-slate-900 overflow-visible mb-36 sm:mb-40 md:mb-44">
+      <section className="relative min-h-[75vh] sm:min-h-[92vh] lg:min-h-[96vh] pt-24 sm:pt-28 pb-16 sm:pb-56 md:pb-60 lg:pb-64 flex flex-col justify-center items-center bg-slate-900 overflow-visible mb-36 sm:mb-40 md:mb-44">
         {/* Full-bleed Video / Image Background */}
         <div className="absolute inset-0 z-0">
           {isMobile ? (
@@ -767,6 +767,61 @@ export default function Hero({
             <p className="mt-2.5 sm:mt-3 text-sm sm:text-base text-brand-200 font-bold italic" lang="hi-Latn">
               Aasaan zariya, transport ka
             </p>
+
+            {/* Tagline / Subtitle */}
+            <p className="mt-7 text-sm sm:text-base font-bold text-slate-300 tracking-wide">
+              How would you like to get started?
+            </p>
+
+            {/* 3 Role Action Cards in Desktop Mode */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 max-w-4xl mx-auto mt-4 w-full text-left">
+              {/* 1. Book Truck (Solid Orange + Dark Text) */}
+              <button
+                type="button"
+                onClick={onOpenEstimate}
+                className="flex items-center gap-3.5 bg-[#f99f1b] hover:bg-[#e89010] active:scale-98 text-slate-950 rounded-2xl p-4 sm:p-5 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/35 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer group"
+              >
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-amber-400/40 shrink-0 group-hover:scale-105 transition-transform">
+                  <SpeedTruckIcon className="w-8 h-7 text-slate-950" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="block text-lg font-black text-slate-950 leading-tight">Book Truck</span>
+                  <span className="block text-xs font-bold text-slate-900/80 mt-0.5 truncate">For customers &amp; shippers</span>
+                </div>
+                <ChevronRight size={18} className="text-slate-950/70 group-hover:translate-x-1 transition-transform shrink-0" />
+              </button>
+
+              {/* 2. Attach Truck (Pure White + Dark Text) */}
+              <Link
+                to="/fleet-partner-registration"
+                className="flex items-center gap-3.5 bg-white hover:bg-slate-50 active:scale-98 text-slate-950 rounded-2xl p-4 sm:p-5 shadow-lg shadow-slate-900/15 hover:shadow-slate-900/25 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer group"
+              >
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-slate-100 shrink-0 group-hover:scale-105 transition-transform">
+                  <AttachTruckIcon className="w-8 h-7 text-slate-950" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="block text-lg font-black text-slate-950 leading-tight">Attach Truck</span>
+                  <span className="block text-xs font-semibold text-slate-500 mt-0.5 truncate">For drivers &amp; owners</span>
+                </div>
+                <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
+              </Link>
+
+              {/* 3. GMT Agent (Pure White + Orange Border + Peach Icon Tile) */}
+              <button
+                type="button"
+                onClick={handleAgentClick}
+                className="flex items-center gap-3.5 bg-white hover:bg-slate-50 active:scale-98 border-2 border-[#f99f1b] rounded-2xl p-4 sm:p-5 shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer group"
+              >
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#fff4eb] shrink-0 group-hover:scale-105 transition-transform">
+                  <AgentIcon className="w-6 h-6 text-[#f99f1b]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="block text-lg font-black text-slate-950 leading-tight">GMT Agent</span>
+                  <span className="block text-xs font-semibold text-slate-500 mt-0.5 truncate">Match loads · Earn 1–5%</span>
+                </div>
+                <ChevronRight size={18} className="text-[#f99f1b] group-hover:translate-x-1 transition-transform shrink-0" />
+              </button>
+            </div>
           </div>
         )}
 

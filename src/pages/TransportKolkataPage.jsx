@@ -90,6 +90,7 @@ export default function TransportKolkataPage() {
       city="Kolkata"
       slug="kolkata"
       canonical="/kolkata/truck-booking"
+      seoTitle="Online Truck Booking & Goods Transport in Kolkata | Commercial Freight"
       headline="Transport Services in Kolkata"
       subheadline="Request a mini truck, Tata Ace, bike delivery, or moving quote in Kolkata. Review route-based pricing and current availability."
       description="Request transport services in Kolkata, including mini trucks, Tata Ace, larger goods vehicles, eligible bike delivery, and scoped moving quotes."

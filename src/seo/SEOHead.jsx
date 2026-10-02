@@ -99,8 +99,9 @@ const DEFAULT_GLOBAL_SCHEMA = {
 
 const toAbsoluteUrl = (value, fallback = BASE_URL) => {
   if (!value) return fallback
-  if (/^https?:\/\//i.test(value)) return value
-  return `${BASE_URL}${value.startsWith("/") ? value : '/' + value}`
+  const url = /^https?:\/\//i.test(value) ? value : `${BASE_URL}${value.startsWith("/") ? value : '/' + value}`
+  // Strictly enforce consistent URL format without trailing slash (unless root domain)
+  return url.replace(/(https?:\/\/[^/]+.*?)\/+$/, "$1")
 }
 
 const serializeJsonLd = (schema) => JSON.stringify(schema).replace(/</g, "\\u003c")

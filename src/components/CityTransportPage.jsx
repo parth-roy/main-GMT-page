@@ -279,27 +279,32 @@ export default function CityTransportPage({
               </div>
 
               <div className="space-y-3">
-                {((slug ? POPULAR_CORRIDORS.filter(c => c.originSlug === slug || c.destSlug === slug) : []).slice(0, 5).concat(
-                  [{ slug: `${slug || 'delhi'}-to-delhi`, originName: city, destName: "Delhi", highway: "NH Trunk Axis", distanceKm: 420 },
-                   { slug: `${slug || 'mumbai'}-to-mumbai`, originName: city, destName: "Mumbai", highway: "Western Highway", distanceKm: 580 },
-                   { slug: `${slug || 'kolkata'}-to-kolkata`, originName: city, destName: "Kolkata", highway: "East Logistics Corridor", distanceKm: 520 }]
-                )).slice(0, 5).map((c, i) => (
-                  <Link
-                    key={i}
-                    to={`/transport/${c.slug}/14ft-truck`}
-                    className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl hover:border-brand-400 hover:shadow-xs transition-all group"
-                  >
-                    <div>
-                      <div className="font-bold text-slate-800 text-sm group-hover:text-brand-700">
-                        {c.originName || city} → {c.destName}
+                {(() => {
+                  const cityCorridors = slug ? POPULAR_CORRIDORS.filter(c => c.originSlug === slug || c.destSlug === slug) : [];
+                  const displayCorridors = cityCorridors.length >= 4
+                    ? cityCorridors.slice(0, 5)
+                    : [
+                        ...cityCorridors,
+                        ...POPULAR_CORRIDORS.filter(c => !cityCorridors.some(cc => cc.slug === c.slug))
+                      ].slice(0, 5);
+                  return displayCorridors.map((c, i) => (
+                    <Link
+                      key={c.slug || i}
+                      to={`/transport/${c.slug}/14ft-truck`}
+                      className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl hover:border-brand-400 hover:shadow-xs transition-all group"
+                    >
+                      <div>
+                        <div className="font-bold text-slate-800 text-sm group-hover:text-brand-700">
+                          {c.originName} → {c.destName}
+                        </div>
+                        <div className="text-[11px] text-slate-500">{c.highway || "Express National Highway"} · {c.distanceKm} km</div>
                       </div>
-                      <div className="text-[11px] text-slate-500">{c.highway || "Express National Highway"} · {c.distanceKm || 350} km</div>
-                    </div>
-                    <span className="text-xs font-bold text-brand-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Check Rates <ArrowRight size={12} />
-                    </span>
-                  </Link>
-                ))}
+                      <span className="text-xs font-bold text-brand-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        Check Rates <ArrowRight size={12} />
+                      </span>
+                    </Link>
+                  ));
+                })()}
               </div>
             </div>
 

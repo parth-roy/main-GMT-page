@@ -332,6 +332,7 @@ export default function App() {
             <Route path="/privacy-policy" element={<Navigate to="/legal/privacy-policy" replace />} />
             
             <Route path="/legal/terms" element={<StaticLegalDocument documentId="terms-conditions" />} />
+            <Route path="/legal/terms-conditions" element={<Navigate to="/legal/terms" replace />} />
             <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
             <Route path="/terms-conditions" element={<Navigate to="/legal/terms" replace />} />
             

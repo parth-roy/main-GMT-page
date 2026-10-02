@@ -97,6 +97,7 @@ export default function MiniTruckKolkataPage() {
       city="Kolkata"
       slug="mini-truck-booking-kolkata"
       canonical="/kolkata/mini-truck-booking"
+      seoTitle="Mini Truck Booking in Kolkata | Tata Ace & Chota Hathi on Rent"
       headline="Mini Truck Booking in Kolkata"
       subheadline="Request a Tata Ace, Chota Hathi, or mini truck in Kolkata. Review load fit, route-based pricing, and current availability."
       description="Request a Tata Ace or mini truck in Kolkata, review the route-based estimate, and follow supported booking status and tracking updates."

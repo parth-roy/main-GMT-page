@@ -144,6 +144,107 @@
   to = "/legal/terms"
   status = 301
 
+[[redirects]]
+  from = "/terms-conditions"
+  to = "/legal/terms"
+  status = 301
+
+[[redirects]]
+  from = "/legal/terms-conditions"
+  to = "/legal/terms"
+  status = 301
+
+# Canonical city redirects for legacy -ts aliases
+[[redirects]]
+  from = "/warangal-ts"
+  to = "/warangal"
+  status = 301
+
+[[redirects]]
+  from = "/warangal-ts/*"
+  to = "/warangal/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/karimnagar-ts"
+  to = "/karimnagar"
+  status = 301
+
+[[redirects]]
+  from = "/karimnagar-ts/*"
+  to = "/karimnagar/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/nizamabad-ts"
+  to = "/nizamabad"
+  status = 301
+
+[[redirects]]
+  from = "/nizamabad-ts/*"
+  to = "/nizamabad/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/khammam-ts"
+  to = "/khammam"
+  status = 301
+
+[[redirects]]
+  from = "/khammam-ts/*"
+  to = "/khammam/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/ramagundam-ts"
+  to = "/ramagundam"
+  status = 301
+
+[[redirects]]
+  from = "/ramagundam-ts/*"
+  to = "/ramagundam/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/mahbubnagar-ts"
+  to = "/mahbubnagar"
+  status = 301
+
+[[redirects]]
+  from = "/mahbubnagar-ts/*"
+  to = "/mahbubnagar/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/nalgonda-ts"
+  to = "/nalgonda"
+  status = 301
+
+[[redirects]]
+  from = "/nalgonda-ts/*"
+  to = "/nalgonda/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/suryapet-ts"
+  to = "/suryapet"
+  status = 301
+
+[[redirects]]
+  from = "/suryapet-ts/*"
+  to = "/suryapet/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/adilabad-ts"
+  to = "/adilabad"
+  status = 301
+
+[[redirects]]
+  from = "/adilabad-ts/*"
+  to = "/adilabad/:splat"
+  status = 301
+
 # Static-file shadowing serves prerendered routes first; unknown URLs return a real 404.
 [[redirects]]
   from = "/*"

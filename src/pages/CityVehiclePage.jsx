@@ -8,7 +8,7 @@ import {
 import SEOHead from "../seo/SEOHead";
 import TrustBadgeRow from "../components/TrustBadgeRow";
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner";
-import { SEO_CITIES } from "../lib/cities";
+import { SEO_CITIES, CITY_ALIASES } from "../lib/cities";
 import { getVehicleBySlug, ALL_SEO_VEHICLES } from "../lib/vehicles";
 import { generateCityFaqs } from "../lib/locationFaqHelper";
 import { useCity } from "../context/CityContext";
@@ -20,15 +20,18 @@ export default function CityVehiclePage() {
   const { currentCity, setCity } = useCity();
   const [openFaq, setOpenFaq] = useState(null);
 
+  // Redirect legacy / duplicate aliases (e.g. /warangal-ts -> /warangal)
+  const canonicalCity = CITY_ALIASES[city];
+  if (canonicalCity) {
+    const targetPath = location.pathname.replace(new RegExp(`^/${city}(/|$)`), `/${canonicalCity}$1`);
+    return <Navigate to={targetPath} replace />;
+  }
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [city, vehicleParam]);
 
-  const cityConfig = SEO_CITIES.find((c) => c.slug === city) || (city ? {
-    name: city.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
-    slug: city,
-    state: "India"
-  } : null);
+  const cityConfig = SEO_CITIES.find((c) => c.slug === city);
 
   useEffect(() => {
     if (cityConfig && currentCity?.slug !== cityConfig.slug) {

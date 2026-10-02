@@ -27,7 +27,7 @@ export const SEO_CITIES = [
   {
     "name": "Warangal",
     "slug": "warangal",
-    "state": "Andhra Pradesh"
+    "state": "Telangana"
   },
   {
     "name": "Nellore",
@@ -57,7 +57,7 @@ export const SEO_CITIES = [
   {
     "name": "Nizamabad",
     "slug": "nizamabad",
-    "state": "Andhra Pradesh"
+    "state": "Telangana"
   },
   {
     "name": "Tirupati",
@@ -67,7 +67,7 @@ export const SEO_CITIES = [
   {
     "name": "Karimnagar",
     "slug": "karimnagar",
-    "state": "Andhra Pradesh"
+    "state": "Telangana"
   },
   {
     "name": "Anantapur",
@@ -77,7 +77,7 @@ export const SEO_CITIES = [
   {
     "name": "Ramagundam",
     "slug": "ramagundam",
-    "state": "Andhra Pradesh"
+    "state": "Telangana"
   },
   {
     "name": "Vizianagaram",
@@ -107,7 +107,7 @@ export const SEO_CITIES = [
   {
     "name": "Khammam",
     "slug": "khammam",
-    "state": "Andhra Pradesh"
+    "state": "Telangana"
   },
   {
     "name": "Machilipatnam",
@@ -132,7 +132,7 @@ export const SEO_CITIES = [
   {
     "name": "Mahbubnagar",
     "slug": "mahbubnagar",
-    "state": "Andhra Pradesh"
+    "state": "Telangana"
   },
   {
     "name": "Chittoor",
@@ -157,7 +157,7 @@ export const SEO_CITIES = [
   {
     "name": "Nalgonda",
     "slug": "nalgonda",
-    "state": "Andhra Pradesh"
+    "state": "Telangana"
   },
   {
     "name": "Guntakal",
@@ -182,7 +182,7 @@ export const SEO_CITIES = [
   {
     "name": "Adilabad",
     "slug": "adilabad",
-    "state": "Andhra Pradesh"
+    "state": "Telangana"
   },
   {
     "name": "Narasaraopet",
@@ -197,7 +197,7 @@ export const SEO_CITIES = [
   {
     "name": "Suryapet",
     "slug": "suryapet",
-    "state": "Andhra Pradesh"
+    "state": "Telangana"
   },
   {
     "name": "Tadepalligudem",
@@ -2582,51 +2582,6 @@ export const SEO_CITIES = [
     "state": "West Bengal"
   },
   {
-    "name": "Warangal",
-    "slug": "warangal-ts",
-    "state": "Telangana"
-  },
-  {
-    "name": "Karimnagar",
-    "slug": "karimnagar-ts",
-    "state": "Telangana"
-  },
-  {
-    "name": "Nizamabad",
-    "slug": "nizamabad-ts",
-    "state": "Telangana"
-  },
-  {
-    "name": "Khammam",
-    "slug": "khammam-ts",
-    "state": "Telangana"
-  },
-  {
-    "name": "Ramagundam",
-    "slug": "ramagundam-ts",
-    "state": "Telangana"
-  },
-  {
-    "name": "Mahbubnagar",
-    "slug": "mahbubnagar-ts",
-    "state": "Telangana"
-  },
-  {
-    "name": "Nalgonda",
-    "slug": "nalgonda-ts",
-    "state": "Telangana"
-  },
-  {
-    "name": "Suryapet",
-    "slug": "suryapet-ts",
-    "state": "Telangana"
-  },
-  {
-    "name": "Adilabad",
-    "slug": "adilabad-ts",
-    "state": "Telangana"
-  },
-  {
     "name": "Siddipet",
     "slug": "siddipet",
     "state": "Telangana"
@@ -4612,3 +4567,15 @@ export const SEO_CITIES = [
     "state": "Uttarakhand"
   }
 ];
+
+export const CITY_ALIASES = {
+  "warangal-ts": "warangal",
+  "karimnagar-ts": "karimnagar",
+  "nizamabad-ts": "nizamabad",
+  "khammam-ts": "khammam",
+  "ramagundam-ts": "ramagundam",
+  "mahbubnagar-ts": "mahbubnagar",
+  "nalgonda-ts": "nalgonda",
+  "suryapet-ts": "suryapet",
+  "adilabad-ts": "adilabad",
+};

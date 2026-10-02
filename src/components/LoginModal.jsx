@@ -29,7 +29,7 @@ export default function LoginModal() {
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
-  const [whatsapp, setWhatsapp] = useState(true)
+  const [whatsapp, setWhatsapp] = useState(false)
   
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const inputRefs = useRef([])
@@ -419,7 +419,7 @@ export default function LoginModal() {
                       checked={whatsapp} 
                       onChange={e => setWhatsapp(e.target.checked)} 
                     />
-                    <span className="text-xs font-medium text-slate-600">Receive updates via WhatsApp</span>
+                    <span className="text-xs font-medium text-slate-600">Opt-in to receive status updates via WhatsApp (Optional)</span>
                   </label>
 
                   {error && (

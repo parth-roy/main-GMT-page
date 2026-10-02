@@ -1,11 +1,47 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { Facebook, Twitter, Linkedin, Instagram, Youtube, Smartphone } from "lucide-react"
-import { SEO_CITIES } from "../lib/cities"
+// Curated major transport hubs featured in footer to optimize page speed, reduce HTML payload, and avoid link dilution
+const FEATURED_HUBS = [
+  { name: "Kolkata", to: "/kolkata" },
+  { name: "Howrah", to: "/howrah" },
+  { name: "Barrackpore", to: "/barrackpore" },
+  { name: "Dankuni", to: "/dankuni" },
+  { name: "Durgapur", to: "/durgapur" },
+  { name: "Asansol", to: "/asansol" },
+  { name: "Siliguri", to: "/siliguri" },
+  { name: "Haldia", to: "/haldia" },
+  { name: "Kharagpur", to: "/kharagpur" },
+  { name: "Delhi NCR", to: "/new-delhi" },
+  { name: "Mumbai", to: "/mumbai" },
+  { name: "Bengaluru", to: "/bengaluru" },
+  { name: "Chennai", to: "/chennai" },
+  { name: "Hyderabad", to: "/hyderabad" },
+  { name: "Ahmedabad", to: "/ahmedabad" },
+  { name: "Pune", to: "/pune" },
+  { name: "Patna", to: "/patna" },
+  { name: "Bhubaneswar", to: "/bhubaneswar" },
+  { name: "Ranchi", to: "/ranchi" },
+  { name: "Guwahati", to: "/guwahati" },
+  { name: "Lucknow", to: "/lucknow" },
+  { name: "Kanpur", to: "/kanpur" },
+  { name: "Jaipur", to: "/jaipur" },
+  { name: "Indore", to: "/indore" },
+  { name: "Nagpur", to: "/nagpur" },
+  { name: "Visakhapatnam", to: "/visakhapatnam" },
+  { name: "Coimbatore", to: "/coimbatore" },
+  { name: "Surat", to: "/surat" },
+  { name: "Vadodara", to: "/vadodara" },
+  { name: "Ludhiana", to: "/ludhiana" },
+  { name: "Chandigarh", to: "/chandigarh" },
+  { name: "Kochi", to: "/kochi" },
+  { name: "Raipur", to: "/raipur" },
+  { name: "Cuttack", to: "/cuttack" },
+  { name: "Jamshedpur", to: "/jamshedpur" },
+  { name: "Dhanbad", to: "/dhanbad" },
+]
 
 export default function Footer({ onScrollToSection }) {
-  // All SEO city pages — dynamically mapped from the single source of truth in cities.js
-  const cities = SEO_CITIES.map((c) => ({ name: c.name, to: `/${c.slug}` }))
 
   // Popular Searches — consolidated to prevent Link Equity Dilution
   const popularSearches = [
@@ -158,31 +194,33 @@ export default function Footer({ onScrollToSection }) {
           </div>
         </div>
 
-        {/* Pan-India 500+ Cities & Industrial Corridors Grid */}
+        {/* Pan-India Service Coverage Grid (Curated Major Hubs + Full Directory Link) */}
         <div className="pt-8 pb-10 border-t border-[#1a1a1a] space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider">
-              Pan-India Service Coverage ({cities.length} Cities, Industrial Corridors &amp; Port Hubs)
-            </h4>
+            <div>
+              <h4 className="text-white font-bold text-xs uppercase tracking-wider">
+                Key Transport Hubs &amp; Industrial Corridors
+              </h4>
+              <p className="text-[11px] text-gray-500 mt-0.5">Primary logistics centers across India with active fleet capacity</p>
+            </div>
             <Link
               to="/directory"
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="text-orange-400 hover:text-orange-300 text-[11px] font-semibold transition-colors"
+              className="text-orange-400 hover:text-orange-300 text-xs font-bold transition-colors inline-flex items-center gap-1"
             >
-              Explore Full State Directory →
+              Explore All 900+ Cities in Directory →
             </Link>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-x-2.5 gap-y-1.5 text-left">
-            {cities.map((city, index) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-2 text-left">
+            {FEATURED_HUBS.map((hub, index) => (
               <Link
                 key={index}
-                to={city.to}
-                title={`Truck booking & transport in ${city.name}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors text-[10px] sm:text-[11px] leading-tight truncate"
+                to={hub.to}
+                title={`Truck booking & transport in ${hub.name}`}
+                className="text-gray-400 hover:text-orange-400 transition-colors text-xs py-0.5 flex items-center gap-1.5"
               >
-                {city.name}
+                <span className="w-1.5 h-1.5 rounded-full bg-gray-700 shrink-0" />
+                <span className="truncate">{hub.name}</span>
               </Link>
             ))}
           </div>

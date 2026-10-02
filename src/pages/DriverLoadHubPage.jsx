@@ -48,22 +48,22 @@ export default function DriverLoadHubPage() {
   const { name: cityName, state } = cityConfig;
   const canonicalPath = location.pathname;
 
-  // Simulated live load opportunities matching local context
-  const simulatedLoads = [
+  // Typical commercial load demand profiles matching local vehicle and city context
+  const sampleDemandProfiles = [
     {
       title: `Warehouse Retail Distribution (${vehicle.shortName})`,
       location: `${cityName} Industrial Zone → City Center`,
       weight: `${vehicle.capacityKg * 0.8} kg`,
       estEarning: `₹${vehicle.baseFare * 3}`,
-      posted: "15 mins ago",
+      cadence: "Daily Recurring Demand",
       type: "Local Delivery",
     },
     {
-      title: `Wholesale Market / Mandi Haulage`,
-      location: `Wholesale Market → ${cityName} Suburbs`,
+      title: `Wholesale Market & APMC Haulage`,
+      location: `Wholesale Hub → ${cityName} Suburbs`,
       weight: `${vehicle.capacityKg * 0.9} kg`,
       estEarning: `₹${vehicle.baseFare * 4}`,
-      posted: "42 mins ago",
+      cadence: "Frequent Dispatch Lane",
       type: "Commercial Goods",
     },
     {
@@ -71,7 +71,7 @@ export default function DriverLoadHubPage() {
       location: `Within ${cityName} (15 km transit)`,
       weight: `${vehicle.capacityKg} kg (Full Load)`,
       estEarning: `₹${vehicle.baseFare * 5}`,
-      posted: "1 hour ago",
+      cadence: "On-demand Dispatch",
       type: "House Shifting",
     },
     {
@@ -79,7 +79,7 @@ export default function DriverLoadHubPage() {
       location: `${cityName} → Regional District Hub`,
       weight: `${vehicle.capacityKg} kg`,
       estEarning: `₹${vehicle.baseFare * 8}`,
-      posted: "2 hours ago",
+      cadence: "Backhaul Return Corridor",
       type: "Intercity Highway",
     },
   ];
@@ -227,16 +227,16 @@ export default function DriverLoadHubPage() {
                 <div className="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
                   <div className="flex items-center gap-2">
                     <Briefcase className="text-amber-400" size={18} />
-                    <span className="font-bold text-white text-sm">Live Load Opportunities</span>
+                    <span className="font-bold text-white text-sm">Typical Load Demand</span>
                   </div>
                   <span className="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active in {cityName}
                   </span>
                 </div>
 
-                {/* Simulated Load List */}
+                {/* Sample Demand Profiles List */}
                 <div className="space-y-3">
-                  {simulatedLoads.map((load, idx) => (
+                  {sampleDemandProfiles.map((load, idx) => (
                     <div key={idx} className="bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 hover:border-amber-500/50 transition-colors">
                       <div className="flex justify-between items-start mb-1">
                         <h4 className="text-xs font-bold text-white leading-snug">{load.title}</h4>
@@ -244,7 +244,7 @@ export default function DriverLoadHubPage() {
                       </div>
                       <div className="flex justify-between items-center text-[11px] text-slate-400">
                         <span className="flex items-center gap-1"><img src="/google-maps-icon.webp" alt="Location" width={11} height={11} className="w-3 h-3 object-contain shrink-0" /> {load.location}</span>
-                        <span className="text-slate-500">{load.posted}</span>
+                        <span className="text-slate-400 font-medium">{load.cadence}</span>
                       </div>
                     </div>
                   ))}
@@ -255,7 +255,7 @@ export default function DriverLoadHubPage() {
                     to="/fleet-partner-registration"
                     className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center justify-center gap-1"
                   >
-                    View All Live Loads &amp; Start Earning <ArrowRight size={13} />
+                    Attach Vehicle &amp; Access Demand <ArrowRight size={13} />
                   </Link>
                 </div>
               </div>
