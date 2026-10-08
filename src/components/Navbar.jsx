@@ -11,20 +11,27 @@ import { useCity } from "../context/CityContext"
 
 const transportersMenu = [
   {
-    heading: "Driver & Fleet Partners",
+    heading: "Driver Earnings Guarantee",
     items: [
-      { label: "Attach My Truck", to: "/fleet-partner-registration", desc: "Register your vehicle" },
-      { label: "Driver Partner", to: "/driver-partner", desc: "Earn from every trip" },
-      { label: "Fleet Owner Portal", to: "/fleet-partner-registration", desc: "Manage your fleet" },
+      { label: "₹25,000 MEG Guarantee", to: "/minimum-earnings-guarantee", desc: "Code on Social Security 2020" },
+      { label: "Driver Partner Onboarding", to: "/driver-partner", desc: "Keep 100% fare • Flat ₹99" },
+      { label: "48h Load Safe Harbor", to: "/minimum-earnings-guarantee", desc: "5 free trips if unmatched" },
     ],
   },
   {
-    heading: "Partner Benefits",
+    heading: "Fleet Attachment Bonus",
     items: [
-      { label: "Instant Trip Matching", to: "/driver-partner", desc: "< 20 min assignment" },
-      { label: "Return Load Finder", to: "/driver-partner", desc: "No empty running" },
-      { label: "Partner Plans", to: "/plans", desc: "Subscription benefits" },
-      { label: "GoMyTruck Verified", to: "/gomytruck-verified", desc: "Trust badge" },
+      { label: "₹5,000 FASTag Credit", to: "/fleet-attachment", desc: "Per 5 trucks attached" },
+      { label: "Attach Commercial Fleet", to: "/fleet-partner-registration", desc: "14ft, 19ft, 22ft & 32ft" },
+      { label: "30-Day Warehouse Contracts", to: "/fleet-attachment", desc: "60+ guaranteed trips/mo" },
+    ],
+  },
+  {
+    heading: "Partner Trust & Tools",
+    items: [
+      { label: "GoMyTruck Verified", to: "/gomytruck-verified", desc: "Sub-10 min VAHAN badge" },
+      { label: "Return Load Finder", to: "/driver-partner", desc: "Zero empty return running" },
+      { label: "Subscription Plans", to: "/plans", desc: "Zero commission passes" },
     ],
   },
 ]
@@ -89,12 +96,12 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
       {
         heading: "Book by Service",
         items: [
+          { label: "Enterprise Dispatch (DMP)", to: "/enterprise-dispatch", desc: "TReDS & E-Way Bill Part-B" },
+          { label: "EV Fleet Solutions", to: "/ev-fleet-solutions", desc: "Tata Ace EV • 46% savings" },
           { label: "Mini Truck Booking", to: isKolkata ? "/kolkata/mini-truck-booking" : `/${citySlug}/mini-truck-booking`, desc: "Tata Ace, 407" },
           { label: "Full Truck Load (FTL)", to: "/goods-transport-services", desc: "32ft container, flatbed" },
           { label: "Part Load (PTL)", to: "/goods-transport-services", desc: "Share truck space" },
           { label: "Intercity Transport", to: `/intercity/${citySlug}`, desc: "Pan-India routes" },
-          { label: "Enterprise Logistics", to: "/enterprise", desc: "B2B contracts" },
-          { label: "Book Truck Online", to: "/book-truck-online", desc: "Instant booking" },
         ],
       },
       {
@@ -393,6 +400,20 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
             Book a Truck ({currentCity?.name || "Kolkata"})
           </p>
           <Link
+            to="/enterprise-dispatch"
+            onClick={() => setIsOpen(false)}
+            className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg"
+          >
+            Enterprise Dispatch (DMP &amp; TReDS)
+          </Link>
+          <Link
+            to="/ev-fleet-solutions"
+            onClick={() => setIsOpen(false)}
+            className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg"
+          >
+            EV Fleet Solutions (Tata Ace EV)
+          </Link>
+          <Link
             to={currentCity?.slug === "kolkata" ? "/kolkata/mini-truck-booking" : `/${currentCity?.slug || "kolkata"}/mini-truck-booking`}
             onClick={() => setIsOpen(false)}
             className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg"
@@ -414,13 +435,6 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
             Intercity Transport from {currentCity?.name || "City"}
           </Link>
           <Link
-            to="/enterprise"
-            onClick={() => setIsOpen(false)}
-            className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg"
-          >
-            Enterprise Logistics
-          </Link>
-          <Link
             to={currentCity?.slug === "kolkata" ? "/kolkata" : `/${currentCity?.slug || "kolkata"}`}
             onClick={() => setIsOpen(false)}
             className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg"
@@ -428,7 +442,9 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
             {currentCity?.name || "All"} Hub & Network
           </Link>
 
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 pt-3 pb-1">Attach Your Truck</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 pt-3 pb-1">Driver & Fleet Programs</p>
+          <Link to="/minimum-earnings-guarantee" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-black text-emerald-800 bg-emerald-50 rounded-lg border border-emerald-200/60">₹25,000 MEG Driver Guarantee</Link>
+          <Link to="/fleet-attachment" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">Fleet Attachment (₹5,000 FASTag Bonus)</Link>
           <Link to="/fleet-partner-registration" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">Fleet Partner Registration</Link>
           <Link to="/driver-partner" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">Driver Partner</Link>
           <Link to="/plans" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">Partner Plans</Link>

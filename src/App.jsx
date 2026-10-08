@@ -22,6 +22,10 @@ const EnterprisePage = lazy(() => import("./pages/EnterprisePage"))
 const AboutPage = lazy(() => import("./pages/AboutPage"))
 const SupportPage = lazy(() => import("./pages/SupportPage"))
 const DriversPage = lazy(() => import("./pages/DriversPage"))
+const DriverMEGPage = lazy(() => import("./pages/DriverMEGPage"))
+const FleetAttachmentPage = lazy(() => import("./pages/FleetAttachmentPage"))
+const EnterpriseDMPPage = lazy(() => import("./pages/EnterpriseDMPPage"))
+const EVFleetSaaSPage = lazy(() => import("./pages/EVFleetSaaSPage"))
 
 const PackersAndMoversPage = lazy(() => import("./pages/PackersAndMoversPage"))
 const BookTruckOnlinePage = lazy(() => import("./pages/BookTruckOnlinePage"))
@@ -360,6 +364,14 @@ export default function App() {
             {/* PAN-INDIA ASSISTED TRUCK BOOKING (DEMAND) */}
             <Route path="/services/assisted-truck-booking" element={<AssistedTruckBookingPage />} />
             <Route path="/services/assisted-truck-booking/:city" element={<AssistedTruckBookingPage />} />
+
+            {/* STRATEGIC BLUEPRINT INITIATIVES & HIGH-VALUE OFFERINGS */}
+            <Route path="/minimum-earnings-guarantee" element={<DriverMEGPage />} />
+            <Route path="/driver-guarantee" element={<Navigate to="/minimum-earnings-guarantee" replace />} />
+            <Route path="/fleet-attachment" element={<FleetAttachmentPage />} />
+            <Route path="/fleet-attachment-bonus" element={<Navigate to="/fleet-attachment" replace />} />
+            <Route path="/enterprise-dispatch" element={<EnterpriseDMPPage />} />
+            <Route path="/ev-fleet-solutions" element={<EVFleetSaaSPage />} />
 
             {/* PROGRAMMATIC SEO & GEO TEMPLATE ROUTES */}
             <Route path="/:city/truck-booking/:vehicle" element={<CityVehiclePage />} />

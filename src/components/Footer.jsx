@@ -58,6 +58,10 @@ export default function Footer({ onScrollToSection }) {
     { label: "Truck Booking Barrackpore",    to: "/barrackpore/truck-booking" },
     { label: "Pickup Truck Near Me",         to: "/kolkata/pickup-truck-booking" },
     { label: "GoMyTruck Verified",           to: "/gomytruck-verified" },
+    { label: "₹25,000 MEG Driver Guarantee", to: "/minimum-earnings-guarantee" },
+    { label: "Fleet Attachment ₹5,000 FASTag", to: "/fleet-attachment" },
+    { label: "Enterprise Dispatch (DMP)",    to: "/enterprise-dispatch" },
+    { label: "Tata Ace EV Fleet Solutions",  to: "/ev-fleet-solutions" },
   ]
 
   return (
@@ -162,15 +166,17 @@ export default function Footer({ onScrollToSection }) {
                 </ul>
               </div>
 
-              {/* <div className="space-y-4">
-                <h4 className="text-white font-bold text-sm tracking-wide">Truck Owners</h4>
+              <div className="space-y-4">
+                <h4 className="text-white font-bold text-sm tracking-wide">Partner Programs</h4>
                 <ul className="space-y-3">
-                  <li><Link to="/driver-partner" className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium" title="Find return load online — load board India">Find Return Load</Link></li>
-                  <li><Link to="/driver-partner" className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium" title="Attach commercial vehicle to GoMyTruck">Attach Truck</Link></li>
-                  <li><Link to="/driver-partner" className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium" title="Truck owner registration — fleet platform">Register as Owner</Link></li>
-                  <li><Link to="/driver-partner" className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium" title="Driver and fleet load marketplace">Load Marketplace</Link></li>
+                  <li><Link to="/minimum-earnings-guarantee" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-emerald-400 hover:text-emerald-300 font-bold transition-colors text-[13px]" title="₹25,000 Minimum Earnings Guarantee for Drivers">₹25,000 Driver MEG</Link></li>
+                  <li><Link to="/fleet-attachment" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium" title="Attach fleet & get ₹5,000 FASTag credit">Fleet Attachment Bonus</Link></li>
+                  <li><Link to="/enterprise-dispatch" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium" title="B2B Dispatch Management Platform & TReDS">Enterprise DMP</Link></li>
+                  <li><Link to="/ev-fleet-solutions" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium" title="Tata Ace EV Fleet Management & TCO Savings">EV Fleet Solutions</Link></li>
+                  <li><Link to="/driver-partner" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium" title="Driver partner attachment">Driver Partner Program</Link></li>
+                  <li><Link to="/fleet-partner-registration" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-gray-400 hover:text-white transition-colors text-[13px] font-medium" title="Attach commercial vehicle to GoMyTruck">Attach Commercial Truck</Link></li>
                 </ul>
-              </div> */}
+              </div>
             </div>
 
             {/* Popular Searches — keyword-rich SEO block */}
