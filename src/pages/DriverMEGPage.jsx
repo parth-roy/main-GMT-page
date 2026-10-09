@@ -29,6 +29,22 @@ export default function DriverMEGPage() {
   const handleWhatsAppOnboard = (e) => {
     e.preventDefault()
     const msg = `Namaskar! I want to attach my ${vehicle} in ${city} for the ₹25,000 Minimum Earnings Guarantee (MEG) program. My mobile number is ${phone || "shared"}.`
+
+    const API_BASE = import.meta.env.VITE_API_URL || 'https://api.gomytruck.com/api/v1'
+    fetch(`${API_BASE}/leads/gmt-whatsapp-log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        intent: 'Become a Driver Partner',
+        name: 'Driver MEG Applicant',
+        phone: phone || '',
+        vehicleType: vehicle,
+        city: city,
+        query: `Attached vehicle: ${vehicle} in ${city} for ₹25,000 Minimum Earnings Guarantee (MEG)`,
+        sourceUrl: typeof window !== 'undefined' ? window.location.href : '',
+      }),
+    }).catch(() => {})
+
     window.open(`https://wa.me/916291957542?text=${encodeURIComponent(msg)}`, "_blank")
   }
 

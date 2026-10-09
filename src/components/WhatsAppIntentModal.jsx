@@ -227,7 +227,8 @@ Sent via GoMyTruck.com`
       companyName: selectedIntent === 'ENTERPRISE' ? companyName.trim() : undefined,
       monthlyRequirement: selectedIntent === 'ENTERPRISE' ? monthlyRequirement.trim() : undefined,
       bookingNumber: selectedIntent === 'SUPPORT' ? bookingNumber.trim() : undefined,
-      query: selectedIntent === 'SUPPORT' ? query.trim() : undefined
+      query: selectedIntent === 'SUPPORT' ? query.trim() : undefined,
+      sourceUrl: typeof window !== 'undefined' ? window.location.href : '',
     };
 
     fetch(`${API_BASE}/leads/gmt-whatsapp-log`, {

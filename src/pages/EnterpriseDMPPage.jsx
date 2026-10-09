@@ -29,6 +29,23 @@ export default function EnterpriseDMPPage() {
   const handleSubmit = (e) => {
     e.preventDefault()
     const msg = `Namaskar! Enterprise demo request from ${companyName}. Work Email: ${workEmail}, Phone: ${phone}, Monthly Freight Volume: ${monthlyVolume}. Interested in Dispatch Management Platform, TReDS financing, and E-Way bill automation.`
+
+    const API_BASE = import.meta.env.VITE_API_URL || 'https://api.gomytruck.com/api/v1'
+    fetch(`${API_BASE}/leads/gmt-whatsapp-log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        intent: 'Enterprise Logistics',
+        name: companyName || 'Enterprise Partner',
+        phone: phone,
+        email: workEmail,
+        companyName: companyName,
+        monthlyRequirement: monthlyVolume,
+        query: 'Enterprise DMP demo request, TReDS financing, and E-Way bill automation',
+        sourceUrl: typeof window !== 'undefined' ? window.location.href : '',
+      }),
+    }).catch(() => {})
+
     window.open(`https://wa.me/916291957542?text=${encodeURIComponent(msg)}`, "_blank")
     setSubmitted(true)
   }

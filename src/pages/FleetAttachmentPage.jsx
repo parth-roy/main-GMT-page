@@ -28,6 +28,23 @@ export default function FleetAttachmentPage() {
   const handleFleetEnroll = (e) => {
     e.preventDefault()
     const msg = `Namaskar! I am a Fleet Owner (${fleetName}). I manage ${truckCount} in ${primaryHub}. I want to attach my fleet for the ₹5,000 FASTag credit bonus and 30-day warehouse rolling contracts. Phone: ${phone}.`
+
+    const API_BASE = import.meta.env.VITE_API_URL || 'https://api.gomytruck.com/api/v1'
+    fetch(`${API_BASE}/leads/gmt-whatsapp-log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        intent: 'Fleet Owner Attachment',
+        name: fleetName || 'Fleet Owner',
+        phone: phone || '',
+        companyName: fleetName,
+        monthlyRequirement: truckCount,
+        city: primaryHub,
+        query: `Fleet Owner attachment: ${truckCount} in ${primaryHub} (FASTag bonus & 30-day contracts)`,
+        sourceUrl: typeof window !== 'undefined' ? window.location.href : '',
+      }),
+    }).catch(() => {})
+
     window.open(`https://wa.me/916291957542?text=${encodeURIComponent(msg)}`, "_blank")
   }
 
