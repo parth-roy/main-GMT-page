@@ -122,6 +122,7 @@ export default function SEOHead({
   preloadImage,
   preloadImageSrcSet,
   preloadImageSizes = "100vw",
+  preloadImageMedia,
 }) {
   const rawTitle = title || "Online Truck Booking & Goods Transport in Kolkata"
   const fullTitle = rawTitle.toLowerCase().includes(SITE_NAME.toLowerCase())
@@ -166,6 +167,7 @@ export default function SEOHead({
           href={preloadImage}
           imageSrcSet={preloadImageSrcSet}
           imageSizes={preloadImageSizes}
+          media={preloadImageMedia}
           fetchpriority="high"
         />
       )}

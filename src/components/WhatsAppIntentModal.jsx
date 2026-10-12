@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Truck, UserCheck, Building2, HelpCircle, ArrowRight, Check, AlertCircle } from 'lucide-react';
+import { X, Truck, UserCheck, Building2, HelpCircle, ArrowRight, Check, AlertCircle, Calendar } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.gomytruck.com/api/v1';
 
@@ -76,6 +76,10 @@ export default function WhatsAppIntentModal({ initialIntent = 'BOOK' }) {
   const [dropCity, setDropCity]     = useState('');
   const [vehicleType, setVehicleType] = useState('Tata Ace/Mini Truck');
   const [goodsType, setGoodsType]   = useState('');
+  const [pickupTimingType, setPickupTimingType] = useState(''); // '', 'IMMEDIATE', 'UNDER_4_HOURS', 'TODAY', 'TOMORROW', 'CUSTOM', 'FLEXIBLE'
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [scheduledTime, setScheduledTime] = useState('');
+  const [showTimingPromptModal, setShowTimingPromptModal] = useState(false);
   
   const [partnerCity, setPartnerCity] = useState('');
   const [vehicleNumber, setVehicleNumber] = useState('');
@@ -124,13 +128,28 @@ export default function WhatsAppIntentModal({ initialIntent = 'BOOK' }) {
 
   if (!isOpen) return null;
 
+  const getTimingLabel = (overrideTiming) => {
+    const timing = typeof overrideTiming === 'string' ? overrideTiming : pickupTimingType;
+    if (!timing) return '';
+    if (timing === 'IMMEDIATE') return 'Immediate Pickup (Within 1-2 Hours)';
+    if (timing === 'UNDER_4_HOURS') return 'Within 4 Hours (High Priority)';
+    if (timing === 'TODAY') return scheduledTime ? `Today by ${scheduledTime}` : 'Today (Within 24 Hours)';
+    if (timing === 'TOMORROW') return scheduledTime ? `Tomorrow by ${scheduledTime}` : 'Tomorrow';
+    if (timing === 'CUSTOM') {
+      return `Scheduled: ${scheduledDate || 'Date TBD'}${scheduledTime ? ` at ${scheduledTime}` : ''}`;
+    }
+    if (timing === 'FLEXIBLE') return 'Flexible / Standard';
+    return typeof timing === 'string' ? timing : '';
+  };
+
   // ── Build WhatsApp message ──────────────────────────────────────────────────
-  const getWhatsAppMessage = () => {
+  const getWhatsAppMessage = (overrideTiming) => {
     const nameTag  = userName.trim()  || '[Name]';
     const phoneTag = userPhone.trim() || '[Phone]';
     const emailTag = userEmail.trim() || '[Email]';
 
     if (selectedIntent === 'BOOK') {
+      const timingLabel = getTimingLabel(overrideTiming);
       return (
 `🚚 *TRUCK BOOKING REQUEST*
 
@@ -139,6 +158,7 @@ export default function WhatsAppIntentModal({ initialIntent = 'BOOK' }) {
 📧 Email: ${emailTag}
 📍 Pickup: ${pickupCity.trim() || '[Pickup]'}
 📍 Drop: ${dropCity.trim() || '[Drop]'}
+⏰ Pickup Timing: ${timingLabel || '[Not Specified - To be confirmed]'}
 🚛 Vehicle: ${vehicleType}
 📦 Goods: ${goodsType.trim() || '[Goods]'}
 
@@ -212,7 +232,9 @@ Sent via GoMyTruck.com`
   };
 
   // ── Send to backend → Google Sheets (fire-and-forget) ──────────────────────
-  const sendToSheet = () => {
+  const sendToSheet = (overrideTiming) => {
+    const effectiveTiming = typeof overrideTiming === 'string' ? overrideTiming : null;
+    const timingLabel = getTimingLabel(effectiveTiming);
     const payload = {
       intent: INTENTS.find(i => i.id === selectedIntent)?.title,
       name: userName.trim(),
@@ -222,6 +244,7 @@ Sent via GoMyTruck.com`
       dropCity: selectedIntent === 'BOOK' ? dropCity.trim() : undefined,
       vehicleType: (selectedIntent === 'BOOK' || selectedIntent === 'PARTNER') ? vehicleType : undefined,
       goodsType: (selectedIntent === 'BOOK' || selectedIntent === 'ENTERPRISE') ? goodsType.trim() : undefined,
+      pickupTime: selectedIntent === 'BOOK' ? (timingLabel || 'Flexible / Not Specified') : undefined,
       city: selectedIntent === 'PARTNER' ? partnerCity.trim() : selectedIntent === 'ENTERPRISE' ? enterpriseCity.trim() : undefined,
       vehicleNumber: selectedIntent === 'PARTNER' ? vehicleNumber.trim() : undefined,
       companyName: selectedIntent === 'ENTERPRISE' ? companyName.trim() : undefined,
@@ -239,7 +262,8 @@ Sent via GoMyTruck.com`
   };
 
   // ── Open WhatsApp ───────────────────────────────────────────────────────────
-  const handleOpenWhatsApp = () => {
+  const handleOpenWhatsApp = (overrideTiming) => {
+    const effectiveTiming = typeof overrideTiming === 'string' ? overrideTiming : null;
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -247,13 +271,39 @@ Sent via GoMyTruck.com`
       return;
     }
     setErrors({});
-    sendToSheet();
-    const text = getWhatsAppMessage();
+
+    // If BOOK intent and user did not choose pickup timing, show timing confirmation prompt modal
+    if (selectedIntent === 'BOOK' && !pickupTimingType && !effectiveTiming) {
+      setShowTimingPromptModal(true);
+      return;
+    }
+
+    sendToSheet(effectiveTiming);
+    const text = getWhatsAppMessage(effectiveTiming);
     const url  = `https://wa.me/919331488999?text=${encodeURIComponent(text)}`;
     if (typeof window !== 'undefined') {
       window.open(url, '_blank', 'noopener,noreferrer');
     }
     onClose();
+  };
+
+  const handleConfirmImmediate = () => {
+    setShowTimingPromptModal(false);
+    setPickupTimingType('IMMEDIATE');
+    handleOpenWhatsApp('IMMEDIATE');
+  };
+
+  const handleConfirmFlexible = () => {
+    setShowTimingPromptModal(false);
+    setPickupTimingType('FLEXIBLE');
+    handleOpenWhatsApp('FLEXIBLE');
+  };
+
+  const handleChooseDateTime = () => {
+    setShowTimingPromptModal(false);
+    setTimeout(() => {
+      document.getElementById('wa-pickup-timing-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   };
 
   const vehicleOptions = ['Tata Ace/Mini Truck', '14ft Truck', '17ft Truck', '20ft Truck', '32ft Container Trailer'];
@@ -417,6 +467,74 @@ Sent via GoMyTruck.com`
                       className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-orange-500" />
                   </Field>
                 </div>
+
+                {/* Pickup Timing / Schedule Field */}
+                <div id="wa-pickup-timing-section" className="p-3 rounded-xl bg-orange-50/50 border border-orange-200/80 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                      <span>⏰ When do you need the truck? <span className="text-slate-400 font-normal">(optional)</span></span>
+                    </label>
+                    {pickupTimingType && (
+                      <button
+                        type="button"
+                        onClick={() => { setPickupTimingType(''); setScheduledDate(''); setScheduledTime(''); }}
+                        className="text-[10px] text-slate-400 hover:text-slate-600 font-medium cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  <select
+                    value={pickupTimingType}
+                    onChange={(e) => setPickupTimingType(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-orange-500 cursor-pointer"
+                  >
+                    <option value="">Select Pickup Timing (e.g. Immediate, Today, Custom...)</option>
+                    <option value="IMMEDIATE">⚡ Immediate Pickup (Within 1-2 Hours)</option>
+                    <option value="UNDER_4_HOURS">⚡ Within 4 Hours (High Priority)</option>
+                    <option value="TODAY">📅 Today (Select Specific Time)</option>
+                    <option value="TOMORROW">📅 Tomorrow (Select Specific Time)</option>
+                    <option value="CUSTOM">📆 Custom Date & Time Picker</option>
+                    <option value="FLEXIBLE">🔄 Flexible / No Rush</option>
+                  </select>
+
+                  {(pickupTimingType === 'TODAY' || pickupTimingType === 'TOMORROW') && (
+                    <div className="pt-1">
+                      <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Preferred Time</label>
+                      <input
+                        type="time"
+                        value={scheduledTime}
+                        onChange={(e) => setScheduledTime(e.target.value)}
+                        className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-orange-500"
+                      />
+                    </div>
+                  )}
+
+                  {pickupTimingType === 'CUSTOM' && (
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Date</label>
+                        <input
+                          type="date"
+                          min={new Date().toISOString().split('T')[0]}
+                          value={scheduledDate}
+                          onChange={(e) => setScheduledDate(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Time</label>
+                        <input
+                          type="time"
+                          value={scheduledTime}
+                          onChange={(e) => setScheduledTime(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -514,7 +632,7 @@ Sent via GoMyTruck.com`
         <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200 flex flex-col gap-2 shrink-0">
           <button
             type="button"
-            onClick={handleOpenWhatsApp}
+            onClick={() => handleOpenWhatsApp()}
             className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-black text-sm sm:text-base py-3.5 px-6 rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:scale-[1.01] active:scale-98 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -529,6 +647,47 @@ Sent via GoMyTruck.com`
             <span>Official Number: +91 9331488999 · Typical reply in &lt; 5 mins</span>
           </div>
         </div>
+
+        {/* Timing Confirmation Prompt Modal */}
+        {showTimingPromptModal && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 text-slate-800 space-y-3.5">
+              <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mx-auto">
+                <Truck size={20} />
+              </div>
+              <div className="text-center space-y-1">
+                <h4 className="text-base font-bold text-slate-900">When is the truck needed?</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  You haven't selected a pickup time. If you need <strong className="text-slate-900">Immediate Pickup</strong>, confirm below so we dispatch instantly.
+                </p>
+              </div>
+              <div className="pt-1 space-y-2.5">
+                <button
+                  type="button"
+                  onClick={handleConfirmImmediate}
+                  className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-md shadow-green-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>⚡ Yes, Need Immediate Pickup (1-2h)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmFlexible}
+                  className="w-full py-2 px-4 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                >
+                  🔄 Continue as Flexible / Standard
+                </button>
+                <button
+                  type="button"
+                  onClick={handleChooseDateTime}
+                  className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-amber-50/90 hover:bg-amber-100 text-amber-900 border-2 border-amber-400 hover:border-amber-500 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer group"
+                >
+                  <Calendar size={15} className="text-amber-700 group-hover:scale-110 transition-transform" />
+                  <span>📅 Choose Specific Date & Time</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

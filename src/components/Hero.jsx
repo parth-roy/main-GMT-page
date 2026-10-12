@@ -924,8 +924,11 @@ export default function Hero({
           {isMobile ? (
             <img 
               src="/hero-bg-960.webp" 
+              srcSet="/hero-bg-640.webp 640w, /hero-bg-960.webp 960w, /hero-bg-1600.webp 1600w"
+              sizes="100vw"
               alt="GoMyTruck logistics"
               className="h-full w-full object-cover object-center"
+              fetchpriority="high"
             />
           ) : (
             <video

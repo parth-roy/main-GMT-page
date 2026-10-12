@@ -615,8 +615,6 @@ export default function LocalSeoPage({ pageKey }) {
         description={page.description} 
         canonical={page.canonical} 
         jsonLd={jsonLd} 
-        preloadImage="/hero-bg-960.webp"
-        preloadImageSrcSet="/hero-bg-640.webp 640w, /hero-bg-960.webp 960w, /hero-bg-1600.webp 1600w"
       />
       <nav aria-label="Breadcrumb" className="border-b border-slate-200">
         <ol className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex gap-2 text-sm text-slate-600">

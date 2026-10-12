@@ -3,7 +3,7 @@ import { useParams, useLocation, Link } from "react-router-dom";
 import { 
   Truck, ShieldCheck, CheckCircle2, ArrowRight, PhoneCall, 
   IndianRupee, Sparkles, HelpCircle, ChevronDown, ChevronUp, 
-  MapPin, Clock, AlertCircle, Check, Loader2
+  MapPin, Clock, AlertCircle, Check, Loader2, Calendar
 } from "lucide-react";
 import SEOHead from "../seo/SEOHead";
 import TrustBadgeRow from "../components/TrustBadgeRow";
@@ -39,6 +39,10 @@ export default function AssistedTruckBookingPage() {
   const [goodsType, setGoodsType] = useState("General Commercial Goods");
   const [goodsWeightKg, setGoodsWeightKg] = useState("1000");
   const [customerBudget, setCustomerBudget] = useState("");
+  const [pickupTimingType, setPickupTimingType] = useState(""); // "", "IMMEDIATE", "UNDER_4_HOURS", "TODAY", "TOMORROW", "CUSTOM", "FLEXIBLE"
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
+  const [showTimingPromptModal, setShowTimingPromptModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(null);
   const [submitError, setSubmitError] = useState("");
@@ -78,9 +82,72 @@ export default function AssistedTruckBookingPage() {
     ? "/services/assisted-truck-booking" 
     : `/services/assisted-truck-booking/${cityConfig.slug}`;
 
-  const handleSubmitLoad = async (e) => {
-    e.preventDefault();
+  const getTimingDetails = (overrideTiming) => {
+    const timing = typeof overrideTiming === 'string' ? overrideTiming : pickupTimingType;
+    let urgencyWindow = "FLEXIBLE";
+    let pickupTime = "Flexible / Standard";
+    let pickupDateTime = null;
+    const now = new Date();
+
+    if (!timing || timing === "FLEXIBLE") {
+      return { urgencyWindow: "FLEXIBLE", pickupTime: "Flexible / Standard", pickupDateTime: null };
+    }
+
+    if (timing === "IMMEDIATE") {
+      urgencyWindow = "UNDER_2_HOURS";
+      pickupTime = "Immediate (Within 1-2 Hours)";
+      pickupDateTime = new Date(now.getTime() + 2 * 3600 * 1000).toISOString();
+    } else if (timing === "UNDER_4_HOURS") {
+      urgencyWindow = "UNDER_4_HOURS";
+      pickupTime = "Within 4 Hours (Urgent)";
+      pickupDateTime = new Date(now.getTime() + 4 * 3600 * 1000).toISOString();
+    } else if (timing === "TODAY") {
+      urgencyWindow = "UNDER_24_HOURS";
+      pickupTime = scheduledTime ? `Today by ${scheduledTime}` : "Today (Within 24 Hours)";
+      const targetDate = new Date();
+      if (scheduledTime) {
+        const [h, m] = scheduledTime.split(":").map(Number);
+        targetDate.setHours(h, m, 0, 0);
+      } else {
+        targetDate.setHours(23, 59, 0, 0);
+      }
+      pickupDateTime = targetDate.toISOString();
+    } else if (timing === "TOMORROW") {
+      urgencyWindow = "TWO_DAYS";
+      pickupTime = scheduledTime ? `Tomorrow by ${scheduledTime}` : "Tomorrow";
+      const targetDate = new Date(now.getTime() + 24 * 3600 * 1000);
+      if (scheduledTime) {
+        const [h, m] = scheduledTime.split(":").map(Number);
+        targetDate.setHours(h, m, 0, 0);
+      } else {
+        targetDate.setHours(18, 0, 0, 0);
+      }
+      pickupDateTime = targetDate.toISOString();
+    } else if (timing === "CUSTOM") {
+      urgencyWindow = "FLEXIBLE";
+      if (scheduledDate) {
+        const targetDate = new Date(scheduledDate);
+        if (scheduledTime) {
+          const [h, m] = scheduledTime.split(":").map(Number);
+          targetDate.setHours(h, m, 0, 0);
+        }
+        pickupDateTime = targetDate.toISOString();
+        pickupTime = `Scheduled: ${targetDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}${scheduledTime ? ` at ${scheduledTime}` : ""}`;
+      } else {
+        pickupTime = "Custom Scheduled";
+      }
+    } else if (timing === "FLEXIBLE") {
+      urgencyWindow = "FLEXIBLE";
+      pickupTime = "Flexible (Standard)";
+    }
+
+    return { urgencyWindow, pickupTime, pickupDateTime };
+  };
+
+  const handleSubmitLoad = async (e, overrideTiming) => {
+    if (e && e.preventDefault) e.preventDefault();
     setSubmitError("");
+    const effectiveTiming = typeof overrideTiming === 'string' ? overrideTiming : null;
 
     if (!pickupCity.trim() || !dropCity.trim()) {
       return setSubmitError("Please specify both pickup and destination cities.");
@@ -88,6 +155,14 @@ export default function AssistedTruckBookingPage() {
     if (!customerBudget || Number(customerBudget) < 100) {
       return setSubmitError("Please enter your realistic preferred target budget (min ₹100).");
     }
+
+    // If pickup timing was left unselected by the user and not overridden, show prompt modal
+    if (!pickupTimingType && !effectiveTiming) {
+      setShowTimingPromptModal(true);
+      return;
+    }
+
+    const timingInfo = getTimingDetails(effectiveTiming);
 
     const payload = {
       pickupCity: pickupCity.trim(),
@@ -98,7 +173,10 @@ export default function AssistedTruckBookingPage() {
       goodsType,
       goodsWeightKg: Number(goodsWeightKg) || 1000,
       customerBudget: Number(customerBudget),
-      targetCities: [pickupCity.trim().toLowerCase()]
+      targetCities: [pickupCity.trim().toLowerCase()],
+      urgencyWindow: timingInfo.urgencyWindow,
+      pickupTime: timingInfo.pickupTime,
+      pickupDateTime: timingInfo.pickupDateTime,
     };
 
     const executePost = async () => {
@@ -129,6 +207,25 @@ export default function AssistedTruckBookingPage() {
         executePost();
       });
     }
+  };
+
+  const handleConfirmImmediate = () => {
+    setShowTimingPromptModal(false);
+    setPickupTimingType("IMMEDIATE");
+    handleSubmitLoad(null, "IMMEDIATE");
+  };
+
+  const handleConfirmFlexible = () => {
+    setShowTimingPromptModal(false);
+    setPickupTimingType("FLEXIBLE");
+    handleSubmitLoad(null, "FLEXIBLE");
+  };
+
+  const handleChooseDateTime = () => {
+    setShowTimingPromptModal(false);
+    setTimeout(() => {
+      document.getElementById("pickup-timing-section")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
   };
 
   // ── Dynamic, hyper-local FAQs (same system as the 26K PSEO pages) ──────────
@@ -364,6 +461,75 @@ export default function AssistedTruckBookingPage() {
                         </div>
                       </div>
 
+                      <div id="pickup-timing-section" className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                            <Clock size={14} className="text-green-600" />
+                            <span>When is the truck needed? <span className="text-slate-400 font-normal">(optional)</span></span>
+                          </label>
+                          {pickupTimingType && (
+                            <button
+                              type="button"
+                              onClick={() => { setPickupTimingType(""); setScheduledDate(""); setScheduledTime(""); }}
+                              className="text-[11px] text-slate-400 hover:text-slate-600 font-medium cursor-pointer"
+                            >
+                              Clear
+                            </button>
+                          )}
+                        </div>
+
+                        <select
+                          value={pickupTimingType}
+                          onChange={(e) => setPickupTimingType(e.target.value)}
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold text-slate-800 bg-white focus:ring-2 focus:ring-green-500 focus:outline-none cursor-pointer"
+                        >
+                          <option value="">Select Pickup Timing (e.g. Immediate, Today, Custom...)</option>
+                          <option value="IMMEDIATE">⚡ Immediate Pickup (Within 1-2 Hours)</option>
+                          <option value="UNDER_4_HOURS">⚡ Within 4 Hours (High Priority)</option>
+                          <option value="TODAY">📅 Today (Select Specific Time)</option>
+                          <option value="TOMORROW">📅 Tomorrow (Select Specific Time)</option>
+                          <option value="CUSTOM">📆 Custom Date & Time Picker</option>
+                          <option value="FLEXIBLE">🔄 Flexible / No Rush</option>
+                        </select>
+
+                        {/* Conditional Date / Time Pickers */}
+                        {(pickupTimingType === 'TODAY' || pickupTimingType === 'TOMORROW') && (
+                          <div className="pt-1">
+                            <label className="block text-[11px] font-bold text-slate-600 mb-1">Preferred Time of Day</label>
+                            <input
+                              type="time"
+                              value={scheduledTime}
+                              onChange={(e) => setScheduledTime(e.target.value)}
+                              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-green-500 focus:outline-none"
+                            />
+                          </div>
+                        )}
+
+                        {pickupTimingType === 'CUSTOM' && (
+                          <div className="grid grid-cols-2 gap-2 pt-1">
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 mb-1">Pickup Date</label>
+                              <input
+                                type="date"
+                                min={new Date().toISOString().split('T')[0]}
+                                value={scheduledDate}
+                                onChange={(e) => setScheduledDate(e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-green-500 focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 mb-1">Pickup Time</label>
+                              <input
+                                type="time"
+                                value={scheduledTime}
+                                onChange={(e) => setScheduledTime(e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-green-500 focus:outline-none"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                       <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
                           Your Target Budget (₹ INR) <span className="text-green-600">*</span>
@@ -386,7 +552,7 @@ export default function AssistedTruckBookingPage() {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full py-3.5 px-4 rounded-xl text-center text-sm font-bold bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/25 transition-all flex items-center justify-center gap-2"
+                        className="w-full py-3.5 px-4 rounded-xl text-center text-sm font-bold bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
                       >
                         {isSubmitting ? (
                           <>
@@ -401,6 +567,47 @@ export default function AssistedTruckBookingPage() {
                         )}
                       </button>
                     </form>
+                  )}
+
+                  {/* TIMING SELECTION PROMPT MODAL */}
+                  {showTimingPromptModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+                      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-slate-800 space-y-4">
+                        <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                          <Clock size={24} />
+                        </div>
+                        <div className="text-center space-y-1">
+                          <h3 className="text-lg font-bold text-slate-900">When do you need the truck?</h3>
+                          <p className="text-xs text-slate-600 leading-relaxed">
+                            You haven't specified a pickup time. If you need <strong className="text-slate-900">Immediate Pickup</strong>, confirm below so nearby drivers receive priority alerts.
+                          </p>
+                        </div>
+                        <div className="pt-2 space-y-2">
+                          <button
+                            type="button"
+                            onClick={handleConfirmImmediate}
+                            className="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-green-500 hover:bg-green-600 text-white shadow-md shadow-green-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                          >
+                            <span>⚡ Yes, Need Immediate Pickup (1-2 Hours)</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleConfirmFlexible}
+                            className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                          >
+                            🔄 Continue as Flexible / Standard
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleChooseDateTime}
+                            className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-amber-50/90 hover:bg-amber-100 text-amber-900 border-2 border-amber-400 hover:border-amber-500 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer group"
+                          >
+                            <Calendar size={15} className="text-amber-700 group-hover:scale-110 transition-transform" />
+                            <span>📅 Choose Scheduled Date & Time</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>

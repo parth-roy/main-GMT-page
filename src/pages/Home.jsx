@@ -78,6 +78,7 @@ export default function Home({ selectedService, setSelectedService, onOpenEstima
         jsonLd={homeSchema}
         preloadImage="/hero-bg-960.webp"
         preloadImageSrcSet="/hero-bg-640.webp 640w, /hero-bg-960.webp 960w, /hero-bg-1600.webp 1600w"
+        preloadImageMedia="(max-width: 767px)"
       />
       <Hero 
         selectedService={selectedService} 
