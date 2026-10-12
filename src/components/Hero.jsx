@@ -298,6 +298,14 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
       return
     }
 
+    const pNorm = pickup.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ');
+    const dNorm = drop.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ');
+    if (pNorm === dNorm) {
+      setError("Pickup and drop location cannot be the same. Please choose a different destination.");
+      dropInputRef?.current?.focus();
+      return;
+    }
+
     setLoading(true)
 
     try {
@@ -588,6 +596,14 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
       setError("Please enter a drop location.")
       dropInputRef?.current?.focus()
       return
+    }
+
+    const pNorm = pickup.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ');
+    const dNorm = drop.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ');
+    if (pNorm === dNorm) {
+      setError("Pickup and drop location cannot be the same. Please choose a different destination.");
+      dropInputRef?.current?.focus();
+      return;
     }
 
     setLoading(true)

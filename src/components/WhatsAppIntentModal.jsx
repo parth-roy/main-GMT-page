@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Truck, UserCheck, Building2, HelpCircle, ArrowRight, Check, AlertCircle, Calendar } from 'lucide-react';
+import GooglePlacesSearchInput from './common/GooglePlacesSearchInput';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.gomytruck.com/api/v1';
 
@@ -73,7 +74,9 @@ export default function WhatsAppIntentModal({ initialIntent = 'BOOK' }) {
 
   // ── Intent-specific optional fields ────────────────────────────────────────
   const [pickupCity, setPickupCity] = useState('');
+  const [pickupCoords, setPickupCoords] = useState(null);
   const [dropCity, setDropCity]     = useState('');
+  const [dropCoords, setDropCoords] = useState(null);
   const [vehicleType, setVehicleType] = useState('Tata Ace/Mini Truck');
   const [goodsType, setGoodsType]   = useState('');
   const [pickupTimingType, setPickupTimingType] = useState(''); // '', 'IMMEDIATE', 'UNDER_4_HOURS', 'TODAY', 'TOMORROW', 'CUSTOM', 'FLEXIBLE'
@@ -219,8 +222,18 @@ Sent via GoMyTruck.com`
     if (!/^[6-9]\d{9}$/.test(userPhone.replace(/\s/g, '')))  newErrors.userPhone = 'Enter a valid 10-digit mobile number';
 
     if (selectedIntent === 'BOOK') {
-      if (!pickupCity.trim()) newErrors.pickupCity = 'Pickup city is required';
-      if (!dropCity.trim()) newErrors.dropCity = 'Drop city is required';
+      if (!pickupCity.trim()) {
+        newErrors.pickupCity = 'Pickup location or city is required';
+      }
+      if (!dropCity.trim()) {
+        newErrors.dropCity = 'Drop location or city is required';
+      } else if (pickupCity.trim() && dropCity.trim()) {
+        const pNorm = pickupCity.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ');
+        const dNorm = dropCity.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ');
+        if (pNorm === dNorm || (pickupCoords && dropCoords && pickupCoords.lat && dropCoords.lat && pickupCoords.lat === dropCoords.lat && pickupCoords.lng === dropCoords.lng)) {
+          newErrors.dropCity = 'Pickup and drop location cannot be the same. Please choose a different destination.';
+        }
+      }
     } else if (selectedIntent === 'PARTNER') {
       if (!partnerCity.trim()) newErrors.partnerCity = 'City is required';
     } else if (selectedIntent === 'ENTERPRISE') {
@@ -443,17 +456,58 @@ Sent via GoMyTruck.com`
             {selectedIntent === 'BOOK' && (
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <Field label="Pickup City" required error={errors.pickupCity}>
-                    <input type="text" placeholder="e.g. Kolkata" value={pickupCity}
-                      onChange={(e) => { setPickupCity(e.target.value); setErrors(p => ({...p, pickupCity: ''})); }}
-                      className={`w-full bg-white border ${errors.pickupCity ? 'border-red-400' : 'border-slate-200'} rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-orange-500`} />
+                  <Field label="Pickup Location / City" required error={errors.pickupCity}>
+                    <GooglePlacesSearchInput
+                      id="wa-pickup-location-input"
+                      placeholder="Search pickup city or area (Google Maps)..."
+                      value={pickupCity}
+                      iconColor="text-blue-500"
+                      borderColorClass="focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500"
+                      error={Boolean(errors.pickupCity)}
+                      onChange={(val) => {
+                        setPickupCity(val);
+                        setErrors((p) => ({ ...p, pickupCity: '', dropCity: p.dropCity?.includes('same') ? '' : p.dropCity }));
+                      }}
+                      onSelect={(res) => {
+                        setPickupCity(res.address);
+                        setPickupCoords({ lat: res.lat, lng: res.lng });
+                        setErrors((p) => ({ ...p, pickupCity: '', dropCity: p.dropCity?.includes('same') ? '' : p.dropCity }));
+                      }}
+                    />
                   </Field>
-                  <Field label="Drop City" required error={errors.dropCity}>
-                    <input type="text" placeholder="e.g. Delhi" value={dropCity}
-                      onChange={(e) => { setDropCity(e.target.value); setErrors(p => ({...p, dropCity: ''})); }}
-                      className={`w-full bg-white border ${errors.dropCity ? 'border-red-400' : 'border-slate-200'} rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-orange-500`} />
+
+                  <Field label="Drop Location / City" required error={errors.dropCity}>
+                    <GooglePlacesSearchInput
+                      id="wa-drop-location-input"
+                      placeholder="Search drop city or area (Google Maps)..."
+                      value={dropCity}
+                      iconColor="text-orange-500"
+                      borderColorClass="focus-within:border-orange-500 focus-within:ring-1 focus-within:ring-orange-500"
+                      error={Boolean(errors.dropCity)}
+                      onChange={(val) => {
+                        setDropCity(val);
+                        setErrors((p) => ({ ...p, dropCity: '' }));
+                      }}
+                      onSelect={(res) => {
+                        setDropCity(res.address);
+                        setDropCoords({ lat: res.lat, lng: res.lng });
+                        setErrors((p) => ({ ...p, dropCity: '' }));
+                      }}
+                    />
                   </Field>
                 </div>
+
+                {/* Real-time Warning if Pickup and Drop are Identical */}
+                {pickupCity.trim() && dropCity.trim() && (
+                  pickupCity.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ') ===
+                  dropCity.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ') ||
+                  (pickupCoords && dropCoords && pickupCoords.lat && dropCoords.lat && pickupCoords.lat === dropCoords.lat && pickupCoords.lng === dropCoords.lng)
+                ) && (
+                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold">
+                    <AlertCircle size={16} className="shrink-0 text-amber-600" />
+                    <span>⚠️ Warning: Pickup and Drop location cannot be the same. Please choose a different destination point.</span>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <Field label="Vehicle Type">
                     <select value={vehicleType} onChange={(e) => setVehicleType(e.target.value)}

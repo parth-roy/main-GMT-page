@@ -316,6 +316,14 @@ export default function DynamicLocationHero({
       return
     }
 
+    const pNorm = pickup.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ');
+    const dNorm = drop.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ');
+    if (pNorm === dNorm) {
+      setError("Pickup and drop location cannot be the same. Please choose a different destination.");
+      dropInputRef?.current?.focus();
+      return;
+    }
+
     setLoading(true)
 
     try {

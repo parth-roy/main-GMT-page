@@ -152,6 +152,11 @@ export default function AssistedTruckBookingPage() {
     if (!pickupCity.trim() || !dropCity.trim()) {
       return setSubmitError("Please specify both pickup and destination cities.");
     }
+    const pNorm = pickupCity.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ');
+    const dNorm = dropCity.trim().toLowerCase().replace(/\s+hub$/i, '').replace(/[\s,.-]+/g, ' ');
+    if (pNorm === dNorm) {
+      return setSubmitError("Pickup and destination location cannot be the same. Please choose a different drop location.");
+    }
     if (!customerBudget || Number(customerBudget) < 100) {
       return setSubmitError("Please enter your realistic preferred target budget (min ₹100).");
     }
