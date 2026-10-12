@@ -12,8 +12,15 @@ export function getGoogleMaps() {
   }
   if (!googleMapsScriptPromise) {
     googleMapsScriptPromise = new Promise((resolve, reject) => {
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]');
+      if (existingScript) {
+        if (window.google?.maps) return resolve(window.google.maps);
+        existingScript.addEventListener('load', () => resolve(window.google?.maps));
+        existingScript.addEventListener('error', (err) => reject(err));
+        return;
+      }
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&loading=async`;
       script.async = true;
       script.defer = true;
       script.onload = () => resolve(window.google.maps);
@@ -62,6 +69,84 @@ export async function geocodeGoogleAddress(address) {
       }
     });
   });
+}
+
+/**
+ * Modern, cost-effective Places Autocomplete fetcher:
+ * 1. Checks in-memory cache first (0 network calls, 0 cost)
+ * 2. Uses google.maps.places.AutocompleteSuggestion (2025+ modern standard, avoids deprecation warning)
+ * 3. Gracefully falls back to AutocompleteService for legacy support
+ */
+export async function fetchPlacePredictions(maps, input, sessionToken) {
+  const trimmed = (input || "").trim();
+  if (!trimmed || trimmed.length < 2) return [];
+
+  const cacheKey = trimmed.toLowerCase();
+  if (predictionCache.has(cacheKey)) {
+    return predictionCache.get(cacheKey);
+  }
+
+  // 1. Try modern AutocompleteSuggestion API (recommended 2025/2026, 0 deprecation warning)
+  if (maps?.places?.AutocompleteSuggestion?.fetchAutocompleteSuggestions) {
+    try {
+      const { suggestions } = await maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        input: trimmed,
+        includedRegionCodes: ["in"],
+        sessionToken: sessionToken || undefined,
+      });
+
+      if (Array.isArray(suggestions) && suggestions.length > 0) {
+        const mapped = suggestions.map((s) => {
+          const p = s.placePrediction;
+          return {
+            placeId: p?.placeId || "",
+            description: p?.text?.toString() || "",
+            mainText: p?.mainText?.toString() || p?.text?.toString() || "",
+            secondaryText: p?.secondaryText?.toString() || "",
+          };
+        });
+        setBoundedCache(predictionCache, cacheKey, mapped);
+        return mapped;
+      }
+      return [];
+    } catch (modernErr) {
+      console.warn("[Places] AutocompleteSuggestion error, attempting fallback:", modernErr);
+    }
+  }
+
+  // 2. Fallback to AutocompleteService (for older environments or when new API unavailable)
+  if (maps?.places?.AutocompleteService) {
+    return new Promise((resolve) => {
+      try {
+        const service = new maps.places.AutocompleteService();
+        service.getPlacePredictions(
+          {
+            input: trimmed,
+            sessionToken: sessionToken || undefined,
+            componentRestrictions: { country: "in" },
+          },
+          (results, status) => {
+            if (status === maps.places.PlacesServiceStatus.OK && Array.isArray(results)) {
+              const mapped = results.map((p) => ({
+                placeId: p.place_id,
+                description: p.description,
+                mainText: p.structured_formatting?.main_text || p.description,
+                secondaryText: p.structured_formatting?.secondary_text || "",
+              }));
+              setBoundedCache(predictionCache, cacheKey, mapped);
+              resolve(mapped);
+            } else {
+              resolve([]);
+            }
+          }
+        );
+      } catch (err) {
+        resolve([]);
+      }
+    });
+  }
+
+  return [];
 }
 
 export default function GoogleAddressAutocomplete({ 
@@ -122,45 +207,22 @@ export default function GoogleAddressAutocomplete({
     setLoading(true)
     setIsOpen(true)
 
-    // 450ms debounce saves ~50% of intermediate keystroke requests
+    // 400ms debounce saves ~60% of intermediate keystroke requests
     debounceRef.current = setTimeout(async () => {
       try {
         const maps = await getGoogleMaps();
-        const service = new maps.places.AutocompleteService();
-
-        // Create session token on first keystroke of each new search
-        if (!sessionTokenRef.current) {
+        if (!sessionTokenRef.current && maps?.places?.AutocompleteSessionToken) {
           sessionTokenRef.current = new maps.places.AutocompleteSessionToken();
         }
-        
-        service.getPlacePredictions(
-          {
-            input: trimmed,
-            sessionToken: sessionTokenRef.current,
-            componentRestrictions: { country: "in" },
-          },
-          (results, status) => {
-            if (status === maps.places.PlacesServiceStatus.OK && results) {
-              const mapped = results.map(p => ({
-                placeId: p.place_id,
-                description: p.description,
-                mainText: p.structured_formatting?.main_text || p.description,
-                secondaryText: p.structured_formatting?.secondary_text || ""
-              }));
-              setBoundedCache(predictionCache, cacheKey, mapped);
-              setPredictions(mapped);
-            } else {
-              setPredictions([]);
-            }
-            setLoading(false);
-          }
-        );
+        const mapped = await fetchPlacePredictions(maps, trimmed, sessionTokenRef.current);
+        setPredictions(mapped);
+        setLoading(false);
       } catch (err) {
-        console.error("Autocomplete error:", err)
-        setPredictions([])
-        setLoading(false)
+        console.error("Autocomplete error:", err);
+        setPredictions([]);
+        setLoading(false);
       }
-    }, 450)
+    }, 400);
   }
 
   const handleSelect = async (prediction) => {

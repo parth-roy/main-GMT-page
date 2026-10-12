@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Loader2 } from 'lucide-react';
-import { getGoogleMaps, geocodeGoogleAddress } from '../GoogleAddressAutocomplete';
+import { getGoogleMaps, geocodeGoogleAddress, fetchPlacePredictions } from '../GoogleAddressAutocomplete';
 
 export default function GooglePlacesSearchInput({
   id,
@@ -20,16 +20,24 @@ export default function GooglePlacesSearchInput({
   const [loading, setLoading] = useState(false);
   const wrapperRef = useRef(null);
   const debounceRef = useRef(null);
+  const safetyTimeoutRef = useRef(null);
   const sessionTokenRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
         setIsOpen(false);
+        setLoading(false);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
+    };
   }, []);
 
   const handleInputChange = (e) => {
@@ -37,55 +45,53 @@ export default function GooglePlacesSearchInput({
     onChange(val);
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
 
     if (!val.trim()) {
       setPredictions([]);
       setIsOpen(false);
+      setLoading(false);
       return;
     }
 
     setLoading(true);
     setIsOpen(true);
 
+    // Auto-stop spinner after 2.5s safety timeout so it never hangs
+    safetyTimeoutRef.current = setTimeout(() => {
+      setLoading(false);
+    }, 2500);
+
+    if (val.trim().length < 2) {
+      setPredictions([]);
+      setLoading(false);
+      return;
+    }
+
     debounceRef.current = setTimeout(async () => {
       try {
         const maps = await getGoogleMaps();
-        const service = new maps.places.AutocompleteService();
-        if (!sessionTokenRef.current) {
+        if (!sessionTokenRef.current && maps?.places?.AutocompleteSessionToken) {
           sessionTokenRef.current = new maps.places.AutocompleteSessionToken();
         }
 
-        service.getPlacePredictions(
-          {
-            input: val,
-            sessionToken: sessionTokenRef.current,
-            componentRestrictions: { country: "in" },
-          },
-          (results, status) => {
-            if (status === maps.places.PlacesServiceStatus.OK && results) {
-              setPredictions(
-                results.map((p) => ({
-                  placeId: p.place_id,
-                  description: p.description,
-                  mainText: p.structured_formatting?.main_text || p.description,
-                  secondaryText: p.structured_formatting?.secondary_text || "",
-                }))
-              );
-            } else {
-              setPredictions([]);
-            }
-            setLoading(false);
-          }
-        );
+        const mapped = await fetchPlacePredictions(maps, val, sessionTokenRef.current);
+        if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
+        setPredictions(mapped);
+        setLoading(false);
       } catch (err) {
         console.error("Autocomplete error:", err);
+        if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
         setPredictions([]);
         setLoading(false);
       }
-    }, 250);
+    }, 350);
   };
 
   const handleSelectPrediction = async (prediction) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
+    setLoading(false);
     setIsOpen(false);
     setPredictions([]);
     onChange(prediction.description);
@@ -128,6 +134,14 @@ export default function GooglePlacesSearchInput({
           onChange={handleInputChange}
           onFocus={() => {
             if (predictions.length > 0) setIsOpen(true);
+          }}
+          onBlur={() => {
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+            if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
+            setLoading(false);
+            setTimeout(() => {
+              setIsOpen(false);
+            }, 250);
           }}
           placeholder={placeholder}
           autoComplete="off"

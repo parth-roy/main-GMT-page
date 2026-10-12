@@ -3,7 +3,7 @@ import { ArrowRight, BadgePercent, Zap, Loader2, Star, ChevronRight, MapPin, Ale
 import { Link, useNavigate } from "react-router-dom"
 import CitySelectorModal from "./CitySelectorModal"
 import EstimateResultModal from "./EstimateResultModal"
-import { getGoogleMaps, geocodeGoogleAddress } from "./GoogleAddressAutocomplete"
+import { getGoogleMaps, geocodeGoogleAddress, fetchPlacePredictions } from "./GoogleAddressAutocomplete"
 import { fetchEstimate } from "../api/pricingApi"
 import { useCity } from "../context/CityContext"
 import { useAuth } from "../context/AuthContext"
@@ -97,39 +97,18 @@ function DynamicGooglePlacesInput({
     debounceRef.current = setTimeout(async () => {
       try {
         const maps = await getGoogleMaps()
-        const service = new maps.places.AutocompleteService()
-        if (!sessionTokenRef.current) {
+        if (!sessionTokenRef.current && maps?.places?.AutocompleteSessionToken) {
           sessionTokenRef.current = new maps.places.AutocompleteSessionToken()
         }
-
-        service.getPlacePredictions(
-          {
-            input: val,
-            sessionToken: sessionTokenRef.current,
-            componentRestrictions: { country: "in" },
-          },
-          (results, status) => {
-            if (status === maps.places.PlacesServiceStatus.OK && results) {
-              setPredictions(
-                results.map((p) => ({
-                  placeId: p.place_id,
-                  description: p.description,
-                  mainText: p.structured_formatting?.main_text || p.description,
-                  secondaryText: p.structured_formatting?.secondary_text || "",
-                }))
-              )
-            } else {
-              setPredictions([])
-            }
-            setLoading(false)
-          }
-        )
+        const mapped = await fetchPlacePredictions(maps, val, sessionTokenRef.current)
+        setPredictions(mapped)
+        setLoading(false)
       } catch (err) {
         console.error("Autocomplete error:", err)
         setPredictions([])
         setLoading(false)
       }
-    }, 250)
+    }, 300)
   }
 
   const handleSelectPrediction = async (prediction) => {
