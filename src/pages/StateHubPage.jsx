@@ -8,11 +8,11 @@ const states = {
   "west-bengal": {
     canonical: "/west-bengal",
     title: "Goods Transport & Truck Booking in West Bengal | GoMyTruck",
-    description: "Book trucks for goods transport across West Bengal — Kolkata, Howrah, Dankuni, Barrackpore, Durgapur, Asansol, Haldia, Siliguri. Only 5% commission, no brokers.",
+    description: "Book trucks for goods transport across West Bengal — Kolkata, Howrah, Dankuni, Barrackpore, Durgapur, Asansol, Haldia, Siliguri. Transparent pricing, no brokers.",
     eyebrow: "West Bengal State Logistics Hub",
     h1: "Goods Transport and Truck Booking Across West Bengal",
-    intro: "West Bengal is Eastern India's logistics backbone, with Kolkata as the regional freight capital and an industrial corridor stretching from Dankuni-Howrah through Durgapur-Asansol to Haldia port. GoMyTruck provides verified truck booking across the entire state at a transparent 5% platform commission.",
-    stateKeyFact: "West Bengal handles over ₹3 lakh crore in annual freight movement across road, rail and sea. GoMyTruck's 5% commission model provides the lowest platform fee for freight booking in the state, compared to traditional broker margins of 10–20%.",
+    intro: "West Bengal is Eastern India's logistics backbone, with Kolkata as the regional freight capital and an industrial corridor stretching from Dankuni-Howrah through Durgapur-Asansol to Haldia port. GoMyTruck provides verified truck booking across the entire state at transparent platform rates.",
+    stateKeyFact: "West Bengal handles over ₹3 lakh crore in annual freight movement across road, rail and sea. GoMyTruck's direct marketplace model provides the most transparent platform for freight booking in the state, eliminating traditional broker margins of 10–20%.",
     industrialHubs: [
       {name: "Dankuni", tagline: "Eastern Freight Corridor terminus", slug: "/dankuni"},
       {name: "Howrah", tagline: "Oldest industrial hub of WB", slug: "/howrah"},
@@ -44,11 +44,11 @@ const states = {
   "odisha": {
     canonical: "/odisha",
     title: "Goods Transport & Truck Booking in Odisha | GoMyTruck",
-    description: "Book trucks for goods transport across Odisha — Bhubaneswar, Cuttack, Paradeep Port, Jagatpur Industrial Estate. Only 5% commission, no brokers.",
+    description: "Book trucks for goods transport across Odisha — Bhubaneswar, Cuttack, Paradeep Port, Jagatpur Industrial Estate. Transparent pricing, no brokers.",
     eyebrow: "Odisha State Logistics Hub",
     h1: "Goods Transport and Truck Booking Across Odisha",
-    intro: "Odisha is Eastern India's fastest-growing industrial state, with Bhubaneswar's IT and FMCG hubs, Cuttack's Jagatpur Industrial Estate and Paradeep's bulk cargo port driving massive freight demand. GoMyTruck provides verified truck booking across Odisha at a transparent 5% platform commission.",
-    stateKeyFact: "Odisha's industrial corridor is one of India's fastest-growing, with planned investments exceeding ₹10 lakh crore. GoMyTruck connects Odisha's manufacturers and traders to verified trucks at a flat 5% commission — no broker margin.",
+    intro: "Odisha is Eastern India's fastest-growing industrial state, with Bhubaneswar's IT and FMCG hubs, Cuttack's Jagatpur Industrial Estate and Paradeep's bulk cargo port driving massive freight demand. GoMyTruck provides verified truck booking across Odisha with transparent platform pricing.",
+    stateKeyFact: "Odisha's industrial corridor is one of India's fastest-growing, with planned investments exceeding ₹10 lakh crore. GoMyTruck connects Odisha's manufacturers and traders to verified trucks with transparent direct pricing — no broker margin.",
     industrialHubs: [
       {name: "Bhubaneswar", tagline: "Odisha capital & IT hub", slug: "/bhubaneswar"},
       {name: "Cuttack", tagline: "Jagatpur Industrial Estate", slug: "/cuttack"},
@@ -68,10 +68,10 @@ const states = {
   "bihar": {
     canonical: "/bihar",
     title: "Goods Transport & Truck Booking in Bihar | GoMyTruck",
-    description: "Book trucks for goods transport across Bihar — Patna, Hajipur, Muzaffarpur, agricultural and FMCG freight. Only 5% commission, no brokers.",
+    description: "Book trucks for goods transport across Bihar — Patna, Hajipur, Muzaffarpur, agricultural and FMCG freight. Transparent pricing, no brokers.",
     eyebrow: "Bihar State Logistics Hub",
     h1: "Goods Transport and Truck Booking Across Bihar",
-    intro: "Bihar is one of India's fastest-growing agricultural and commercial freight markets, with Patna as the commercial capital and Hajipur's Industrial Area as the primary manufacturing hub. GoMyTruck provides verified truck booking across Bihar at a transparent 5% platform commission.",
+    intro: "Bihar is one of India's fastest-growing agricultural and commercial freight markets, with Patna as the commercial capital and Hajipur's Industrial Area as the primary manufacturing hub. GoMyTruck provides verified truck booking across Bihar at transparent platform rates.",
     stateKeyFact: "Bihar's road freight market is estimated at over ₹25,000 crore annually, driven by agricultural produce, FMCG distribution and construction materials. GoMyTruck provides a digital alternative to the traditional intermediary-heavy truck booking system in Bihar.",
     industrialHubs: [
       {name: "Patna", tagline: "Bihar capital & commercial hub", slug: "/patna"},
@@ -92,10 +92,10 @@ const states = {
   "assam-northeast": {
     canonical: "/assam-northeast",
     title: "Goods Transport & Truck Booking in Assam & Northeast India | GoMyTruck",
-    description: "Book trucks for goods transport in Assam and Northeast India — Guwahati, Siliguri corridor. Only 5% commission, verified drivers, return load matching.",
+    description: "Book trucks for goods transport in Assam and Northeast India — Guwahati, Siliguri corridor. Verified drivers, return load matching.",
     eyebrow: "Assam & Northeast India Hub",
     h1: "Goods Transport and Truck Booking in Assam & Northeast India",
-    intro: "The Assam and Northeast India freight market is served primarily through Guwahati as the distribution gateway. GoMyTruck connects FMCG distributors, traders and manufacturers to verified trucks on the Kolkata–Guwahati corridor at a transparent 5% commission, with return load (backhaul) matching to reduce empty running.",
+    intro: "The Assam and Northeast India freight market is served primarily through Guwahati as the distribution gateway. GoMyTruck connects FMCG distributors, traders and manufacturers to verified trucks on the Kolkata–Guwahati corridor with transparent pricing and return load (backhaul) matching to reduce empty running.",
     stateKeyFact: "The Kolkata–Guwahati freight corridor handles over 3,000 truck movements daily — making it one of Eastern India's highest-volume freight lanes. GoMyTruck's backhaul matching helps fleet operators reduce empty running on the return route.",
     industrialHubs: [
       {name: "Guwahati", tagline: "Northeast India freight gateway", slug: "/guwahati"},
@@ -195,7 +195,7 @@ const StateHubPage = ({ stateKey }) => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <div className="inline-flex items-center space-x-2 bg-slate-800/50 rounded-full px-3 py-1 mb-6 border border-slate-700">
-              <span className="text-brand-400 font-semibold text-sm">Only 5% Commission</span>
+              <span className="text-brand-400 font-semibold text-sm">Direct Freight Marketplace</span>
             </div>
             <p className="text-brand-300 font-medium mb-4">{eyebrow}</p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
@@ -232,8 +232,8 @@ const StateHubPage = ({ stateKey }) => {
                    <span className="text-2xl font-bold text-white">{keyRoutes.length}</span>
                  </div>
                  <div className="flex justify-between items-center">
-                   <span className="text-slate-400">Platform Commission</span>
-                   <span className="text-2xl font-bold text-brand-400">5% Flat</span>
+                   <span className="text-slate-400">Broker Margin</span>
+                   <span className="text-2xl font-bold text-brand-400">0% Direct</span>
                  </div>
                </div>
              </div>
@@ -358,7 +358,7 @@ const StateHubPage = ({ stateKey }) => {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to book transport in {eyebrow.split(' State')[0].split(' &')[0]}?</h2>
           <p className="text-slate-300 text-lg mb-10">
-            Join thousands of businesses moving freight reliably at a flat 5% commission. 
+            Join thousands of businesses moving freight reliably with transparent pricing. 
             No hidden fees, no broker margins.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -9,13 +9,13 @@ import { lockScroll, unlockScroll } from "../utils/scrollLock"
 // Local image map — backend imageUrl is null; use verified local blueprints with corrected names
 const VEHICLE_DISPLAY_CONFIG = {
   BIKE:           { image: "/vehicles/Standard Bike.webp", name: "2-Wheeler (Bike)" },
-  THREE_WHEELER:  { image: "/vehicles/Mini Open Pickup.webp", name: "3-Wheeler / Ape" },
-  TATA_ACE:       { image: "/vehicles/Tata Ace.webp", name: "Tata Ace" },
-  MINI_TRUCK:     { image: "/vehicles/Bolero Pickup.webp", name: "Bolero Pickup" },
-  TRUCK_14FT:     { image: "/vehicles/14 Ft Open Truck.webp", name: "14ft Open Truck" },
-  TRUCK_17FT:     { image: "/vehicles/17 Ft Closed Truck.webp", name: "17ft Closed Truck" },
-  TRUCK_20FT:     { image: "/vehicles/19 Ft Truck.webp", name: "19ft / 20ft Truck" },
-  CONTAINER_32FT: { image: "/vehicles/LCV Box Truck.webp", name: "32ft Container" },
+  THREE_WHEELER:  { image: "/vehicles/3 Wheeler.webp", name: "3-Wheeler / Ape" },
+  TATA_ACE:       { image: "/vehicles/open/7ft.webp", name: "Tata Ace" },
+  MINI_TRUCK:     { image: "/vehicles/open/8ft-1.5ton.webp", name: "Bolero Pickup" },
+  TRUCK_14FT:     { image: "/vehicles/open/14ft-4ton.webp", name: "14ft Open Truck" },
+  TRUCK_17FT:     { image: "/vehicles/container/17ft-4ton.webp", name: "17ft Closed Truck" },
+  TRUCK_20FT:     { image: "/vehicles/open/20ft-10ton.webp", name: "19ft / 20ft Truck" },
+  CONTAINER_32FT: { image: "/vehicles/container/32ft-18ton.webp", name: "32ft Container" },
 }
 
 // Which vehicleTypes to show per service context
@@ -26,18 +26,25 @@ const SERVICE_VEHICLE_FILTER = {
 import { useAuth } from "../context/AuthContext"
 import GoodsTypeModal from "./GoodsTypeModal"
 import BookingPersonaStep from "./BookingPersonaStep"
+import TruckSelectorModal from "./TruckSelectorModal"
+import { ALL_TRUCKS, findTruckById } from "../constants/trucksData"
 
 /**
  * EstimateResultModal
  * estimateData contains:
  * {
  *   pickupAddress, dropAddress, phone, name,
- *   estimatedDistanceKm, estimatedDurationMins, polyline, vehicle
+ *   estimatedDistanceKm, estimatedDurationMins, polyline, vehicle, selectedTruck
  * }
  */
 export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
   const [vehicles, setVehicles] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedTruck, setSelectedTruck] = useState(() => {
+    if (estimateData?.selectedTruck) return estimateData.selectedTruck
+    return ALL_TRUCKS.find((t) => t.backendVehicleType === (estimateData?.vehicle?.vehicleType || "TRUCK_14FT_OPEN")) || ALL_TRUCKS[0]
+  })
+  const [showTruckPicker, setShowTruckPicker] = useState(false)
   const [selectedVehicleType, setSelectedVehicleType] = useState(estimateData?.vehicle?.vehicleType || "MINI_TRUCK")
   const [liveEstimate, setLiveEstimate] = useState(estimateData)
   const [estimateRefreshing, setEstimateRefreshing] = useState(false)
@@ -83,7 +90,12 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
   useEffect(() => {
     if (!isOpen || !estimateData) return
     setLiveEstimate(estimateData)
-    setSelectedVehicleType(estimateData.vehicle?.vehicleType || "MINI_TRUCK")
+    const truck =
+      estimateData.selectedTruck ||
+      ALL_TRUCKS.find((t) => t.backendVehicleType === (estimateData.vehicle?.vehicleType || "TRUCK_14FT_OPEN")) ||
+      ALL_TRUCKS[0]
+    setSelectedTruck(truck)
+    setSelectedVehicleType(estimateData.vehicle?.vehicleType || truck.backendVehicleType || "MINI_TRUCK")
   }, [isOpen, estimateData])
 
   // Lock background scroll and pin body when open
@@ -326,6 +338,40 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
     }
   }
 
+  const handleTruckChanged = async (newTruck) => {
+    setSelectedTruck(newTruck)
+    setSelectedVehicleType(newTruck.backendVehicleType)
+    setEstimateRefreshing(true)
+    setBookingError("")
+    try {
+      const estimate = await fetchEstimate({
+        pickupLat: estimateData.pickupLat,
+        pickupLng: estimateData.pickupLng,
+        dropLat: estimateData.dropLat,
+        dropLng: estimateData.dropLng,
+        vehicleType: newTruck.backendVehicleType,
+        hasLoadingService: !!selectedGoods?.laborRequired,
+        helperCount: selectedGoods?.laborersCount,
+      })
+      setLiveEstimate({
+        ...estimate,
+        selectedTruck: newTruck,
+        vehicle: {
+          ...estimate.vehicle,
+          vehicleType: newTruck.backendVehicleType,
+          displayName: newTruck.name,
+          capacityDesc: newTruck.capacityDesc,
+          image: newTruck.image,
+        },
+      })
+    } catch (error) {
+      console.error("Failed to re-calculate fare for selected truck:", error)
+      setBookingError(error.message || "Could not refresh the estimate for this vehicle.")
+    } finally {
+      setEstimateRefreshing(false)
+    }
+  }
+
   return createPortal(
     <>
       <div data-modal-portal="true" data-modal-open="true" className="fixed inset-0 z-[150] flex flex-col justify-end md:justify-center md:p-6 lg:p-10 pointer-events-auto">
@@ -438,69 +484,68 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                   </div>
                 </div>
 
-                {/* 2. Select Vehicle Section */}
+                {/* 2. Chosen Vehicle Section (Focused View) */}
                 <div>
-                  <div className="flex items-center justify-between mb-2.5">
-                    <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">Select Vehicle</h4>
-                    <span className="text-[11px] text-slate-400 font-semibold">{filteredVehicles.length} vehicles available</span>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                      Selected Commercial Vehicle
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => setShowTruckPicker(true)}
+                      className="text-xs font-black text-orange-600 hover:text-orange-700 underline cursor-pointer"
+                    >
+                      Change Truck
+                    </button>
                   </div>
 
-                  {loading ? (
-                    <div className="py-8 flex items-center justify-center">
-                      <Loader2 className="animate-spin text-blue-600" size={28} />
-                    </div>
-                  ) : (
-                    <div className="space-y-2.5">
-                      {filteredVehicles.map((v) => {
-                        const isSelected = selectedVehicleType === v.vehicleType
-                        const config = VEHICLE_DISPLAY_CONFIG[v.vehicleType] || {}
-                        const imgSrc = config.image || "/navy_truck.webp"
-                        const displayName = config.name || v.displayName
-
-                        return (
-                          <div
-                            key={v.vehicleType}
-                            onClick={() => selectVehicle(v)}
-                            className={`flex items-center justify-between p-3 rounded-2xl border-2 transition-all cursor-pointer ${
-                              isSelected
-                                ? "border-blue-600 bg-blue-50/50 shadow-sm"
-                                : "border-slate-200 bg-white hover:border-slate-300"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-16 h-12 bg-slate-50 rounded-xl flex items-center justify-center p-1 shrink-0 overflow-hidden border border-slate-100">
-                                <img src={imgSrc} alt={displayName} className="w-full h-full object-contain" />
-                              </div>
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-1.5">
-                                  <h5 className="font-black text-slate-900 text-sm leading-tight truncate">{displayName}</h5>
-                                  {isSelected && <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0" />}
-                                </div>
-                                <p className="text-[11px] font-semibold text-slate-500 mt-0.5 leading-tight truncate">
-                                  {v.capacityDesc || `${v.capacityKg} Kg capacity`}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="text-right shrink-0 pl-3">
-                              {isSelected ? (
-                                <div>
-                                  <span className="text-base font-black text-slate-900 block leading-tight">
-                                    {estimateRefreshing ? <Loader2 size={14} className="animate-spin inline text-blue-600" /> : `₹${Math.round(currentFare)}`}
-                                  </span>
-                                  <span className="text-[10px] font-bold text-blue-600">Selected</span>
-                                </div>
-                              ) : (
-                                <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
-                                  Select
-                                </span>
-                              )}
-                            </div>
+                  <div className="p-3.5 rounded-2xl border-2 border-orange-500 bg-orange-50/30 shadow-xs relative">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-20 h-16 bg-white rounded-xl flex items-center justify-center p-1.5 shrink-0 overflow-hidden border border-orange-100 shadow-2xs">
+                          <img
+                            src={selectedTruck?.image || liveEstimate?.vehicle?.image || "/hero-service-open-truck.webp"}
+                            alt={selectedTruck?.name || liveEstimate?.vehicle?.displayName || "Selected Truck"}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <h5 className="font-black text-slate-900 text-sm leading-tight">
+                              {selectedTruck?.name || liveEstimate?.vehicle?.displayName}
+                            </h5>
                           </div>
-                        )
-                      })}
+                          <p className="text-[11px] font-bold text-slate-600 mt-1 leading-tight">
+                            Payload: {selectedTruck?.capacityDesc || liveEstimate?.vehicle?.capacityDesc}
+                          </p>
+                          {selectedTruck?.dimensions && (
+                            <p className="text-[10px] font-semibold text-slate-400 mt-0.5">
+                              Dim: {selectedTruck.dimensions}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span className="text-lg font-black text-slate-900 block leading-tight">
+                          {estimateRefreshing ? (
+                            <Loader2 size={16} className="animate-spin inline text-orange-600" />
+                          ) : (
+                            `₹${Math.round(currentFare)}`
+                          )}
+                        </span>
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                          Estimated Fare
+                        </span>
+                      </div>
                     </div>
-                  )}
+
+                    {selectedTruck?.bestFor && (
+                      <p className="mt-2 text-[10px] text-slate-500 bg-white/70 rounded-lg px-2.5 py-1 border border-orange-100/60 font-medium line-clamp-1">
+                        Best suited for: {selectedTruck.bestFor}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {/* 3. Transparent Fare Breakdown Card */}
@@ -516,8 +561,8 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                       <span className="font-semibold text-slate-800">₹{Number(fareBreakdown.distanceFare || 0).toFixed(0)}</span>
                     </div>
                     <div className="flex justify-between text-emerald-700 font-semibold">
-                      <span>Platform Commission</span>
-                      <span>Only 5%</span>
+                      <span>Platform Fee</span>
+                      <span>Included</span>
                     </div>
                     {totalGst > 0 && (
                       <div className="flex justify-between">
@@ -531,7 +576,7 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                     </div>
                   </div>
                   <p className="text-[10px] font-medium text-slate-500 mt-2 text-center bg-white/70 py-1 px-2 rounded-lg border border-slate-100">
-                    Zero surge pricing • 95% goes directly to the driver
+                    Transparent pricing • Direct driver booking
                   </p>
                 </div>
 
@@ -711,7 +756,7 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                         <span>₹{currentFare.toFixed(2)}</span>
                       </div>
                       <p className="text-xs text-slate-500 mt-2 font-medium bg-slate-50 p-2 rounded-lg border border-slate-200 text-center shadow-sm">
-                        Total Cost = Driver Payout (95%) + GoMyTruck Commission (5%) + Applicable GST/Tolls
+                        Total Cost = Driver Payout + Platform Fee + Applicable GST/Tolls
                       </p>
                     </div>
                     <div className="flex justify-between items-center py-4 border-t border-slate-100 text-sm">
@@ -763,61 +808,59 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
                   </div>
                 ) : (
                   <>
-                    <div className="p-6 sm:p-8 pb-4">
-                      <h3 className="text-xl font-extrabold text-slate-900">Select Vehicle</h3>
+                    <div className="p-6 sm:p-8 pb-3 flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-extrabold text-slate-900">Chosen Vehicle</h3>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">Commercial truck selected for your shipment</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowTruckPicker(true)}
+                        className="text-xs font-black text-orange-600 hover:text-orange-700 underline cursor-pointer bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-200 transition-colors"
+                      >
+                        Change Truck
+                      </button>
                     </div>
 
-                    {loading ? (
-                      <div className="flex-grow flex items-center justify-center">
-                        <Loader2 className="animate-spin text-blue-600" size={32} />
+                    <div className="flex-grow overflow-y-auto px-6 sm:px-8 custom-scrollbar space-y-4 pb-4">
+                      {/* Chosen Truck Card */}
+                      <div className="border-2 border-orange-500 bg-white rounded-2xl p-5 shadow-sm relative transition-all">
+                        <div className="absolute top-2 left-2 right-2 bottom-2 bg-orange-50/20 rounded-xl pointer-events-none"></div>
+                        <div className="w-full bg-slate-50/80 rounded-xl overflow-hidden mb-4 relative z-10 flex items-center justify-center p-4 h-48 border border-slate-100">
+                          <img
+                            src={selectedTruck?.image || liveEstimate?.vehicle?.image || "/hero-service-open-truck.webp"}
+                            alt={selectedTruck?.name || liveEstimate?.vehicle?.displayName || "Selected Truck"}
+                            loading="lazy"
+                            decoding="async"
+                            className="max-h-44 w-auto object-contain"
+                          />
+                        </div>
+                        <div className="relative z-10">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-black text-slate-900 text-xl">{selectedTruck?.name || liveEstimate?.vehicle?.displayName}</h4>
+                            <span className="text-2xl font-black text-slate-900">
+                              {estimateRefreshing ? "Refreshing…" : `₹ ${Math.round(currentFare)}`}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs font-extrabold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-md border border-orange-200">
+                              Payload: {selectedTruck?.capacityDesc || `${liveEstimate?.vehicle?.capacityKg || 0} Kg`}
+                            </span>
+                            {selectedTruck?.dimensions && (
+                              <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
+                                Dimensions: {selectedTruck.dimensions}
+                              </span>
+                            )}
+                          </div>
+                          {selectedTruck?.bestFor && (
+                            <p className="text-xs text-slate-500 font-medium mt-3 bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
+                              <span className="font-bold text-slate-700">Recommended for: </span>
+                              {selectedTruck.bestFor}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    ) : (
-                      <div className="flex-grow overflow-y-auto px-6 sm:px-8 custom-scrollbar space-y-4 pb-4">
-                        {filteredVehicles.map(v => {
-                          const isSelected = selectedVehicleType === v.vehicleType
-                          const fare = isSelected ? currentFare : null
-                          
-                          const config = VEHICLE_DISPLAY_CONFIG[v.vehicleType] || {}
-                          const imgSrc = config.image || "/navy_truck.webp"
-                          const displayName = config.name || v.displayName
-
-                          if (isSelected) {
-                            return (
-                              <div key={v.vehicleType} className="border-2 border-blue-600 bg-white rounded-2xl p-4 shadow-sm relative transition-all">
-                                <div className="absolute top-2 left-2 right-2 bottom-2 bg-blue-50/30 rounded-xl pointer-events-none"></div>
-                                <div className="w-full bg-slate-50 rounded-xl overflow-hidden mb-3 relative z-10 flex items-center justify-center p-2">
-                                  <img src={imgSrc} alt={displayName} loading="lazy" decoding="async" className="max-h-40 w-auto object-contain" />
-                                </div>
-                                <h4 className="font-bold text-slate-800 text-lg text-center relative z-10">{displayName}</h4>
-                                <div className="flex justify-between items-end mt-2 relative z-10">
-                                  <span className="text-sm font-semibold text-slate-600">{v.capacityDesc || `${v.capacityKg} Kg`}</span>
-                                  <span className="text-xl font-black text-slate-900">{estimateRefreshing ? "Refreshing…" : `₹ ${Math.round(fare)}`}</span>
-                                </div>
-                              </div>
-                            )
-                          }
-
-                          return (
-                            <div
-                              key={v.vehicleType}
-                              onClick={() => selectVehicle(v)}
-                              className="flex items-center justify-between border border-slate-200 bg-white rounded-xl p-3 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all"
-                            >
-                              <div className="flex items-center gap-4">
-                                <div className="w-24 bg-slate-50 rounded-lg overflow-hidden shrink-0 flex items-center justify-center p-1">
-                                  <img src={imgSrc} alt={displayName} loading="lazy" decoding="async" className="h-14 w-auto object-contain" />
-                                </div>
-                                <div>
-                                  <h4 className="font-bold text-slate-800 text-sm">{displayName}</h4>
-                                  <span className="text-xs font-semibold text-slate-500">{v.capacityDesc || `${v.capacityKg} Kg`}</span>
-                                </div>
-                              </div>
-                              <span className="text-xs font-bold text-brand-700 shrink-0">Select for estimate</span>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )}
+                    </div>
 
                     {/* Bottom Fixed Section (Desktop) */}
                     <div className="p-6 sm:p-8 pt-4 bg-slate-50/50 mt-auto border-t border-slate-100">
@@ -1026,6 +1069,15 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
           setBookingState("PERSONA")
         }}
         initialData={selectedGoods}
+      />
+
+      {/* Truck Selection Modal for changing truck inside EstimateResultModal */}
+      <TruckSelectorModal
+        isOpen={showTruckPicker}
+        onClose={() => setShowTruckPicker(false)}
+        selectedTruckId={selectedTruck?.id}
+        initialCategoryId={selectedTruck?.categoryId || "open_truck"}
+        onSelectTruck={handleTruckChanged}
       />
     </>,
     document.body

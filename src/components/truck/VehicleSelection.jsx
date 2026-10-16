@@ -1,190 +1,142 @@
 import React, { useState } from "react"
-import { Weight, Ruler } from "lucide-react"
-
-const LIGHT_VEHICLES = [
-  {
-    name: "3 Wheeler",
-    img: "/trucks/3-Wheeler.webp",
-    capacity: "500 kg",
-    dimension: "5100 × 1800 mm",
-    desc: "Ideal for small parcels, courier drops & intra-city deliveries.",
-  },
-  {
-    name: "E-Loader",
-    img: "/trucks/E-Loader.webp",
-    capacity: "500 kg",
-    dimension: "2600 × 1700 mm",
-    desc: "Eco-friendly open flatbed for light goods & last-mile delivery.",
-  },
-  {
-    name: "Tata Ace",
-    img: "/trucks/Tata Ace.webp",
-    capacity: "750 kg",
-    dimension: "3800 × 1850 mm",
-    desc: "The go-to mini truck for household goods & commercial loads.",
-  },
-]
-
-const HEAVY_VEHICLES = [
-  {
-    name: "Pickup",
-    img: "/trucks/Pickup.webp",
-    capacity: "1,000 kg",
-    dimension: "5200 × 1750 mm",
-    desc: "Open flatbed pickup — great for construction material & bulk items.",
-  },
-  {
-    name: "Bolero Pickup",
-    img: "/trucks/Bolero-Pickup.webp",
-    capacity: "1,250 kg",
-    dimension: "4950 × 1900 mm",
-    desc: "Rugged 4WD pickup built for heavy loads across any terrain.",
-  },
-  {
-    name: "14 ft Truck",
-    img: "/trucks/14ft-Truck.webp",
-    capacity: "2,500 kg",
-    dimension: "14 ft × 7.5 ft",
-    desc: "Enclosed box truck for furniture shifting, factory goods & more.",
-  },
-  {
-    name: "17 ft Truck",
-    img: "/trucks/17ft-Truck.webp",
-    capacity: "5,000 kg",
-    dimension: "17 ft × 7.5 ft",
-    desc: "High-capacity box truck for large-scale commercial transport.",
-  },
-  {
-    name: "20 ft Truck",
-    img: "/trucks/20ft-Truck.webp",
-    capacity: "10,000 kg",
-    dimension: "20 ft × 12 ft",
-    desc: "Heavy-duty multi-axle truck for industrial & bulk cargo loads.",
-  },
-]
+import { Weight, Ruler, ArrowRight, ShieldCheck, Check } from "lucide-react"
+import { TRUCK_CATEGORIES } from "../../constants/trucksData"
 
 function VehicleCard({ vehicle }) {
+  const scrollToEstimate = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col hover:shadow-lg hover:border-brand-300 transition-all cursor-pointer group">
+    <div
+      onClick={scrollToEstimate}
+      className="bg-white border border-slate-200/90 hover:border-orange-500 rounded-2xl p-5 flex flex-col justify-between hover:shadow-xl transition-all duration-300 cursor-pointer group relative overflow-hidden"
+    >
+      <div>
+        {/* Top Badges */}
+        <div className="flex items-center justify-between gap-2 flex-wrap mb-3">
+          <span className="flex items-center gap-1.5 bg-orange-50 text-orange-700 border border-orange-200/70 px-2.5 py-1 rounded-full text-xs font-black">
+            <Weight size={12} className="text-orange-600" />
+            {vehicle.capacityDesc}
+          </span>
+          <span className="flex items-center gap-1.5 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full text-xs font-bold">
+            <Ruler size={12} className="text-slate-500" />
+            {vehicle.size}
+          </span>
+        </div>
 
-      {/* Image area */}
-      <div className="w-full bg-slate-50 rounded-xl mb-5 overflow-hidden">
-        <img
-          src={vehicle.img}
-          alt={vehicle.name}
-          width="640"
-          height="360"
-          loading="lazy"
-          decoding="async"
-          className="w-full h-auto group-hover:scale-105 transition-transform duration-300"
-        />
+        {/* Truck Image Container */}
+        <div className="w-full h-40 bg-slate-50/80 rounded-xl mb-4 overflow-hidden flex items-center justify-center p-3 border border-slate-100 group-hover:bg-orange-50/20 transition-colors">
+          <img
+            src={vehicle.image}
+            alt={vehicle.name}
+            width={400}
+            height={260}
+            loading="lazy"
+            decoding="async"
+            className="max-h-full w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+
+        {/* Title & Dimension */}
+        <h3 className="text-lg font-black text-slate-900 group-hover:text-orange-600 transition-colors">
+          {vehicle.name}
+        </h3>
+        <p className="text-xs font-semibold text-slate-500 mt-1">
+          Dimensions: <span className="text-slate-700">{vehicle.dimensions}</span>
+        </p>
+
+        {/* Best For */}
+        <p className="text-slate-500 text-xs mt-2 leading-relaxed line-clamp-2">
+          {vehicle.bestFor}
+        </p>
       </div>
-
-      {/* Badges */}
-      <div className="flex items-center gap-2 flex-wrap mb-3">
-        <span className="flex items-center gap-1 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full text-xs font-bold">
-          <Weight size={12} />
-          {vehicle.capacity}
-        </span>
-        <span className="flex items-center gap-1 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full text-xs font-bold">
-          <Ruler size={12} />
-          {vehicle.dimension}
-        </span>
-      </div>
-
-      {/* Name + desc */}
-      <h3 className="text-lg font-display font-extrabold text-slate-900 group-hover:text-brand-700 transition-colors">
-        {vehicle.name}
-      </h3>
-      <p className="text-slate-500 text-sm mt-1 leading-relaxed flex-1">
-        {vehicle.desc}
-      </p>
 
       {/* Footer */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-        <span className="text-slate-400 text-xs font-medium">
-          Route-based pricing
+      <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-100">
+        <span className="text-slate-400 text-xs font-semibold flex items-center gap-1">
+          <ShieldCheck size={13} className="text-emerald-600" />
+          Verified Fleet
         </span>
         <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="text-brand-600 font-bold text-sm border-b border-dashed border-brand-400 pb-0.5 hover:text-brand-700 hover:border-brand-700 transition-colors"
+          type="button"
+          onClick={scrollToEstimate}
+          className="text-orange-600 font-black text-xs flex items-center gap-1 group-hover:translate-x-0.5 transition-transform cursor-pointer"
         >
-          Get Estimate
+          <span>Book Truck</span>
+          <ArrowRight size={13} />
         </button>
       </div>
-
     </div>
   )
 }
 
 export default function VehicleSelection({ city }) {
-  const [activeTab, setActiveTab] = useState("light")
+  const [activeCategoryId, setActiveCategoryId] = useState("open_truck")
+
+  const currentCategory =
+    TRUCK_CATEGORIES.find((c) => c.id === activeCategoryId) || TRUCK_CATEGORIES[0]
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-
       {/* Heading */}
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-display font-extrabold text-slate-900">
-          Book Mini Trucks in {city}
+        <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-100/70 border border-orange-200 text-orange-700 text-xs font-black tracking-widest uppercase mb-3">
+          Commercial Fleet Directory
+        </span>
+        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          Commercial Trucks Available in {city}
         </h2>
-        <p className="text-slate-500 mt-2 text-base">
-          Compare planning capacities, then confirm the exact body, payload, and availability for your declared load.
+        <p className="text-slate-500 mt-2 text-base max-w-2xl mx-auto">
+          Explore our complete fleet across Open Trucks, Container Trucks, and Trailers. Select any truck to check live route-based fare estimates.
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex justify-center gap-8 border-b border-slate-200 mb-10">
-        <button
-          onClick={() => setActiveTab("light")}
-          className={`pb-4 px-2 font-bold transition-colors border-b-2 -mb-px ${
-            activeTab === "light"
-              ? "text-brand-600 border-brand-600"
-              : "text-slate-500 border-transparent hover:text-slate-700"
-          }`}
-        >
-          Light Vehicles
-          <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-semibold ${
-            activeTab === "light" ? "bg-brand-100 text-brand-700" : "bg-slate-100 text-slate-500"
-          }`}>
-            up to 750 kg
-          </span>
-        </button>
-        <button
-          onClick={() => setActiveTab("heavy")}
-          className={`pb-4 px-2 font-bold transition-colors border-b-2 -mb-px ${
-            activeTab === "heavy"
-              ? "text-brand-600 border-brand-600"
-              : "text-slate-500 border-transparent hover:text-slate-700"
-          }`}
-        >
-          Heavy Vehicles
-          <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-semibold ${
-            activeTab === "heavy" ? "bg-brand-100 text-brand-700" : "bg-slate-100 text-slate-500"
-          }`}>
-            750 kg+
-          </span>
-        </button>
+      {/* 3 Main Category Tabs */}
+      <div className="flex justify-center mb-8">
+        <div className="inline-flex p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200/80 gap-1.5 max-w-full overflow-x-auto">
+          {TRUCK_CATEGORIES.map((cat) => {
+            const isActive = cat.id === activeCategoryId
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setActiveCategoryId(cat.id)}
+                className={`flex items-center gap-2 py-2.5 px-4 sm:px-6 rounded-xl font-black text-xs sm:text-sm transition-all whitespace-nowrap cursor-pointer ${
+                  isActive
+                    ? "bg-white text-orange-600 shadow-sm border border-slate-200/80"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
+                }`}
+              >
+                <span>{cat.title}</span>
+                <span
+                  className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-full ${
+                    isActive
+                      ? "bg-orange-100 text-orange-700"
+                      : "bg-slate-200 text-slate-600"
+                  }`}
+                >
+                  {cat.trucks.length}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      {/* Light grid — 3 cards */}
-      {activeTab === "light" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {LIGHT_VEHICLES.map((v) => (
-            <VehicleCard key={v.name} vehicle={v} />
-          ))}
-        </div>
-      )}
+      {/* Category description banner */}
+      <div className="text-center mb-8">
+        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+          {currentCategory.tagline}
+        </p>
+      </div>
 
-      {/* Heavy grid — 5 cards, 3-col wraps to 2+3 naturally */}
-      {activeTab === "heavy" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {HEAVY_VEHICLES.map((v) => (
-            <VehicleCard key={v.name} vehicle={v} />
-          ))}
-        </div>
-      )}
-
+      {/* Truck Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {currentCategory.trucks.map((truck) => (
+          <VehicleCard key={truck.id} vehicle={truck} />
+        ))}
+      </div>
     </section>
   )
 }

@@ -4,7 +4,7 @@ GoMyTruck is a digital B2B load-posting platform and logistics marketplace, focu
 
 ## Focus & Business Model
 - **B2B Load-Posting Focus**: Connecting businesses with verified truck owners and drivers.
-- **Transparent Commission**: We operate on a flat 5% commission model, ensuring fair pricing for both shippers and transporters.
+- **Transparent Pricing**: We operate on a transparent pricing model with direct driver-shipper connectivity and zero hidden broker margins, ensuring fair rates for both shippers and transporters.
 
 ## Tier 1 Locations (Service Areas)
 - Dankuni

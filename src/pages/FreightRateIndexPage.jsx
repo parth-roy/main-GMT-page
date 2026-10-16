@@ -30,8 +30,8 @@ export default function FreightRateIndexPage() {
   ];
 
   const BROKER_COMPARISON = [
-    { metric: "Platform / Broker Fee", broker: "15% – 25% margin markup", gomytruck: "Flat 5% Commission OR ₹99 Direct Unlock" },
-    { metric: "Per-Trip Intermediary Cut", broker: "₹1,500 – ₹2,500 per trip", gomytruck: "Zero broker markup (Driver gets 95%+ of freight)" },
+    { metric: "Platform / Broker Fee", broker: "15% – 25% margin markup", gomytruck: "Transparent Platform Fee OR ₹99 Direct Unlock" },
+    { metric: "Per-Trip Intermediary Cut", broker: "₹1,500 – ₹2,500 per trip", gomytruck: "Zero broker markup (Driver gets direct earnings)" },
     { metric: "Driver Direct Contact", broker: "Hidden (broker controls communication)", gomytruck: "Direct phone number & WhatsApp revealed" },
     { metric: "Pricing Transparency", broker: "Arbitrary quotes based on market urgency", gomytruck: "Algorithmic per-km transparent calculation" },
     { metric: "Verification Standard", broker: "Unverified unorganized intermediaries", gomytruck: "100% Commercial DL & RC validated partners" },
@@ -44,7 +44,7 @@ export default function FreightRateIndexPage() {
     },
     {
       question: "How do traditional transport brokers compare with GoMyTruck's commission model?",
-      answer: "Traditional transport brokers typically extract a 15% to 25% margin (costing shippers between ₹1,500 and ₹2,500 per load). GoMyTruck disrupts this model by offering two transparent alternatives: a flat 5% platform commission on managed digital bookings, or a flat one-time ₹99 Direct Driver Connect unlock that provides unmasked contact numbers of 10 verified commercial drivers with zero broker fees."
+      answer: "Traditional transport brokers typically extract a 15% to 25% margin (costing shippers between ₹1,500 and ₹2,500 per load). GoMyTruck disrupts this model by offering two transparent alternatives: transparent digital bookings with zero broker markup, or a flat one-time ₹99 Direct Driver Connect unlock that provides unmasked contact numbers of 10 verified commercial drivers with zero broker fees."
     },
     {
       question: "How does the Dedicated Freight Corridor (DFC) impact highway truck freight rates?",
@@ -95,7 +95,7 @@ export default function FreightRateIndexPage() {
     <div className="bg-white min-h-screen font-sans">
       <SEOHead
         title="2026 Indian Road Freight Rate Index & Broker Margin Analysis | GoMyTruck"
-        description="Authoritative 2026 road logistics freight rate index across Eastern India and national highway corridors. Per-km vehicle benchmarks, DFC transit times, and 5% commission audit."
+        description="Authoritative 2026 road logistics freight rate index across Eastern India and national highway corridors. Per-km vehicle benchmarks, DFC transit times, and broker margin audit."
         canonical={canonicalPath}
         keywords="freight rate index 2026, road transport rates per km India, truck booking rates Kolkata, DFC freight corridor rates, broker commission logistics India, tata ace per km rate"
         jsonLd={jsonLd}
@@ -119,7 +119,7 @@ export default function FreightRateIndexPage() {
           </h1>
 
           <p className="text-slate-300 text-base sm:text-lg max-w-3xl mx-auto leading-relaxed mb-8">
-            An empirical, verifiable benchmark of commercial road logistics rates in India. Contrasting traditional 15%–25% freight broker commissions against GoMyTruck’s flat 5% platform commission and ₹99 direct driver contact model.
+            An empirical, verifiable benchmark of commercial road logistics rates in India. Contrasting traditional 15%–25% freight broker commissions against GoMyTruck’s transparent direct model and ₹99 direct driver contact model.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
@@ -231,7 +231,7 @@ export default function FreightRateIndexPage() {
             Traditional Transport Brokers vs. GoMyTruck Transparent Digital Model
           </h2>
           <p className="text-slate-700 text-sm leading-relaxed mb-6">
-            In traditional Indian road logistics, transport brokers extract 15% to 25% margins by manipulating asymmetric price information between shippers and vehicle operators. GoMyTruck commoditizes driver access, returning 95%+ of freight value directly to vehicle operators.
+            In traditional Indian road logistics, transport brokers extract 15% to 25% margins by manipulating asymmetric price information between shippers and vehicle operators. GoMyTruck commoditizes driver access, returning maximum freight value directly to vehicle operators.
           </p>
 
           <div className="overflow-x-auto rounded-2xl bg-white border border-amber-200 shadow-2xs">

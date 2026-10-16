@@ -181,7 +181,7 @@ const resources = {
         content: "Aggregators must designate a Grievance Officer and publish contact details. Complaints must be acknowledged within 24 hours and resolved within 30 days. GoMyTruck's support team is available via in-app support, direct contact desk and email."
       }
     ],
-    keyFact: "GoMyTruck operates as a Motor Vehicle Aggregator (not a GTA) under the Motor Vehicles Aggregator Guidelines. GoMyTruck charges a 5% platform commission with zero surge pricing and provides a GST-compliant digital invoice for every transaction.",
+    keyFact: "GoMyTruck operates as a Motor Vehicle Aggregator (not a GTA) under the Motor Vehicles Aggregator Guidelines. GoMyTruck operates on transparent platform pricing and provides a GST-compliant digital invoice for every transaction.",
     disclaimer: "Aggregator Guidelines vary by state. The 2020 Model Guidelines issued by the Ministry of Road Transport & Highways serve as the base framework, but individual states may issue modified versions. Verify the applicable guidelines in your state with a transport law specialist.",
     relatedLinks: [["GST for GTA Guide", "/resources/gst-for-goods-transport-agency"], ["Driver Partner", "/driver-partner"], ["Fleet Partner Registration", "/fleet-partner-registration"], ["GoMyTruck Verified", "/gomytruck-verified"]]
   },
@@ -206,7 +206,7 @@ const resources = {
         content: "SAC 996811: Postal services. SAC 996812: Courier services. SAC 996813: Local delivery services. For cargo handling: SAC 996711: Cargo handling services provided for freight in land transport."
       }
     ],
-    keyFact: "GoMyTruck charges a transparent 5% platform commission — vs the standard 10–20% broker margins. As a trusted Motor Vehicle Aggregator, we provide GST-compliant digital invoices for every transaction, complete with correct SAC codes.",
+    keyFact: "GoMyTruck operates on a transparent direct pricing model without middleman markups. As a trusted Motor Vehicle Aggregator, we provide GST-compliant digital invoices for every transaction, complete with correct SAC codes.",
     disclaimer: "Tax codes and regulations are subject to change. Please consult with a qualified tax professional or Chartered Accountant to verify the correct SAC/HSN codes for your specific transactions.",
     relatedLinks: [["GST for GTA Guide", "/resources/gst-for-goods-transport-agency"], ["GST RCM Guide", "/resources/gst-rcm-transporters"], ["Book a Truck", "/book-truck-online"]]
   },
@@ -231,7 +231,7 @@ const resources = {
         content: "If a platform falls under Section 52, fleet owners (the actual suppliers) handle their own GST compliance, subject to the TCS collected by the platform. If the platform operates under Section 9(5), the platform itself assumes the GST liability, removing that compliance burden from the individual transporter."
       }
     ],
-    keyFact: "GoMyTruck charges a transparent 5% platform commission — vs the standard 10–20% broker margins. As a trusted Motor Vehicle Aggregator, we ensure 100% compliance with all GST ECO provisions to protect our shippers and fleet owners.",
+    keyFact: "GoMyTruck operates on a transparent direct pricing model without middleman markups. As a trusted Motor Vehicle Aggregator, we ensure 100% compliance with all GST ECO provisions to protect our shippers and fleet owners.",
     disclaimer: "GST laws governing e-commerce and aggregators are complex and continually evolving. This summary does not constitute legal or tax advice. Consult a Chartered Accountant for specific guidance.",
     relatedLinks: [["Motor Vehicle Aggregator Guidelines", "/resources/motor-vehicle-aggregator-guidelines-2025"], ["GST for GTA Guide", "/resources/gst-for-goods-transport-agency"], ["Book a Truck", "/book-truck-online"]]
   }
@@ -285,7 +285,7 @@ export default function ResourcesPage({ resourceKey }) {
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight max-w-4xl">{res.h1}</h1>
           <p className="mt-6 text-lg sm:text-xl text-slate-200 leading-relaxed max-w-3xl">{res.intro}</p>
           <div className="mt-5 inline-flex items-center gap-2 bg-brand-700/30 border border-brand-500/40 rounded-full px-4 py-1.5">
-            <span className="text-brand-300 font-black text-sm">Only 5% Commission — vs 10–20% broker margins</span>
+            <span className="text-brand-300 font-black text-sm">Transparent Direct Pricing — vs 10–20% broker margins</span>
           </div>
         </div>
       </header>

@@ -57,7 +57,7 @@ export default function DynamicSeoPage({ serviceType }) {
   let urlSegment = "";
   let serviceHeadline = `Transport Services in ${cityName}`;
   let serviceBanner = `Your trusted partner for truck booking and goods transport in ${cityName}`;
-  let serviceDesc = `On-demand goods transport and commercial truck booking in ${cityName}, ${state}. Flat 5% commission, verified drivers, and transparent live pricing.`;
+  let serviceDesc = `On-demand goods transport and commercial truck booking in ${cityName}, ${state}. Direct driver booking, verified partners, and transparent live pricing.`;
 
   if (serviceType === "truck-booking") {
     urlSegment = "truck-booking";
@@ -73,7 +73,7 @@ export default function DynamicSeoPage({ serviceType }) {
     urlSegment = "14-feet-truck-rental";
     serviceHeadline = `14 Feet Truck Rental in ${cityName}`;
     serviceBanner = `Hire 14ft Eicher and intermediate commercial trucks in ${cityName}`;
-    serviceDesc = `Book 14 feet trucks in ${cityName} for up to 3.5–5 ton commercial loads, factory dispatches, wholesale distribution, and intercity freight with 5% commission.`;
+    serviceDesc = `Book 14 feet trucks in ${cityName} for up to 3.5–5 ton commercial loads, factory dispatches, wholesale distribution, and intercity freight with transparent pricing.`;
   } else if (serviceType === "tata-ace") {
     urlSegment = "tata-ace-booking";
     serviceHeadline = `Tata Ace / Chota Hathi Booking in ${cityName}`;
@@ -93,7 +93,7 @@ export default function DynamicSeoPage({ serviceType }) {
     urlSegment = "goods-transport";
     serviceHeadline = `Goods Transport Services in ${cityName}`;
     serviceBanner = `Commercial goods transport and freight logistics across ${cityName}`;
-    serviceDesc = `Reliable goods transport services in ${cityName}, ${state}. Hire verified trucks for retail cargo, manufacturing consignments, and wholesale distribution with flat 5% commission.`;
+    serviceDesc = `Reliable goods transport services in ${cityName}, ${state}. Hire verified trucks for retail cargo, manufacturing consignments, and wholesale distribution with transparent direct pricing.`;
   } else if (serviceType === "ftl-transport") {
     urlSegment = "ftl-transport";
     serviceHeadline = `Full Truckload (FTL) Freight in ${cityName}`;

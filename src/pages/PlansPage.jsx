@@ -12,7 +12,7 @@ export default function PlansPage() {
     },
     {
       question: "Why should I subscribe? What are the benefits?",
-      answer: "Subscribing allows you to find continuous commercial loads on the GoMyTruck platform without paying hefty commissions to brokers. We are a minimum commission platform, charging only 0 - 5% so you maximize your take-home profit per trip."
+      answer: "Subscribing allows you to find continuous commercial loads on the GoMyTruck platform without paying hefty commissions to brokers. We are a direct marketplace platform, charging only a nominal platform fee so you maximize your take-home profit per trip."
     },
     {
       question: "How much does the subscription cost? When will the payment be due?",
@@ -50,7 +50,7 @@ export default function PlansPage() {
         title="Partner Subscription Plans | GoMyTruck"
         description="Transparent GoMyTruck subscription plan for commercial drivers and fleet owners. Minimum commission platform with direct daily earnings."
         canonical="/plans"
-        keywords="GoMyTruck partner plan, truck driver subscription, freight marketplace plans, low commission logistics"
+        keywords="GoMyTruck partner plan, truck driver subscription, freight marketplace plans, direct loads logistics"
       />
 
       {/* Header Section */}
@@ -71,8 +71,8 @@ export default function PlansPage() {
               GoMyTruck Partner Plans
             </h1>
             <p className="text-lg md:text-xl lg:text-xl xl:text-2xl text-gray-200 leading-relaxed mb-12 drop-shadow-sm font-medium opacity-95">
-              We built GoMyTruck to revolutionize logistics by offering 0 - 5% commission loads 
-              (the lowest commission logistics platform) and direct earnings for our partners. To sustain this promise and keep our 
+              We built GoMyTruck to revolutionize logistics by offering direct verified loads 
+              without high broker margins and maximizing direct earnings for our partners. To sustain this promise and keep our 
               technology running smoothly, we are launching the GoMyTruck Partner Subscription. 
               By paying a small, predictable fee, you help us cover essential platform costs 
               while you keep maximum profit from your trips.
@@ -81,7 +81,7 @@ export default function PlansPage() {
             <ul className="space-y-6 md:space-y-6">
               <li className="flex items-center text-white">
                 <Check className="text-[#00d084] mr-4 drop-shadow-sm" size={28} strokeWidth={3} />
-                <span className="font-bold text-lg md:text-xl lg:text-xl xl:text-2xl drop-shadow-sm tracking-wide">0 - 5% Lowest Commission</span>
+                <span className="font-bold text-lg md:text-xl lg:text-xl xl:text-2xl drop-shadow-sm tracking-wide">Direct Loads & Fair Fee</span>
               </li>
               <li className="flex items-center text-white">
                 <Check className="text-[#00d084] mr-4 drop-shadow-sm" size={28} strokeWidth={3} />

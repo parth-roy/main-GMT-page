@@ -32,7 +32,7 @@ GoMyTruck is an on-demand freight and commercial truck aggregator operating acro
 ### 4. Driver Partner Onboarding (`/driver-partner`)
 - **Zero Security Deposit**: Driver registration is free with zero security deposits or hidden joining fees.
 - **90-Day Verified Premium Membership**: A nominal one-time ₹99 verification fee activates 90 days of verified premium driver status with priority regional loads and zero broker deductions.
-- **Lowest Platform Commission**: 0 - 5% platform commission on completed trips.
+- **Zero Hidden Charges**: Direct earnings on completed trips with transparent pricing and no hidden deductions.
 
 ---
 

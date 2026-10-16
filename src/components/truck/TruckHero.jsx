@@ -123,10 +123,10 @@ export default function TruckHero({ city, setCity }) {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
-          {/* 5% Commission Badge */}
+          {/* Direct Booking Badge */}
           <div className="mb-6 inline-flex items-center gap-2 bg-brand-600/20 border border-brand-400/40 rounded-full px-4 py-1.5">
-            <BadgePercent size={16} className="text-brand-300" />
-            <span className="text-brand-200 font-bold text-sm tracking-wide">Only 5% Commission — No Broker Margin</span>
+            <Shield size={16} className="text-brand-300" />
+            <span className="text-brand-200 font-bold text-sm tracking-wide">Direct Booking — No Broker Margin</span>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-white tracking-tight leading-tight max-w-4xl drop-shadow-xl">
             Online Truck Booking in {city}

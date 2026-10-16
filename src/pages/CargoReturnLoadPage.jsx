@@ -225,7 +225,7 @@ export default function CargoReturnLoadPage({ mode = "return-load" }) {
   const pageFaqs = [
     {
       question: `How do I book ${cargo.name} in ${cityName}?`,
-      answer: `You can book specialized transport for ${cargo.name} in ${cityName} via GoMyTruck. We provide verified vehicles fitted with protective tarpaulins, lashing straps, and experienced drivers at a flat 5% platform commission.`
+      answer: `You can book specialized transport for ${cargo.name} in ${cityName} via GoMyTruck. We provide verified vehicles fitted with protective tarpaulins, lashing straps, and experienced drivers with transparent direct pricing and no broker markups.`
     },
     {
       question: `Which vehicles are best suited for ${cargo.name}?`,

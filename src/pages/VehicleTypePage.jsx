@@ -43,10 +43,10 @@ const vehicles = {
   "bolero-pickup": {
     canonical: "/kolkata/bolero-pickup-rent",
     title: "Bolero Pickup Truck on Rent in Kolkata | GoMyTruck",
-    description: "Book a Bolero pickup truck in Kolkata for local delivery, mandi transport and small commercial loads up to 1.5 tonnes. Transparent 5% commission.",
+    description: "Book a Bolero pickup truck in Kolkata for local delivery, mandi transport and small commercial loads up to 1.5 tonnes. Transparent pricing.",
     h1: "Bolero Pickup Truck on Rent in Kolkata",
     eyebrow: "Light Commercial Vehicle — Bolero Pickup",
-    intro: "The Bolero pickup is ideal for local mandi-to-retail delivery, construction material transport and small commercial loads in Kolkata and the surrounding areas. Book verified Bolero pickups with transparent pricing and a 5% platform commission.",
+    intro: "The Bolero pickup is ideal for local mandi-to-retail delivery, construction material transport and small commercial loads in Kolkata and the surrounding areas. Book verified Bolero pickups with transparent pricing and no broker margins.",
     specs: [
       { label: "Body Length", value: "6–8 feet loading deck" },
       { label: "Payload Capacity", value: "Up to 750 kg–1.5 tonnes" },
@@ -79,10 +79,10 @@ const vehicles = {
   "14ft-eicher": {
     canonical: "/kolkata/14-feet-eicher-truck",
     title: "14 Feet Eicher Truck Hire in Kolkata | Medium Commercial Vehicle",
-    description: "Book a 14ft Eicher truck in Kolkata for medium commercial loads up to 5 tonnes. FTL and PTL options, transparent 5% commission, verified drivers.",
+    description: "Book a 14ft Eicher truck in Kolkata for medium commercial loads up to 5 tonnes. FTL and PTL options, transparent pricing, verified drivers.",
     h1: "14 Feet Eicher Truck Hire in Kolkata",
     eyebrow: "Medium Commercial Vehicle — 14ft Eicher",
-    intro: "A 14ft Eicher truck bridges the gap between mini trucks and 32ft containers, making it ideal for medium commercial loads, furniture shifts and intercity PTL. GoMyTruck connects you to verified 14ft operators with a transparent 5% commission.",
+    intro: "A 14ft Eicher truck bridges the gap between mini trucks and 32ft containers, making it ideal for medium commercial loads, furniture shifts and intercity PTL. GoMyTruck connects you to verified 14ft operators with transparent pricing.",
     specs: [
       { label: "Body Length", value: "14 feet (approx. 4.25 m)" },
       { label: "Payload Capacity", value: "Up to 3–5 tonnes (varies by permit)" },
@@ -192,9 +192,9 @@ export default function VehicleTypePage({ vehicleKey }) {
           <p className="text-brand-300 font-bold uppercase tracking-widest text-sm mb-4">{v.eyebrow}</p>
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight max-w-4xl">{v.h1}</h1>
           <p className="mt-6 text-lg sm:text-xl text-slate-200 leading-relaxed max-w-3xl">{v.intro}</p>
-          {/* 5% commission badge */}
+          {/* Direct booking badge */}
           <div className="mt-5 inline-flex items-center gap-2 bg-brand-700/30 border border-brand-500/40 rounded-full px-4 py-1.5">
-            <span className="text-brand-300 font-black text-sm">Only 5% Commission — No Broker Margin</span>
+            <span className="text-brand-300 font-black text-sm">Direct Booking — No Broker Margin</span>
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/book-truck-online" className="min-h-12 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 font-bold flex items-center gap-2">
@@ -245,13 +245,13 @@ export default function VehicleTypePage({ vehicleKey }) {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-black">How GoMyTruck Pricing Works</h2>
             <p className="mt-3 text-slate-300 max-w-2xl mx-auto">
-              Total Freight Cost = Driver Payout (95%) + GoMyTruck Commission (5%) + Applicable GST/Tolls
+              Transparent Freight Cost = Direct Driver Payout + Nominal Platform Fee + Applicable GST/Tolls
             </p>
             <div className="mt-8 grid sm:grid-cols-3 gap-4">
               {[
-                { label: "Platform Commission", value: "Only 5%", sub: "vs 10–20% brokers charge" },
+                { label: "Middleman Markups", value: "0%", sub: "Direct driver rates without broker margins" },
                 { label: "GST Invoicing", value: "100%", sub: "Tax-compliant digital invoices" },
-                { label: "Surge Pricing", value: "Zero", sub: "No dynamic surge ever" },
+                { label: "Pricing Structure", value: "Transparent", sub: "Clear upfront quotes with no hidden fees" },
               ].map(({ label, value, sub }) => (
                 <div key={label} className="bg-slate-900 rounded-2xl p-5 border border-slate-800">
                   <p className="text-brand-400 text-xs font-bold uppercase tracking-widest">{label}</p>

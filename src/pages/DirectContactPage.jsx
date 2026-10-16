@@ -96,7 +96,7 @@ const VEHICLE_CATEGORIES = [
   { 
     id: "14ft",             
     label: "14ft Truck",          
-    icon: "/vehicles/14ft-truck.webp",  
+    icon: "/vehicles/open/14ft-4ton.webp",  
     vehicle: "14 Feet Eicher Truck (4-5 Ton)", 
     baseRate: "₹1,800 Base",
     leadCount: "2.7k+ Drivers",
@@ -105,7 +105,7 @@ const VEHICLE_CATEGORIES = [
   { 
     id: "17ft",             
     label: "17ft Truck",          
-    icon: "/vehicles/17ft-truck.webp",  
+    icon: "/vehicles/open/17ft-5ton.webp",  
     vehicle: "17 Feet Commercial Truck (7 Ton)", 
     baseRate: "₹2,400 Base",
     leadCount: "Verified",
@@ -114,7 +114,7 @@ const VEHICLE_CATEGORIES = [
   { 
     id: "19ft",             
     label: "19ft Truck",          
-    icon: "/vehicles/19ft-truck.webp",  
+    icon: "/vehicles/open/19ft-10ton.webp",  
     vehicle: "19 Feet Multi-Axle Truck (8-9 Ton)", 
     baseRate: "₹2,800 Base",
     leadCount: "2.5k+ Drivers",
@@ -123,7 +123,7 @@ const VEHICLE_CATEGORIES = [
   { 
     id: "20ft",             
     label: "20ft Truck",          
-    icon: "/vehicles/20ft-truck.webp",  
+    icon: "/vehicles/open/20ft-10ton.webp",  
     vehicle: "20 Feet Multi-Axle (10 Ton)", 
     baseRate: "₹3,200 Base",
     leadCount: "5.5k+ Drivers",
@@ -132,11 +132,20 @@ const VEHICLE_CATEGORIES = [
   { 
     id: "32ft",             
     label: "32ft Container",      
-    icon: "/vehicles/32ft-container.webp",  
+    icon: "/vehicles/container/32ft-18ton.webp",  
     vehicle: "32ft Multi-Axle Container (15-18 Ton)", 
     baseRate: "₹5,500 Base",
     leadCount: "5k+ Drivers",
     payload: "15-18 Ton"
+  },
+  { 
+    id: "40ft-trailer",             
+    label: "40ft Trailer",      
+    icon: "/vehicles/trailer/40ft-semi-trailer.webp",  
+    vehicle: "40ft Semi / Flatbed Trailer (35 Ton)", 
+    baseRate: "₹8,500 Base",
+    leadCount: "1.2k+ Drivers",
+    payload: "35 Ton"
   },
 ];
 

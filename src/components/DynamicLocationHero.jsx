@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react"
-import { ArrowRight, BadgePercent, Zap, Loader2, Star, ChevronRight, MapPin, AlertCircle } from "lucide-react"
+import { ArrowRight, BadgePercent, Zap, Loader2, Star, ChevronRight, MapPin, AlertCircle, X } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import CitySelectorModal from "./CitySelectorModal"
 import EstimateResultModal from "./EstimateResultModal"
+import TruckSelectorModal from "./TruckSelectorModal"
+import { TRUCK_CATEGORIES, ALL_TRUCKS, getDefaultTruckForCategory, findTruckById } from "../constants/trucksData"
 import { getGoogleMaps, geocodeGoogleAddress, fetchPlacePredictions } from "./GoogleAddressAutocomplete"
 import { fetchEstimate } from "../api/pricingApi"
 import { useCity } from "../context/CityContext"
@@ -60,6 +62,7 @@ function DynamicGooglePlacesInput({
   borderColorClass = "focus-within:border-blue-500",
   value,
   onChange,
+  onClear,
   onSelect,
 }) {
   const [predictions, setPredictions] = useState([])
@@ -78,6 +81,17 @@ function DynamicGooglePlacesInput({
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
+
+  const handleClear = (e) => {
+    e.stopPropagation()
+    onChange("")
+    onClear?.()
+    setPredictions([])
+    setIsOpen(false)
+    if (inputRef?.current) {
+      inputRef.current.focus()
+    }
+  }
 
   const handleInputChange = (e) => {
     const val = e.target.value
@@ -149,9 +163,20 @@ function DynamicGooglePlacesInput({
           }}
           placeholder={placeholder}
           autoComplete="off"
-          className="w-full bg-transparent text-slate-800 text-xs sm:text-sm font-semibold placeholder:text-slate-400 focus:outline-none"
+          className="flex-1 bg-transparent text-slate-800 text-xs sm:text-sm font-semibold placeholder:text-slate-400 focus:outline-none min-w-0"
         />
         {loading && <Loader2 size={14} className="animate-spin text-slate-400 shrink-0" />}
+        {value && !loading && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200/60 transition-colors shrink-0 cursor-pointer"
+            title="Clear location"
+            aria-label="Clear location"
+          >
+            <X size={15} />
+          </button>
+        )}
       </div>
 
       {isOpen && (
@@ -215,7 +240,10 @@ export default function DynamicLocationHero({
 
   const [cityOpen, setCityOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [activeService, setActiveService] = useState(defaultVehicle)
+  const [activeService, setActiveService] = useState("open_truck")
+  const [selectedTruck, setSelectedTruck] = useState(() => getDefaultTruckForCategory("open_truck"))
+  const [showTruckSelectorModal, setShowTruckSelectorModal] = useState(false)
+  const [selectorCategory, setSelectorCategory] = useState("open_truck")
   const [trailerImageIndex, setTrailerImageIndex] = useState(0)
 
   // Pickup & Drop address + coordinates
@@ -259,6 +287,15 @@ export default function DynamicLocationHero({
     }, 2500)
     return () => clearInterval(timer)
   }, [])
+
+  const handleCategoryClick = (category) => {
+    setActiveService(category)
+    setSelectorCategory(category)
+    if (selectedTruck.categoryId !== category) {
+      setSelectedTruck(getDefaultTruckForCategory(category))
+    }
+    setShowTruckSelectorModal(true)
+  }
 
   const handleAgentClick = (e) => {
     if (e && e.preventDefault) e.preventDefault()
@@ -318,14 +355,7 @@ export default function DynamicLocationHero({
         setDropCoords(dCoords)
       }
 
-      let vehicleType = "MINI_TRUCK"
-      if (activeService === "trailers") {
-        vehicleType = "CONTAINER_32FT"
-      } else if (activeService === "open_truck") {
-        vehicleType = "TRUCK_14FT"
-      } else {
-        vehicleType = "MINI_TRUCK"
-      }
+      const vehicleType = selectedTruck.backendVehicleType || "TRUCK_14FT_OPEN"
 
       const estimate = await fetchEstimate({
         pickupLat: pCoords.lat,
@@ -344,9 +374,13 @@ export default function DynamicLocationHero({
         dropLat: dCoords.lat,
         dropLng: dCoords.lng,
         service: "truck",
+        selectedTruck,
         vehicle: {
           ...estimate.vehicle,
           vehicleType,
+          displayName: selectedTruck.name,
+          capacityDesc: selectedTruck.capacityDesc,
+          image: selectedTruck.image,
         },
       })
       setShowEstimateModal(true)
@@ -423,36 +457,13 @@ export default function DynamicLocationHero({
                   Need a truck in {activeCityName}? Get an estimate
                 </h3>
 
-                {/* 3 service image selectors: Truck | Open Truck | Trailers */}
-                <div className="grid grid-cols-3 gap-2 mb-4">
+                {/* 3 service image selectors: Open Truck | Container Truck | Trailers */}
+                <div className="grid grid-cols-3 gap-2 mb-2.5">
+                  {/* 1. Open Truck */}
                   <button
-                    onClick={() => setActiveService("truck")}
-                    className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 ${
-                      activeService === "truck"
-                        ? "border-2 border-orange-500 bg-orange-50/60 shadow-sm shadow-orange-500/15"
-                        : "border border-slate-200/60 bg-slate-50/50 hover:border-slate-300"
-                    }`}
-                    style={{ minHeight: 96 }}
-                  >
-                    <div className="w-full h-16 flex items-center justify-center">
-                      <img
-                        src="/hero-service-truck.webp"
-                        alt="Truck"
-                        width={120}
-                        height={80}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-contain object-center"
-                      />
-                    </div>
-                    <span className={`text-[11px] font-bold mt-1 text-center px-1 leading-tight ${activeService === "truck" ? "text-orange-600" : "text-slate-700"}`}>
-                      Truck
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveService("open_truck")}
-                    className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 ${
+                    type="button"
+                    onClick={() => handleCategoryClick("open_truck")}
+                    className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 cursor-pointer ${
                       activeService === "open_truck"
                         ? "border-2 border-orange-500 bg-orange-50/60 shadow-sm shadow-orange-500/15"
                         : "border border-slate-200/60 bg-slate-50/50 hover:border-slate-300"
@@ -461,7 +472,7 @@ export default function DynamicLocationHero({
                   >
                     <div className="w-full h-16 flex items-center justify-center p-0.5">
                       <img
-                        src="/hero-service-open-truck.webp"
+                        src={activeService === "open_truck" && selectedTruck ? selectedTruck.image : "/vehicles/open/14ft-4ton.webp"}
                         alt="Open Truck"
                         width={120}
                         height={80}
@@ -475,9 +486,38 @@ export default function DynamicLocationHero({
                     </span>
                   </button>
 
+                  {/* 2. Container Truck */}
                   <button
-                    onClick={() => setActiveService("trailers")}
-                    className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 ${
+                    type="button"
+                    onClick={() => handleCategoryClick("container_truck")}
+                    className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 cursor-pointer ${
+                      activeService === "container_truck"
+                        ? "border-2 border-orange-500 bg-orange-50/60 shadow-sm shadow-orange-500/15"
+                        : "border border-slate-200/60 bg-slate-50/50 hover:border-slate-300"
+                    }`}
+                    style={{ minHeight: 96 }}
+                  >
+                    <div className="w-full h-16 flex items-center justify-center p-0.5">
+                      <img
+                        src={activeService === "container_truck" && selectedTruck ? selectedTruck.image : "/vehicles/container/14ft-3.5ton.webp"}
+                        alt="Container Truck"
+                        width={120}
+                        height={80}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-contain object-center scale-[0.96]"
+                      />
+                    </div>
+                    <span className={`text-[11px] font-bold mt-1 text-center px-1 leading-tight ${activeService === "container_truck" ? "text-orange-600" : "text-slate-700"}`}>
+                      Container Truck
+                    </span>
+                  </button>
+
+                  {/* 3. Trailers */}
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryClick("trailers")}
+                    className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 cursor-pointer ${
                       activeService === "trailers"
                         ? "border-2 border-orange-500 bg-orange-50/60 shadow-sm shadow-orange-500/15"
                         : "border border-slate-200/60 bg-slate-50/50 hover:border-slate-300"
@@ -486,8 +526,8 @@ export default function DynamicLocationHero({
                   >
                     <div className="relative w-full h-16 flex items-center justify-center overflow-hidden p-0.5">
                       <img
-                        src="/hero-service-trailer-1.webp"
-                        alt="Trailers"
+                        src="/vehicles/trailer/40ft-semi-trailer.webp"
+                        alt="Trailers 1"
                         width={120}
                         height={80}
                         loading="lazy"
@@ -497,8 +537,8 @@ export default function DynamicLocationHero({
                         }`}
                       />
                       <img
-                        src="/hero-service-trailer-2.webp"
-                        alt="Trailers"
+                        src="/vehicles/trailer/40ft-flatbed-trailer.webp"
+                        alt="Trailers 2"
                         width={120}
                         height={80}
                         loading="lazy"
@@ -513,6 +553,43 @@ export default function DynamicLocationHero({
                     </span>
                   </button>
                 </div>
+
+                {/* Selected Truck Card with Change option */}
+                {selectedTruck && (
+                  <div
+                    onClick={() => {
+                      setSelectorCategory(activeService)
+                      setShowTruckSelectorModal(true)
+                    }}
+                    className="mb-3 p-2 rounded-xl bg-orange-50/80 border border-orange-200/80 flex items-center justify-between cursor-pointer hover:bg-orange-100/60 transition-all"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-12 h-9 bg-white rounded-lg p-0.5 border border-orange-100 shrink-0 flex items-center justify-center overflow-hidden">
+                        <img
+                          src={selectedTruck.image}
+                          alt={selectedTruck.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-black uppercase text-orange-600 tracking-wide">
+                            Selected Truck
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-500">
+                            • {selectedTruck.size} ({selectedTruck.capacityDesc})
+                          </span>
+                        </div>
+                        <p className="text-xs font-black text-slate-900 truncate leading-tight">
+                          {selectedTruck.name}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-black text-orange-600 bg-white px-2 py-1 rounded-lg border border-orange-200 shadow-2xs shrink-0">
+                      Change
+                    </span>
+                  </div>
+                )}
 
                 {error && (
                   <div className="mb-3 flex items-center gap-1.5 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200/80 rounded-lg px-3 py-2">
@@ -532,6 +609,11 @@ export default function DynamicLocationHero({
                     value={pickup}
                     onChange={(val) => {
                       setPickup(val)
+                      setError("")
+                    }}
+                    onClear={() => {
+                      setPickup("")
+                      setPickupCoords(null)
                       setError("")
                     }}
                     onSelect={(res) => {
@@ -554,6 +636,11 @@ export default function DynamicLocationHero({
                     value={drop}
                     onChange={(val) => {
                       setDrop(val)
+                      setError("")
+                    }}
+                    onClear={() => {
+                      setDrop("")
+                      setDropCoords(null)
                       setError("")
                     }}
                     onSelect={(res) => {
@@ -592,7 +679,7 @@ export default function DynamicLocationHero({
             <div className="inline-flex items-center gap-2 bg-orange-100/80 border border-orange-200 rounded-full px-4 py-1.5 mb-3 sm:mb-4 shadow-xs">
               <BadgePercent size={15} className="text-orange-600" />
               <span className="text-orange-950 font-bold text-xs sm:text-sm tracking-wide">
-                {badgeText || `Serving ${activeCityName} & Surrounding Hubs — Flat 5% Commission`}
+                {badgeText || `Serving ${activeCityName} & Surrounding Hubs — Transparent Pricing`}
               </span>
             </div>
 
@@ -604,7 +691,7 @@ export default function DynamicLocationHero({
               {subheadline || (
                 <>
                   Connect directly with verified trucks across {activeState}.{" "}
-                  <span className="text-orange-600 font-bold">No brokers. No surge pricing. No hidden fees.</span>
+                  <span className="text-orange-600 font-bold">No brokers. Direct pricing. No hidden fees.</span>
                 </>
               )}
             </p>
@@ -724,36 +811,10 @@ export default function DynamicLocationHero({
               <div className="flex flex-col md:flex-row items-center justify-between gap-6 lg:gap-8 w-full pt-1">
                 {/* Left: 3 Vehicle Service Cards */}
                 <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-                  {/* 1. Truck */}
+                  {/* 1. Open Truck */}
                   <button
                     type="button"
-                    onClick={() => setActiveService("truck")}
-                    className={`relative flex flex-col items-center justify-between w-28 sm:w-32 h-28 sm:h-32 rounded-2xl transition-all duration-200 p-2 cursor-pointer ${
-                      activeService === "truck"
-                        ? "border-2 border-orange-500 bg-orange-50/70 shadow-md shadow-orange-500/20"
-                        : "border border-slate-200/80 bg-white hover:border-slate-300 shadow-xs hover:bg-slate-50/80"
-                    }`}
-                  >
-                    <div className="w-full flex-1 flex items-center justify-center">
-                      <img
-                        src="/hero-service-truck.webp"
-                        alt="Truck"
-                        width={120}
-                        height={80}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-16 object-contain object-center"
-                      />
-                    </div>
-                    <span className={`text-xs font-bold text-center leading-tight ${activeService === "truck" ? "text-orange-600" : "text-slate-800"}`}>
-                      Truck
-                    </span>
-                  </button>
-
-                  {/* 2. Open Truck */}
-                  <button
-                    type="button"
-                    onClick={() => setActiveService("open_truck")}
+                    onClick={() => handleCategoryClick("open_truck")}
                     className={`relative flex flex-col items-center justify-between w-28 sm:w-32 h-28 sm:h-32 rounded-2xl transition-all duration-200 p-2 cursor-pointer ${
                       activeService === "open_truck"
                         ? "border-2 border-orange-500 bg-orange-50/70 shadow-md shadow-orange-500/20"
@@ -762,7 +823,7 @@ export default function DynamicLocationHero({
                   >
                     <div className="w-full flex-1 flex items-center justify-center p-0.5">
                       <img
-                        src="/hero-service-open-truck.webp"
+                        src={activeService === "open_truck" && selectedTruck ? selectedTruck.image : "/vehicles/open/14ft-4ton.webp"}
                         alt="Open Truck"
                         width={120}
                         height={80}
@@ -776,10 +837,36 @@ export default function DynamicLocationHero({
                     </span>
                   </button>
 
+                  {/* 2. Container Truck */}
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryClick("container_truck")}
+                    className={`relative flex flex-col items-center justify-between w-28 sm:w-32 h-28 sm:h-32 rounded-2xl transition-all duration-200 p-2 cursor-pointer ${
+                      activeService === "container_truck"
+                        ? "border-2 border-orange-500 bg-orange-50/70 shadow-md shadow-orange-500/20"
+                        : "border border-slate-200/80 bg-white hover:border-slate-300 shadow-xs hover:bg-slate-50/80"
+                    }`}
+                  >
+                    <div className="w-full flex-1 flex items-center justify-center p-0.5">
+                      <img
+                        src={activeService === "container_truck" && selectedTruck ? selectedTruck.image : "/vehicles/container/14ft-3.5ton.webp"}
+                        alt="Container Truck"
+                        width={120}
+                        height={80}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-16 object-contain object-center scale-[0.96]"
+                      />
+                    </div>
+                    <span className={`text-xs font-bold text-center leading-tight ${activeService === "container_truck" ? "text-orange-600" : "text-slate-800"}`}>
+                      Container Truck
+                    </span>
+                  </button>
+
                   {/* 3. Trailers */}
                   <button
                     type="button"
-                    onClick={() => setActiveService("trailers")}
+                    onClick={() => handleCategoryClick("trailers")}
                     className={`relative flex flex-col items-center justify-between w-28 sm:w-32 h-28 sm:h-32 rounded-2xl transition-all duration-200 p-2 cursor-pointer ${
                       activeService === "trailers"
                         ? "border-2 border-orange-500 bg-orange-50/70 shadow-md shadow-orange-500/20"
@@ -788,8 +875,8 @@ export default function DynamicLocationHero({
                   >
                     <div className="relative w-full flex-1 flex items-center justify-center overflow-hidden p-0.5">
                       <img
-                        src="/hero-service-trailer-1.webp"
-                        alt="Trailers"
+                        src="/vehicles/trailer/40ft-semi-trailer.webp"
+                        alt="Trailers 1"
                         width={120}
                         height={80}
                         loading="lazy"
@@ -799,8 +886,8 @@ export default function DynamicLocationHero({
                         }`}
                       />
                       <img
-                        src="/hero-service-trailer-2.webp"
-                        alt="Trailers"
+                        src="/vehicles/trailer/40ft-flatbed-trailer.webp"
+                        alt="Trailers 2"
                         width={120}
                         height={80}
                         loading="lazy"
@@ -821,6 +908,29 @@ export default function DynamicLocationHero({
 
                 {/* Right: Pickup + Drop inputs and Check Fare button */}
                 <div className="flex-1 w-full lg:max-w-md flex flex-col gap-2.5">
+                  {/* Selected Truck Pill */}
+                  {selectedTruck && (
+                    <div
+                      onClick={() => {
+                        setSelectorCategory(activeService)
+                        setShowTruckSelectorModal(true)
+                      }}
+                      className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-orange-50/80 border border-orange-200/80 cursor-pointer hover:bg-orange-100/60 transition-all text-xs"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
+                        <span className="font-extrabold text-slate-800 truncate">
+                          {selectedTruck.name}
+                        </span>
+                        <span className="text-[11px] font-bold text-slate-500 shrink-0">
+                          • {selectedTruck.size} ({selectedTruck.capacityDesc})
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-black text-orange-600 hover:text-orange-700 underline shrink-0 ml-2">
+                        Change Truck
+                      </span>
+                    </div>
+                  )}
                   {error && (
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200/80 rounded-lg px-3 py-1.5">
                       <AlertCircle size={14} className="shrink-0" />
@@ -838,6 +948,11 @@ export default function DynamicLocationHero({
                       value={pickup}
                       onChange={(val) => {
                         setPickup(val)
+                        setError("")
+                      }}
+                      onClear={() => {
+                        setPickup("")
+                        setPickupCoords(null)
                         setError("")
                       }}
                       onSelect={(res) => {
@@ -859,6 +974,11 @@ export default function DynamicLocationHero({
                       value={drop}
                       onChange={(val) => {
                         setDrop(val)
+                        setError("")
+                      }}
+                      onClear={() => {
+                        setDrop("")
+                        setDropCoords(null)
                         setError("")
                       }}
                       onSelect={(res) => {
@@ -907,6 +1027,18 @@ export default function DynamicLocationHero({
           estimateData={estimateData}
         />
       )}
+
+      {/* Truck Selection Modal (Step 1) */}
+      <TruckSelectorModal
+        isOpen={showTruckSelectorModal}
+        onClose={() => setShowTruckSelectorModal(false)}
+        selectedTruckId={selectedTruck?.id}
+        initialCategoryId={selectorCategory}
+        onSelectTruck={(truck) => {
+          setSelectedTruck(truck)
+          setActiveService(truck.categoryId)
+        }}
+      />
     </>
   )
 }

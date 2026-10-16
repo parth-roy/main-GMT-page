@@ -205,7 +205,7 @@ export default function CityVehiclePage() {
               </div>
               <p className="text-base sm:text-lg font-black text-slate-900">~₹{vehicle.perKmRate}/km Standard</p>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                State diesel index factored upfront with zero hidden surge markups.
+                State diesel index factored upfront with zero hidden markups.
               </p>
             </div>
 

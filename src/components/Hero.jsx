@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react"
-import { ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp, Loader2, Star, ChevronRight, MapPin, Navigation, AlertCircle } from "lucide-react"
+import { ArrowRight, ShieldCheck, BadgePercent, Zap, TrendingUp, Loader2, Star, ChevronRight, MapPin, Navigation, AlertCircle, X } from "lucide-react"
 import { Link, useParams, useNavigate } from "react-router-dom"
 import CitySelectorModal from "./CitySelectorModal"
 import EstimateResultModal from "./EstimateResultModal"
-import { getGoogleMaps, geocodeGoogleAddress, fetchPlacePredictions } from "./GoogleAddressAutocomplete"
+import TruckSelectorModal from "./TruckSelectorModal"
+import { TRUCK_CATEGORIES, ALL_TRUCKS, getDefaultTruckForCategory, findTruckById } from "../constants/trucksData"
+import { getGoogleMaps, geocodeGoogleAddress, fetchPlacePredictions, reverseGeocodeGoogleCoords } from "./GoogleAddressAutocomplete"
 import { fetchEstimate } from "../api/pricingApi"
 import { useCity } from "../context/CityContext"
 import { useAuth } from "../context/AuthContext"
@@ -82,13 +84,17 @@ function HeroGooglePlacesInput({
   value,
   onChange,
   onSelect,
+  onClear,
+  autoFetchOnFirstClick = false,
 }) {
   const [predictions, setPredictions] = useState([])
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isDetecting, setIsDetecting] = useState(false)
   const wrapperRef = useRef(null)
   const debounceRef = useRef(null)
   const sessionTokenRef = useRef(null)
+  const hasAttemptedAutoFetchRef = useRef(false)
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -99,6 +105,68 @@ function HeroGooglePlacesInput({
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
+
+  const detectCurrentLocation = () => {
+    if (typeof window === "undefined" || !navigator?.geolocation) return
+
+    setIsDetecting(true)
+    setLoading(true)
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const lat = pos.coords.latitude
+          const lng = pos.coords.longitude
+          const address = await reverseGeocodeGoogleCoords(lat, lng)
+
+          if (address) {
+            onChange(address)
+            onSelect?.({
+              address,
+              lat,
+              lng,
+              isAutoFetch: true,
+            })
+          }
+        } catch (err) {
+          console.warn("Location reverse geocode error:", err)
+        } finally {
+          setIsDetecting(false)
+          setLoading(false)
+        }
+      },
+      (err) => {
+        console.warn("Geolocation denied or error:", err)
+        setIsDetecting(false)
+        setLoading(false)
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    )
+  }
+
+  const handleFocusOrClick = () => {
+    if (value && value.trim()) {
+      setIsOpen(true)
+      return
+    }
+
+    if (autoFetchOnFirstClick && !hasAttemptedAutoFetchRef.current && !value && !isDetecting) {
+      hasAttemptedAutoFetchRef.current = true
+      detectCurrentLocation()
+    }
+  }
+
+  const handleClear = (e) => {
+    e.stopPropagation()
+    hasAttemptedAutoFetchRef.current = true
+    onChange("")
+    onClear?.()
+    setPredictions([])
+    setIsOpen(false)
+    if (inputRef?.current) {
+      inputRef.current.focus()
+    }
+  }
 
   const handleInputChange = (e) => {
     const val = e.target.value
@@ -188,14 +256,25 @@ function HeroGooglePlacesInput({
           type="text"
           value={value}
           onChange={handleInputChange}
-          onFocus={() => {
-            if (value && value.trim()) setIsOpen(true)
-          }}
-          placeholder={placeholder}
+          onFocus={handleFocusOrClick}
+          onClick={handleFocusOrClick}
+          placeholder={isDetecting ? "Detecting current location..." : placeholder}
           autoComplete="off"
+          disabled={isDetecting}
           className="flex-1 bg-transparent text-sm font-medium text-slate-800 placeholder:text-slate-400 outline-none"
         />
-        {loading && <Loader2 size={15} className="animate-spin text-slate-400 shrink-0" />}
+        {loading && <Loader2 size={15} className={`animate-spin ${isDetecting ? "text-blue-500" : "text-slate-400"} shrink-0`} />}
+        {value && !isDetecting && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200/60 transition-colors shrink-0 cursor-pointer"
+            title="Clear location"
+            aria-label="Clear location"
+          >
+            <X size={15} />
+          </button>
+        )}
       </div>
 
       {isOpen && (
@@ -239,7 +318,10 @@ function HeroGooglePlacesInput({
 //  MobileEstimateCard component
 // ─────────────────────────────────────────────
 function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
-  const [activeService, setActiveService] = useState("truck")
+  const [activeService, setActiveService] = useState("open_truck")
+  const [selectedTruck, setSelectedTruck] = useState(() => getDefaultTruckForCategory("open_truck"))
+  const [showTruckSelectorModal, setShowTruckSelectorModal] = useState(false)
+  const [selectorCategory, setSelectorCategory] = useState("open_truck")
   const [trailerImageIndex, setTrailerImageIndex] = useState(0)
 
   // Pickup & Drop address + coordinates
@@ -261,6 +343,15 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
     }, 2500)
     return () => clearInterval(timer)
   }, [])
+
+  const handleCategoryClick = (category) => {
+    setActiveService(category)
+    setSelectorCategory(category)
+    if (selectedTruck.categoryId !== category) {
+      setSelectedTruck(getDefaultTruckForCategory(category))
+    }
+    setShowTruckSelectorModal(true)
+  }
 
   const handleCheckFare = async (e) => {
     if (e && e.preventDefault) e.preventDefault()
@@ -302,15 +393,8 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
         setDropCoords(dCoords)
       }
 
-      // 3. Map selected service to vehicle type
-      let vehicleType = "MINI_TRUCK"
-      if (activeService === "trailers") {
-        vehicleType = "CONTAINER_32FT"
-      } else if (activeService === "open_truck") {
-        vehicleType = "TRUCK_14FT"
-      } else {
-        vehicleType = "MINI_TRUCK"
-      }
+      // 3. Map selected truck to backend vehicle type
+      const vehicleType = selectedTruck.backendVehicleType || "TRUCK_14FT_OPEN"
 
       // 4. Call real pricing estimate API
       const estimate = await fetchEstimate({
@@ -331,9 +415,13 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
         dropLat: dCoords.lat,
         dropLng: dCoords.lng,
         service: "truck",
+        selectedTruck,
         vehicle: {
           ...estimate.vehicle,
           vehicleType,
+          displayName: selectedTruck.name,
+          capacityDesc: selectedTruck.capacityDesc,
+          image: selectedTruck.image,
         },
       })
       setShowEstimateModal(true)
@@ -353,38 +441,13 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
             Need a truck? Get an estimate
           </h3>
 
-          {/* 3 service image selectors: Truck | Open Truck | Trailers */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {/* 1. Truck */}
+          {/* 3 service image selectors: Open Truck | Container Truck | Trailers */}
+          <div className="grid grid-cols-3 gap-2 mb-2.5">
+            {/* 1. Open Truck */}
             <button
-              onClick={() => setActiveService("truck")}
-              className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 ${
-                activeService === "truck"
-                  ? "border-2 border-orange-500 bg-orange-50/60 shadow-sm shadow-orange-500/15"
-                  : "border border-slate-200/40 bg-slate-50/40 hover:border-slate-300/60 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
-              }`}
-              style={{ minHeight: 96 }}
-            >
-              <div className="w-full h-16 flex items-center justify-center">
-                <img
-                  src="/hero-service-truck.webp"
-                  alt="Truck"
-                  width={120}
-                  height={80}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-contain object-center"
-                />
-              </div>
-              <span className={`text-[11px] font-bold mt-1 text-center px-1 leading-tight ${activeService === "truck" ? "text-orange-600" : "text-slate-700"}`}>
-                Truck
-              </span>
-            </button>
-
-            {/* 2. Open Truck (reduced 2-3% so it doesn't overflow borders) */}
-            <button
-              onClick={() => setActiveService("open_truck")}
-              className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 ${
+              type="button"
+              onClick={() => handleCategoryClick("open_truck")}
+              className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 cursor-pointer ${
                 activeService === "open_truck"
                   ? "border-2 border-orange-500 bg-orange-50/60 shadow-sm shadow-orange-500/15"
                   : "border border-slate-200/40 bg-slate-50/40 hover:border-slate-300/60 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
@@ -393,7 +456,7 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
             >
               <div className="w-full h-16 flex items-center justify-center p-0.5">
                 <img
-                  src="/hero-service-open-truck.webp"
+                  src={activeService === "open_truck" && selectedTruck ? selectedTruck.image : "/vehicles/open/14ft-4ton.webp"}
                   alt="Open Truck"
                   width={120}
                   height={80}
@@ -407,10 +470,38 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
               </span>
             </button>
 
-            {/* 3. Trailers (alternating 2 images smoothly every 2.5s, scaled down 2-3%) */}
+            {/* 2. Container Truck */}
             <button
-              onClick={() => setActiveService("trailers")}
-              className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 ${
+              type="button"
+              onClick={() => handleCategoryClick("container_truck")}
+              className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 cursor-pointer ${
+                activeService === "container_truck"
+                  ? "border-2 border-orange-500 bg-orange-50/60 shadow-sm shadow-orange-500/15"
+                  : "border border-slate-200/40 bg-slate-50/40 hover:border-slate-300/60 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
+              }`}
+              style={{ minHeight: 96 }}
+            >
+              <div className="w-full h-16 flex items-center justify-center p-0.5">
+                <img
+                  src={activeService === "container_truck" && selectedTruck ? selectedTruck.image : "/vehicles/container/14ft-3.5ton.webp"}
+                  alt="Container Truck"
+                  width={120}
+                  height={80}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-contain object-center scale-[0.96]"
+                />
+              </div>
+              <span className={`text-[11px] font-bold mt-1 text-center px-1 leading-tight ${activeService === "container_truck" ? "text-orange-600" : "text-slate-700"}`}>
+                Container Truck
+              </span>
+            </button>
+
+            {/* 3. Trailers */}
+            <button
+              type="button"
+              onClick={() => handleCategoryClick("trailers")}
+              className={`relative flex flex-col items-center justify-end rounded-xl overflow-hidden transition-all duration-200 pb-2 pt-1 cursor-pointer ${
                 activeService === "trailers"
                   ? "border-2 border-orange-500 bg-orange-50/60 shadow-sm shadow-orange-500/15"
                   : "border border-slate-200/40 bg-slate-50/40 hover:border-slate-300/60 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
@@ -419,7 +510,7 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
             >
               <div className="relative w-full h-16 flex items-center justify-center overflow-hidden p-0.5">
                 <img
-                  src="/hero-service-trailer-1.webp"
+                  src="/vehicles/trailer/40ft-semi-trailer.webp"
                   alt="Trailers 1"
                   width={120}
                   height={80}
@@ -432,7 +523,7 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
                   }`}
                 />
                 <img
-                  src="/hero-service-trailer-2.webp"
+                  src="/vehicles/trailer/40ft-flatbed-trailer.webp"
                   alt="Trailers 2"
                   width={120}
                   height={80}
@@ -451,6 +542,43 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
             </button>
           </div>
 
+          {/* Selected Truck Card with Change option */}
+          {selectedTruck && (
+            <div
+              onClick={() => {
+                setSelectorCategory(activeService)
+                setShowTruckSelectorModal(true)
+              }}
+              className="mb-3 p-2 rounded-xl bg-orange-50/80 border border-orange-200/80 flex items-center justify-between cursor-pointer hover:bg-orange-100/60 transition-all"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-12 h-9 bg-white rounded-lg p-0.5 border border-orange-100 shrink-0 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={selectedTruck.image}
+                    alt={selectedTruck.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black uppercase text-orange-600 tracking-wide">
+                      Selected Truck
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-500">
+                      • {selectedTruck.size} ({selectedTruck.capacityDesc})
+                    </span>
+                  </div>
+                  <p className="text-xs font-black text-slate-900 truncate leading-tight">
+                    {selectedTruck.name}
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-black text-orange-600 bg-white px-2 py-1 rounded-lg border border-orange-200 shadow-2xs shrink-0">
+                Change
+              </span>
+            </div>
+          )}
+
           {/* Error Message */}
           {error && (
             <div className="mb-3 flex items-center gap-1.5 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200/80 rounded-lg px-3 py-2">
@@ -468,15 +596,21 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
               icon={<MapPin size={18} className="text-blue-500 shrink-0" />}
               borderColorClass="focus-within:border-blue-500"
               value={pickup}
+              autoFetchOnFirstClick={true}
               onChange={(val) => {
                 setPickup(val)
+                setError("")
+              }}
+              onClear={() => {
+                setPickup("")
+                setPickupCoords(null)
                 setError("")
               }}
               onSelect={(res) => {
                 setPickup(res.address)
                 setPickupCoords({ lat: res.lat, lng: res.lng })
                 setError("")
-                if (!drop) dropInputRef?.current?.focus()
+                if (!res.isAutoFetch && !drop) dropInputRef?.current?.focus()
               }}
             />
           </div>
@@ -492,6 +626,11 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
               value={drop}
               onChange={(val) => {
                 setDrop(val)
+                setError("")
+              }}
+              onClear={() => {
+                setDrop("")
+                setDropCoords(null)
                 setError("")
               }}
               onSelect={(res) => {
@@ -531,6 +670,18 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
           estimateData={estimateData}
         />
       )}
+
+      {/* Truck Selection Modal (Step 1) */}
+      <TruckSelectorModal
+        isOpen={showTruckSelectorModal}
+        onClose={() => setShowTruckSelectorModal(false)}
+        selectedTruckId={selectedTruck?.id}
+        initialCategoryId={selectorCategory}
+        onSelectTruck={(truck) => {
+          setSelectedTruck(truck)
+          setActiveService(truck.categoryId)
+        }}
+      />
     </>
   )
 }
@@ -539,7 +690,10 @@ function MobileEstimateCard({ pickupInputRef, dropInputRef }) {
 //  DesktopEstimateBar component (horizontal, compact)
 // ─────────────────────────────────────────────
 function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
-  const [activeService, setActiveService] = useState("truck")
+  const [activeService, setActiveService] = useState("open_truck")
+  const [selectedTruck, setSelectedTruck] = useState(() => getDefaultTruckForCategory("open_truck"))
+  const [showTruckSelectorModal, setShowTruckSelectorModal] = useState(false)
+  const [selectorCategory, setSelectorCategory] = useState("open_truck")
   const [trailerImageIndex, setTrailerImageIndex] = useState(0)
 
   // Pickup & Drop address + coordinates
@@ -561,6 +715,15 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
     }, 2500)
     return () => clearInterval(timer)
   }, [])
+
+  const handleCategoryClick = (category) => {
+    setActiveService(category)
+    setSelectorCategory(category)
+    if (selectedTruck.categoryId !== category) {
+      setSelectedTruck(getDefaultTruckForCategory(category))
+    }
+    setShowTruckSelectorModal(true)
+  }
 
   const handleCheckFare = async (e) => {
     if (e && e.preventDefault) e.preventDefault()
@@ -602,15 +765,8 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
         setDropCoords(dCoords)
       }
 
-      // 3. Map selected service to vehicle type
-      let vehicleType = "MINI_TRUCK"
-      if (activeService === "trailers") {
-        vehicleType = "CONTAINER_32FT"
-      } else if (activeService === "open_truck") {
-        vehicleType = "TRUCK_14FT"
-      } else {
-        vehicleType = "MINI_TRUCK"
-      }
+      // 3. Map selected truck to backend vehicle type
+      const vehicleType = selectedTruck.backendVehicleType || "TRUCK_14FT_OPEN"
 
       // 4. Call real pricing estimate API
       const estimate = await fetchEstimate({
@@ -631,9 +787,13 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
         dropLat: dCoords.lat,
         dropLng: dCoords.lng,
         service: "truck",
+        selectedTruck,
         vehicle: {
           ...estimate.vehicle,
           vehicleType,
+          displayName: selectedTruck.name,
+          capacityDesc: selectedTruck.capacityDesc,
+          image: selectedTruck.image,
         },
       })
       setShowEstimateModal(true)
@@ -648,38 +808,12 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
   return (
     <>
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 lg:gap-8 w-full pt-1">
-        {/* Left: 3 Vehicle Service Cards (Truck, Open Truck, Trailers) */}
+        {/* Left: 3 Vehicle Service Cards (Open Truck, Container Truck, Trailers) */}
         <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-          {/* 1. Truck */}
+          {/* 1. Open Truck */}
           <button
             type="button"
-            onClick={() => setActiveService("truck")}
-            className={`relative flex flex-col items-center justify-between w-28 sm:w-32 h-28 sm:h-32 rounded-2xl transition-all duration-200 p-2 cursor-pointer ${
-              activeService === "truck"
-                ? "border-2 border-orange-500 bg-orange-50/70 shadow-md shadow-orange-500/20"
-                : "border border-slate-200/80 bg-white hover:border-slate-300 shadow-xs hover:bg-slate-50/80"
-            }`}
-          >
-            <div className="w-full flex-1 flex items-center justify-center">
-              <img
-                src="/hero-service-truck.webp"
-                alt="Truck"
-                width={120}
-                height={80}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-16 object-contain object-center"
-              />
-            </div>
-            <span className={`text-xs font-bold text-center leading-tight ${activeService === "truck" ? "text-orange-600" : "text-slate-800"}`}>
-              Truck
-            </span>
-          </button>
-
-          {/* 2. Open Truck */}
-          <button
-            type="button"
-            onClick={() => setActiveService("open_truck")}
+            onClick={() => handleCategoryClick("open_truck")}
             className={`relative flex flex-col items-center justify-between w-28 sm:w-32 h-28 sm:h-32 rounded-2xl transition-all duration-200 p-2 cursor-pointer ${
               activeService === "open_truck"
                 ? "border-2 border-orange-500 bg-orange-50/70 shadow-md shadow-orange-500/20"
@@ -688,7 +822,7 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
           >
             <div className="w-full flex-1 flex items-center justify-center p-0.5">
               <img
-                src="/hero-service-open-truck.webp"
+                src={activeService === "open_truck" && selectedTruck ? selectedTruck.image : "/vehicles/open/14ft-4ton.webp"}
                 alt="Open Truck"
                 width={120}
                 height={80}
@@ -702,10 +836,36 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
             </span>
           </button>
 
+          {/* 2. Container Truck */}
+          <button
+            type="button"
+            onClick={() => handleCategoryClick("container_truck")}
+            className={`relative flex flex-col items-center justify-between w-28 sm:w-32 h-28 sm:h-32 rounded-2xl transition-all duration-200 p-2 cursor-pointer ${
+              activeService === "container_truck"
+                ? "border-2 border-orange-500 bg-orange-50/70 shadow-md shadow-orange-500/20"
+                : "border border-slate-200/80 bg-white hover:border-slate-300 shadow-xs hover:bg-slate-50/80"
+            }`}
+          >
+            <div className="w-full flex-1 flex items-center justify-center p-0.5">
+              <img
+                src={activeService === "container_truck" && selectedTruck ? selectedTruck.image : "/vehicles/container/14ft-3.5ton.webp"}
+                alt="Container Truck"
+                width={120}
+                height={80}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-16 object-contain object-center scale-[0.96]"
+              />
+            </div>
+            <span className={`text-xs font-bold text-center leading-tight ${activeService === "container_truck" ? "text-orange-600" : "text-slate-800"}`}>
+              Container Truck
+            </span>
+          </button>
+
           {/* 3. Trailers */}
           <button
             type="button"
-            onClick={() => setActiveService("trailers")}
+            onClick={() => handleCategoryClick("trailers")}
             className={`relative flex flex-col items-center justify-between w-28 sm:w-32 h-28 sm:h-32 rounded-2xl transition-all duration-200 p-2 cursor-pointer ${
               activeService === "trailers"
                 ? "border-2 border-orange-500 bg-orange-50/70 shadow-md shadow-orange-500/20"
@@ -714,8 +874,8 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
           >
             <div className="relative w-full flex-1 flex items-center justify-center overflow-hidden p-0.5">
               <img
-                src="/hero-service-trailer-1.webp"
-                alt="Trailers"
+                src="/vehicles/trailer/40ft-semi-trailer.webp"
+                alt="Trailers 1"
                 width={120}
                 height={80}
                 loading="lazy"
@@ -725,8 +885,8 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
                 }`}
               />
               <img
-                src="/hero-service-trailer-2.webp"
-                alt="Trailers"
+                src="/vehicles/trailer/40ft-flatbed-trailer.webp"
+                alt="Trailers 2"
                 width={120}
                 height={80}
                 loading="lazy"
@@ -747,6 +907,29 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
 
         {/* Right: Pickup + Drop inputs and Check Fare button */}
         <div className="flex-1 w-full lg:max-w-md flex flex-col gap-2.5">
+          {/* Selected Truck Pill */}
+          {selectedTruck && (
+            <div
+              onClick={() => {
+                setSelectorCategory(activeService)
+                setShowTruckSelectorModal(true)
+              }}
+              className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-orange-50/80 border border-orange-200/80 cursor-pointer hover:bg-orange-100/60 transition-all text-xs"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
+                <span className="font-extrabold text-slate-800 truncate">
+                  {selectedTruck.name}
+                </span>
+                <span className="text-[11px] font-bold text-slate-500 shrink-0">
+                  • {selectedTruck.size} ({selectedTruck.capacityDesc})
+                </span>
+              </div>
+              <span className="text-[11px] font-black text-orange-600 hover:text-orange-700 underline shrink-0 ml-2">
+                Change Truck
+              </span>
+            </div>
+          )}
           {error && (
             <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200/80 rounded-lg px-3 py-1.5">
               <AlertCircle size={14} className="shrink-0" />
@@ -762,15 +945,21 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
               icon={<MapPin size={18} className="text-blue-500 shrink-0" />}
               borderColorClass="focus-within:border-blue-500"
               value={pickup}
+              autoFetchOnFirstClick={true}
               onChange={(val) => {
                 setPickup(val)
+                setError("")
+              }}
+              onClear={() => {
+                setPickup("")
+                setPickupCoords(null)
                 setError("")
               }}
               onSelect={(res) => {
                 setPickup(res.address)
                 setPickupCoords({ lat: res.lat, lng: res.lng })
                 setError("")
-                if (!drop) dropInputRef?.current?.focus()
+                if (!res.isAutoFetch && !drop) dropInputRef?.current?.focus()
               }}
             />
           </div>
@@ -785,6 +974,11 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
               value={drop}
               onChange={(val) => {
                 setDrop(val)
+                setError("")
+              }}
+              onClear={() => {
+                setDrop("")
+                setDropCoords(null)
                 setError("")
               }}
               onSelect={(res) => {
@@ -822,6 +1016,18 @@ function DesktopEstimateBar({ pickupInputRef, dropInputRef }) {
           estimateData={estimateData}
         />
       )}
+
+      {/* Truck Selection Modal (Step 1) */}
+      <TruckSelectorModal
+        isOpen={showTruckSelectorModal}
+        onClose={() => setShowTruckSelectorModal(false)}
+        selectedTruckId={selectedTruck?.id}
+        initialCategoryId={selectorCategory}
+        onSelectTruck={(truck) => {
+          setSelectedTruck(truck)
+          setActiveService(truck.categoryId)
+        }}
+      />
     </>
   )
 }
@@ -835,7 +1041,6 @@ export default function Hero({
   onOpenEstimate,
   onSelectVehicle
 }) {
-  const [sliderValue, setSliderValue] = useState(10000)
   const [cityOpen, setCityOpen] = useState(false)
   const { city: slug } = useParams()
   const navigate = useNavigate()
@@ -885,30 +1090,6 @@ export default function Hero({
       setCity(slug, false)
     }
   }, [slug, setCity])
-
-  const driverPayout = Math.round(sliderValue * 0.95)
-  const gmtCommission = Math.round(sliderValue * 0.05)
-
-  const trustBadges = [
-    {
-      icon: BadgePercent,
-      title: "Only 5% Commission",
-      sub: "Lowest in Eastern India",
-      color: "text-brand-600 bg-brand-50",
-    },
-    {
-      icon: ShieldCheck,
-      title: "Zero Surge Pricing",
-      sub: "Transparent fare, always",
-      color: "text-emerald-700 bg-emerald-50",
-    },
-    {
-      icon: Zap,
-      title: "Match in < 20 mins",
-      sub: "Or support escalates",
-      color: "text-orange-600 bg-orange-50",
-    },
-  ]
 
   return (
     <>
@@ -1030,10 +1211,10 @@ export default function Hero({
         ) : (
           /* ── DESKTOP HERO LAYOUT ── */
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
-            {/* 5% Commission Badge */}
+            {/* Transparent Freight Marketplace Badge */}
             <div className="inline-flex items-center gap-2 bg-brand-600/20 border border-brand-400/40 rounded-full px-4 py-1.5 mb-3 sm:mb-4">
-              <BadgePercent size={15} className="text-brand-300" />
-              <span className="text-brand-200 font-bold text-xs sm:text-sm tracking-wide">India's Most Transparent Freight Marketplace — Only 5% Commission</span>
+              <ShieldCheck size={15} className="text-brand-300" />
+              <span className="text-brand-200 font-bold text-xs sm:text-sm tracking-wide">India's Most Transparent Freight Marketplace</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto drop-shadow-lg">
@@ -1042,7 +1223,7 @@ export default function Hero({
 
             <p className="mt-2.5 sm:mt-3 text-sm sm:text-base lg:text-lg font-semibold sm:font-bold text-slate-200 max-w-2xl mx-auto leading-relaxed">
               Connect directly with verified trucks across {currentCity.state || currentCity.region || "India"}.{" "}
-              <span className="text-brand-300">No brokers. No surge pricing. No hidden fees.</span>
+              <span className="text-brand-300">Direct booking. Verified drivers. No hidden fees.</span>
             </p>
 
             <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-brand-200 font-bold italic" lang="hi-Latn">
@@ -1185,26 +1366,50 @@ export default function Hero({
         )}
       </section>
 
-      {/* ── TRUST STRIP ───────────────────────────────── */}
+      {/* ──────────────────────────────────────────────────────────
+          TRUST STRIP (COMMENTED OUT)
+      ────────────────────────────────────────────────────────── */}
+      {/*
       <section className="bg-white border-b border-slate-200 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {trustBadges.map(({ icon: Icon, title, sub, color }) => (
-              <div key={title} className="flex items-center gap-3 p-4 rounded-xl border border-slate-100 shadow-sm bg-white">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
-                  <Icon size={22} />
-                </div>
-                <div>
-                  <p className="font-black text-slate-900 text-base">{title}</p>
-                  <p className="text-slate-500 text-xs font-medium">{sub}</p>
-                </div>
+            <div className="flex items-center gap-3 p-4 rounded-xl border border-slate-100 shadow-sm bg-white">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-brand-600 bg-brand-50">
+                <BadgePercent size={22} />
               </div>
-            ))}
+              <div>
+                <p className="font-black text-slate-900 text-base">Only 5% Commission</p>
+                <p className="text-slate-500 text-xs font-medium">Lowest in Eastern India</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-4 rounded-xl border border-slate-100 shadow-sm bg-white">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-emerald-700 bg-emerald-50">
+                <ShieldCheck size={22} />
+              </div>
+              <div>
+                <p className="font-black text-slate-900 text-base">Zero Surge Pricing</p>
+                <p className="text-slate-500 text-xs font-medium">Transparent fare, always</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-4 rounded-xl border border-slate-100 shadow-sm bg-white">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-orange-600 bg-orange-50">
+                <Zap size={22} />
+              </div>
+              <div>
+                <p className="font-black text-slate-900 text-base">Match in &lt; 20 mins</p>
+                <p className="text-slate-500 text-xs font-medium">Or support escalates</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+      */}
 
-      {/* ── PRICING TRANSPARENCY SLIDER ───────────────── */}
+      {/* ──────────────────────────────────────────────────────────
+          PRICING TRANSPARENCY SLIDER (COMMENTED OUT)
+          "See exactly where your money goes"
+      ────────────────────────────────────────────────────────── */}
+      {/*
       <section className="bg-slate-950 py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-brand-400 font-bold uppercase tracking-widest text-xs mb-2">How GoMyTruck pricing works</p>
@@ -1216,15 +1421,14 @@ export default function Hero({
           <div className="mt-10 bg-slate-900 rounded-2xl p-8 border border-slate-800">
             <div className="flex items-center justify-between mb-3">
               <span className="text-slate-400 text-sm font-semibold">Freight Cost</span>
-              <span className="text-white font-black text-2xl">₹{sliderValue.toLocaleString("en-IN")}</span>
+              <span className="text-white font-black text-2xl">₹10,000</span>
             </div>
             <input
               type="range"
               min={2000}
               max={100000}
               step={1000}
-              value={sliderValue}
-              onChange={(e) => setSliderValue(Number(e.target.value))}
+              defaultValue={10000}
               className="w-full h-2 rounded-full accent-brand-500 cursor-pointer"
             />
             <div className="flex justify-between text-slate-600 text-xs mt-1">
@@ -1235,12 +1439,12 @@ export default function Hero({
             <div className="mt-8 grid grid-cols-2 gap-4">
               <div className="bg-emerald-950 border border-emerald-800 rounded-xl p-5">
                 <p className="text-emerald-400 font-bold text-xs uppercase tracking-widest mb-1">Driver / Transporter Gets</p>
-                <p className="text-emerald-300 font-black text-3xl">₹{driverPayout.toLocaleString("en-IN")}</p>
+                <p className="text-emerald-300 font-black text-3xl">₹9,500</p>
                 <p className="text-emerald-600 text-xs mt-1">95% of total freight</p>
               </div>
               <div className="bg-brand-950 border border-brand-800 rounded-xl p-5">
                 <p className="text-brand-400 font-bold text-xs uppercase tracking-widest mb-1">GoMyTruck Commission</p>
-                <p className="text-brand-300 font-black text-3xl">₹{gmtCommission.toLocaleString("en-IN")}</p>
+                <p className="text-brand-300 font-black text-3xl">₹500</p>
                 <p className="text-brand-700 text-xs mt-1">Only 5% — no broker margin</p>
               </div>
             </div>
@@ -1266,6 +1470,7 @@ export default function Hero({
           </div>
         </div>
       </section>
+      */}
 
       {/* Global City Selector Modal */}
       <CitySelectorModal

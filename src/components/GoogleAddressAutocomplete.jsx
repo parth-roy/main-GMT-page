@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { Loader2 } from "lucide-react"
+import { Loader2, X } from "lucide-react"
 // API key read from env var — set VITE_GOOGLE_MAPS_KEY in .env
 import { trackBeginBooking } from "../utils/analytics"
 
@@ -69,6 +69,53 @@ export async function geocodeGoogleAddress(address) {
       }
     });
   });
+}
+
+const reverseGeocodeCache = new Map();
+
+export async function reverseGeocodeGoogleCoords(lat, lng) {
+  const normKey = `${Number(lat).toFixed(5)},${Number(lng).toFixed(5)}`;
+  if (reverseGeocodeCache.has(normKey)) {
+    return reverseGeocodeCache.get(normKey);
+  }
+
+  let formattedAddress = null;
+
+  try {
+    const maps = await getGoogleMaps();
+    if (maps?.Geocoder) {
+      const geocoder = new maps.Geocoder();
+      formattedAddress = await new Promise((resolve, reject) => {
+        geocoder.geocode({ location: { lat: Number(lat), lng: Number(lng) } }, (results, status) => {
+          if (status === "OK" && results?.[0]?.formatted_address) {
+            resolve(results[0].formatted_address);
+          } else {
+            reject(new Error(status || "No results"));
+          }
+        });
+      });
+    }
+  } catch (err) {
+    console.warn("Client reverse-geocode error, trying backend fallback:", err);
+  }
+
+  if (!formattedAddress) {
+    try {
+      const res = await fetch(`https://api.gomytruck.com/api/v1/maps/reverse-geocode?lat=${lat}&lng=${lng}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data?.address) {
+          formattedAddress = json.data.address;
+        }
+      }
+    } catch (apiErr) {
+      console.warn("Backend reverse-geocode error:", apiErr);
+    }
+  }
+
+  const finalResult = formattedAddress || `Current Location (${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)})`;
+  setBoundedCache(reverseGeocodeCache, normKey, finalResult);
+  return finalResult;
 }
 
 /**
@@ -163,9 +210,21 @@ export default function GoogleAddressAutocomplete({
   const [loading, setLoading] = useState(false)
   const wrapperRef = useRef(null)
   const debounceRef = useRef(null)
+  const inputRef = useRef(null)
   const hasTrackedFocusRef = useRef(false)
   // Session token groups all keystrokes + final selection into ONE billing unit
   const sessionTokenRef = useRef(null)
+
+  const handleClear = (e) => {
+    e.stopPropagation()
+    setQuery("")
+    setPredictions([])
+    setIsOpen(false)
+    onAddressSelect?.({ address: "", lat: null, lng: null })
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -278,27 +337,41 @@ export default function GoogleAddressAutocomplete({
       <label htmlFor={id} className="text-[10px] sm:text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">
         {label}
       </label>
-      <input
-        id={id}
-        type="text"
-        value={query}
-        onChange={handleInputChange}
-        onFocus={() => {
-          if (!hasTrackedFocusRef.current) {
-            hasTrackedFocusRef.current = true
-            trackBeginBooking(id || label || "address-autocomplete")
-          }
-          if (query.trim()) setIsOpen(true)
-        }}
-        placeholder={placeholder}
-        autoComplete={autoComplete}
-        required
-        role="combobox"
-        aria-autocomplete="list"
-        aria-expanded={isOpen}
-        aria-controls={id ? `${id}-suggestions` : undefined}
-        className="min-h-11 w-full bg-slate-50 border border-slate-300 rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
-      />
+      <div className="relative flex items-center">
+        <input
+          id={id}
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={handleInputChange}
+          onFocus={() => {
+            if (!hasTrackedFocusRef.current) {
+              hasTrackedFocusRef.current = true
+              trackBeginBooking(id || label || "address-autocomplete")
+            }
+            if (query.trim()) setIsOpen(true)
+          }}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          required
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={isOpen}
+          aria-controls={id ? `${id}-suggestions` : undefined}
+          className="min-h-11 w-full bg-slate-50 border border-slate-300 rounded-lg py-2 pl-3 pr-9 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-2.5 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200/60 transition-colors cursor-pointer"
+            title="Clear location"
+            aria-label="Clear location"
+          >
+            <X size={15} />
+          </button>
+        )}
+      </div>
 
       {isOpen && (
         <div className="absolute top-[100%] left-0 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">

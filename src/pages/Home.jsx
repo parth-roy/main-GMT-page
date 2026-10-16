@@ -29,7 +29,7 @@ const homeSchema = [
     "serviceType": "Digital Freight Marketplace",
     "provider": { "@id": "https://gomytruck.com/#organization" },
     "areaServed": ["West Bengal", "Eastern India", "India"],
-    "description": "GoMyTruck is India's most transparent freight marketplace. Book mini trucks, FTL, PTL and intercity transport across Eastern India at only 5% platform commission — no brokers, no surge pricing.",
+    "description": "GoMyTruck is India's most transparent freight marketplace. Book mini trucks, FTL, PTL and intercity transport across Eastern India — verified drivers, transparent pricing, no hidden broker markups.",
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "GoMyTruck Logistics & Transport Services",
@@ -62,11 +62,11 @@ export default function Home({ selectedService, setSelectedService, onOpenEstima
 
   const dynamicTitle = currentCity?.name && currentCity.name !== 'Kolkata'
     ? `Online Truck Booking & Goods Transport in ${currentCity.name} | GoMyTruck`
-    : "India's Most Transparent Freight Marketplace | Only 5% Commission | GoMyTruck";
+    : "India's Most Transparent Freight Marketplace | GoMyTruck";
 
   const dynamicDescription = currentCity?.name && currentCity.name !== 'Kolkata'
-    ? `Book mini trucks, Tata Ace, FTL, PTL and intercity goods transport across ${currentCity.name} and ${currentCity.state || 'India'} at only 5% platform commission. Verified drivers, no brokers, no surge pricing.`
-    : "Book mini trucks, FTL, PTL and intercity goods transport across Eastern India at only 5% platform commission. No brokers, no surge pricing, no hidden fees. Verified drivers in Kolkata, Dankuni, Howrah, Durgapur.";
+    ? `Book mini trucks, Tata Ace, FTL, PTL and intercity goods transport across ${currentCity.name} and ${currentCity.state || 'India'}. Verified drivers, transparent pricing, no hidden broker markups.`
+    : "Book mini trucks, FTL, PTL and intercity goods transport across Eastern India. Transparent pricing, no hidden fees, verified drivers in Kolkata, Dankuni, Howrah, Durgapur.";
 
   return (
     <>
@@ -74,7 +74,7 @@ export default function Home({ selectedService, setSelectedService, onOpenEstima
         title={dynamicTitle}
         description={dynamicDescription}
         canonical="/"
-        keywords="online truck booking, book truck online, hire truck for goods, truck booking near me, transport service near me, goods transport services, mini truck booking near me, tata ace on rent, pickup truck booking, FTL transport services, part load transport, goods carrier near me, truck booking Kolkata, truck booking West Bengal, 5% commission freight, transparent freight marketplace, Dankuni logistics, intercity truck booking"
+        keywords="online truck booking, book truck online, hire truck for goods, truck booking near me, transport service near me, goods transport services, mini truck booking near me, tata ace on rent, pickup truck booking, FTL transport services, part load transport, goods carrier near me, truck booking Kolkata, truck booking West Bengal, transparent freight marketplace, Dankuni logistics, intercity truck booking"
         jsonLd={homeSchema}
         preloadImage="/hero-bg-960.webp"
         preloadImageSrcSet="/hero-bg-640.webp 640w, /hero-bg-960.webp 960w, /hero-bg-1600.webp 1600w"

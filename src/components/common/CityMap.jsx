@@ -79,7 +79,7 @@ export default function CityMap({ cityName, stateName, vehicleName, serviceType 
           </span>
           <span className="inline-flex items-center gap-1.5">
             <Zap className="w-4 h-4 text-amber-500 fill-current" />
-            <span>Zero Broker Margin (5% Flat)</span>
+            <span>Zero Broker Margin (Direct Connect)</span>
           </span>
         </div>
 

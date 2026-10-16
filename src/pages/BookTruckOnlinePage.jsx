@@ -30,7 +30,7 @@ const schema = [
 
 const steps = [
   { icon: Package, title: "Enter Pickup & Drop", desc: "Use exact addresses so the platform can map the route and check serviceability." },
-  { icon: Truck, title: "Choose Your Vehicle", desc: "Select from Bike, 3-Wheeler, Tata Ace, or Mini Truck based on your load size." },
+  { icon: Truck, title: "Choose Your Vehicle", desc: "Select from Open Truck, Container Truck, or Trailers based on your cargo volume and tonnage." },
   { icon: Clock, title: "Review the Estimate", desc: "Check the current route, vehicle, pricing components, and stated trip assumptions." },
   { icon: Star, title: "Confirm and Follow Status", desc: "Confirmation begins partner matching; supported active trips can provide status and tracking updates." },
 ]

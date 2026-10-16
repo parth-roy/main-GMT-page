@@ -96,11 +96,11 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
       {
         heading: "Book by Service",
         items: [
-          { label: "Enterprise Dispatch (DMP)", to: "/enterprise-dispatch", desc: "TReDS & E-Way Bill Part-B" },
-          { label: "EV Fleet Solutions", to: "/ev-fleet-solutions", desc: "Tata Ace EV • 46% savings" },
+          // { label: "Enterprise Dispatch (DMP)", to: "/enterprise-dispatch", desc: "TReDS & E-Way Bill Part-B" },
+          // { label: "EV Fleet Solutions", to: "/ev-fleet-solutions", desc: "Tata Ace EV • 46% savings" },
           { label: "Mini Truck Booking", to: isKolkata ? "/kolkata/mini-truck-booking" : `/${citySlug}/mini-truck-booking`, desc: "Tata Ace, 407" },
           { label: "Full Truck Load (FTL)", to: "/goods-transport-services", desc: "32ft container, flatbed" },
-          { label: "Part Load (PTL)", to: "/goods-transport-services", desc: "Share truck space" },
+          // { label: "Part Load (PTL)", to: "/goods-transport-services", desc: "Share truck space" },
           { label: "Intercity Transport", to: `/intercity/${citySlug}`, desc: "Pan-India routes" },
         ],
       },
@@ -111,7 +111,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
           { label: "Pickup / Bolero", to: isKolkata ? "/kolkata/pickup-truck-booking" : `/${citySlug}/pickup-truck-for-rent`, desc: "Up to 1.5 ton" },
           { label: "Mini Truck (407)", to: isKolkata ? "/kolkata/mini-truck-booking" : `/${citySlug}/mini-truck-booking`, desc: "Up to 3 ton" },
           { label: "14 Feet Truck", to: isKolkata ? "/kolkata/14-feet-truck-rental" : `/${citySlug}/14-feet-truck-rental`, desc: "Up to 5 ton" },
-          { label: "Packers & Movers", to: "/packers-and-movers", desc: "Home & office moves" },
+          // { label: "Packers & Movers", to: "/packers-and-movers", desc: "Home & office moves" },
         ],
       },
       {
@@ -399,6 +399,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 pt-2 pb-1">
             Book a Truck ({currentCity?.name || "Kolkata"})
           </p>
+          {/*
           <Link
             to="/enterprise-dispatch"
             onClick={() => setIsOpen(false)}
@@ -413,6 +414,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
           >
             EV Fleet Solutions (Tata Ace EV)
           </Link>
+          */}
           <Link
             to={currentCity?.slug === "kolkata" ? "/kolkata/mini-truck-booking" : `/${currentCity?.slug || "kolkata"}/mini-truck-booking`}
             onClick={() => setIsOpen(false)}

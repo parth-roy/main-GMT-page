@@ -341,7 +341,7 @@ export default function CityTransportPage({
                 "Itemized fare components shown upfront before payment",
                 "Verified driver profiles and commercial vehicle documentation",
                 "Live GPS trip tracking available on active bookings",
-                "Flat 5% platform commission — zero hidden broker markups",
+                "Transparent platform pricing — zero hidden broker markups",
                 "Direct trip support: talk to drivers directly or connect via WhatsApp",
               ]).map((h, i) => (
                 <li key={i} className="flex items-center gap-3 text-slate-700 font-medium">
@@ -355,7 +355,7 @@ export default function CityTransportPage({
             <div className="grid grid-cols-2 gap-4 mb-6">
               {[
                 { v: "Route based", l: "Digital estimates" },
-                { v: "5% Flat", l: "No broker margin" },
+                { v: "0% Broker", l: "No middleman markup" },
                 { v: "In app", l: "Live GPS updates" },
                 { v: "Verified", l: "Driver & fleet network" },
               ].map((s, i) => (
