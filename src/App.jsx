@@ -1,4 +1,4 @@
-import React, { useState, Suspense, lazy } from "react"
+import React, { useState, useEffect, Suspense, lazy } from "react"
 import { Routes, Route, useNavigate, Navigate, useLocation } from "react-router-dom"
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
@@ -7,6 +7,7 @@ import RouteAnalytics from "./components/RouteAnalytics"
 import LoginModal from "./components/LoginModal"
 import DriverPremiumWelcomeModal from "./components/driver/DriverPremiumWelcomeModal"
 import WhatsAppIntentModal from "./components/WhatsAppIntentModal"
+import AppDownloadModal from "./components/AppDownloadModal"
 
 import Home from "./pages/Home"
 
@@ -89,14 +90,47 @@ const PageLoader = () => (
 export default function App() {
   const [isSelectServiceOpen, setIsSelectServiceOpen] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
+  const [isAppDownloadOpen, setIsAppDownloadOpen] = useState(false)
+  const [appDownloadTrack, setAppDownloadTrack] = useState("customer")
   const navigate = useNavigate()
   const location = useLocation()
 
   const isAgentRoute = location.pathname.startsWith('/agent')
 
+  // Global app install intercept event listener + first-visit engagement trigger
+  useEffect(() => {
+    const handleOpenAppModal = (e) => {
+      const track = e?.detail?.track || "customer"
+      setAppDownloadTrack(track)
+      setIsAppDownloadOpen(true)
+    }
+    window.addEventListener("open-app-modal", handleOpenAppModal)
+
+    // Trigger on first visit to any page (desktop & mobile) after 2.5 seconds if not yet dismissed
+    const alreadySeen = typeof window !== "undefined" && sessionStorage.getItem("gmt_app_intercept_dismissed")
+    let timer = null
+    if (!alreadySeen && !isAgentRoute) {
+      timer = setTimeout(() => {
+        setAppDownloadTrack("customer")
+        setIsAppDownloadOpen(true)
+      }, 2500)
+    }
+
+    return () => {
+      window.removeEventListener("open-app-modal", handleOpenAppModal)
+      if (timer) clearTimeout(timer)
+    }
+  }, [isAgentRoute])
+
   const handleOpenEstimate = () => {
-    // Open the upgraded 2-step GetEstimateModal (selects vehicle + enters route + hits API)
-    setIsSelectServiceOpen(true)
+    const alreadySeen = typeof window !== "undefined" && sessionStorage.getItem("gmt_app_intercept_dismissed")
+    if (!alreadySeen) {
+      setAppDownloadTrack("customer")
+      setIsAppDownloadOpen(true)
+      sessionStorage.setItem("gmt_app_intercept_dismissed", "true")
+    } else {
+      setIsSelectServiceOpen(true)
+    }
   }
 
   const handleScrollToSection = (id) => {
@@ -426,6 +460,19 @@ export default function App() {
       <DriverPremiumWelcomeModal />
 
       <WhatsAppIntentModal />
+
+      {/* Global App Install Intercept Modal */}
+      <AppDownloadModal 
+        isOpen={isAppDownloadOpen} 
+        onClose={() => { 
+          setIsAppDownloadOpen(false) 
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("gmt_app_intercept_dismissed", "true")
+          }
+          setIsSelectServiceOpen(true)
+        }} 
+        initialTrack={appDownloadTrack} 
+      />
     </div>
   )
 }

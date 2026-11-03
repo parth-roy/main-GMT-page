@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect, useMemo } from "react"
-import { Menu, X, ChevronRight, ChevronDown, PhoneCall, LogIn, LogOut, Truck, Package, Building2, Users, ArrowRight, Zap, Briefcase } from "lucide-react"
+import { Menu, X, ChevronRight, ChevronDown, PhoneCall, LogIn, LogOut, Truck, Package, Building2, Users, ArrowRight, Zap, Briefcase, Download } from "lucide-react"
 import { useLocation, Link, useNavigate } from "react-router-dom"
 import AppDownloadModal from "./AppDownloadModal"
 import CitySelectorModal from "./CitySelectorModal"
 import { useAuth } from "../context/AuthContext"
 import { useCity } from "../context/CityContext"
+import { APP_URLS } from "../constants/appUrls"
 
 // Dropdown data
 
@@ -27,8 +28,15 @@ const transportersMenu = [
     ],
   },
   {
-    heading: "Partner Trust & Tools",
+    heading: "Partner App & Tools",
     items: [
+      { 
+        label: "Download Driver Partner App", 
+        to: APP_URLS.PARTNER, 
+        desc: "0% commission loads • Daily payouts", 
+        isExternal: true, 
+        highlight: true 
+      },
       { label: "GoMyTruck Verified", to: "/gomytruck-verified", desc: "Sub-10 min VAHAN badge" },
       { label: "Return Load Finder", to: "/driver-partner", desc: "Zero empty return running" },
       { label: "Subscription Plans", to: "/plans", desc: "Zero commission passes" },
@@ -44,15 +52,40 @@ function DropdownMenu({ sections, onClose }) {
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{section.heading}</p>
           <div className="space-y-0.5">
             {section.items.map((item) => (
-              <Link
-                key={item.label}
-                to={item.to}
-                onClick={onClose}
-                className="flex flex-col px-2 py-2 rounded-lg hover:bg-brand-50 group transition-colors"
-              >
-                <span className="text-slate-800 font-bold text-sm group-hover:text-brand-700">{item.label}</span>
-                <span className="text-slate-400 text-xs">{item.desc}</span>
-              </Link>
+              item.isExternal ? (
+                <a
+                  key={item.label}
+                  href={item.to}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={onClose}
+                  className={`flex flex-col px-2.5 py-2 rounded-xl transition-all ${
+                    item.highlight 
+                      ? 'bg-blue-50/80 border border-blue-200/80 hover:bg-blue-100/80' 
+                      : 'hover:bg-brand-50'
+                  }`}
+                >
+                  <span className={`font-bold text-sm flex items-center justify-between ${
+                    item.highlight ? 'text-blue-900' : 'text-slate-800 hover:text-brand-700'
+                  }`}>
+                    {item.label}
+                    <Download size={14} className={item.highlight ? "text-blue-600" : "text-slate-400"} />
+                  </span>
+                  <span className={item.highlight ? "text-blue-700/80 text-xs" : "text-slate-400 text-xs"}>
+                    {item.desc}
+                  </span>
+                </a>
+              ) : (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  onClick={onClose}
+                  className="flex flex-col px-2 py-2 rounded-lg hover:bg-brand-50 group transition-colors"
+                >
+                  <span className="text-slate-800 font-bold text-sm group-hover:text-brand-700">{item.label}</span>
+                  <span className="text-slate-400 text-xs">{item.desc}</span>
+                </Link>
+              )
             ))}
           </div>
         </div>
@@ -65,6 +98,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
+  const [downloadTrack, setDownloadTrack] = useState("customer")
   const [isCityModalOpen, setIsCityModalOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null) // "shippers" | "transporters" | null
 
@@ -211,11 +245,11 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               </div>
             </div>
 
-            {/* City Selector Badge Button (Desktop only) */}
+            {/* City Selector Badge Button (Visible on sm screens and up next to logo) */}
             <button
               type="button"
               onClick={() => setIsCityModalOpen(true)}
-              className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border transition-all hover:scale-105 active:scale-95 cursor-pointer ml-1 ${
+              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border transition-all hover:scale-105 active:scale-95 cursor-pointer ml-1 shrink-0 ${
                 isDarkTheme
                   ? "bg-white/10 border-white/20 text-white hover:bg-white/20"
                   : "bg-brand-100/80 border-brand-200 text-brand-900 hover:bg-brand-200/80 shadow-xs"
@@ -228,13 +262,13 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
             </button>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-2 xl:gap-3">
+          {/* Desktop Navigation (Only on xl: 1280px+ to ensure zero overflow) */}
+          <div className="hidden xl:flex items-center gap-1.5 2xl:gap-2.5">
             {/* Shippers Dropdown */}
             <div className="relative">
               <button
                 onClick={() => toggleDropdown("shippers")}
-                className={`flex items-center gap-1 font-bold text-sm px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
+                className={`flex items-center gap-1 font-bold text-xs 2xl:text-sm px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${
                   activeDropdown === "shippers"
                     ? "bg-brand-600 text-white"
                     : isDarkTheme
@@ -242,9 +276,9 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
                     : "text-slate-700 hover:bg-slate-100 hover:text-brand-700"
                 }`}
               >
-                <Truck size={15} />
+                <Truck size={14} />
                 Book a Truck
-                <ChevronDown size={14} className={`transition-transform ${activeDropdown === "shippers" ? "rotate-180" : ""}`} />
+                <ChevronDown size={13} className={`transition-transform ${activeDropdown === "shippers" ? "rotate-180" : ""}`} />
               </button>
               {activeDropdown === "shippers" && (
                 <DropdownMenu sections={shippersMenu} onClose={() => setActiveDropdown(null)} />
@@ -255,7 +289,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
             <div className="relative">
               <button
                 onClick={() => toggleDropdown("transporters")}
-                className={`flex items-center gap-1 font-bold text-sm px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
+                className={`flex items-center gap-1 font-bold text-xs 2xl:text-sm px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${
                   activeDropdown === "transporters"
                     ? "bg-slate-900 text-white"
                     : isDarkTheme
@@ -263,16 +297,16 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
                     : "text-slate-700 hover:bg-slate-100 hover:text-brand-700"
                 }`}
               >
-                <Users size={15} />
+                <Users size={14} />
                 Attach Truck
-                <ChevronDown size={14} className={`transition-transform ${activeDropdown === "transporters" ? "rotate-180" : ""}`} />
+                <ChevronDown size={13} className={`transition-transform ${activeDropdown === "transporters" ? "rotate-180" : ""}`} />
               </button>
               {activeDropdown === "transporters" && (
                 <DropdownMenu sections={transportersMenu} onClose={() => setActiveDropdown(null)} />
               )}
             </div>
 
-            <div className={`h-6 w-px ${isDarkTheme ? "bg-gray-700" : "bg-slate-300"}`} />
+            <div className={`h-5 w-px ${isDarkTheme ? "bg-gray-700" : "bg-slate-300"}`} />
 
             {/* Simple nav items */}
             {simpleNavItems.map((item) =>
@@ -282,7 +316,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`font-semibold text-sm whitespace-nowrap transition-colors relative py-1 px-2 ${
+                  className={`font-semibold text-xs 2xl:text-sm whitespace-nowrap transition-colors relative py-1 px-1.5 2xl:px-2 ${
                     isDarkTheme ? "text-gray-200 hover:text-white" : "text-slate-600 hover:text-brand-600"
                   }`}
                 >
@@ -292,7 +326,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
                 <button
                   key={item.name}
                   onClick={() => handleNavClick(item.id)}
-                  className={`font-semibold text-sm whitespace-nowrap transition-colors relative py-1 px-2 ${
+                  className={`font-semibold text-xs 2xl:text-sm whitespace-nowrap transition-colors relative py-1 px-1.5 2xl:px-2 ${
                     isDarkTheme ? "text-gray-200 hover:text-white" : "text-slate-600 hover:text-brand-600"
                   }`}
                 >
@@ -301,28 +335,28 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               )
             )}
 
-            <div className={`h-6 w-px ${isDarkTheme ? "bg-gray-700" : "bg-slate-300"}`} />
+            <div className={`h-5 w-px ${isDarkTheme ? "bg-gray-700" : "bg-slate-300"}`} />
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 2xl:gap-2 shrink-0">
               <Link
                 to="/direct-driver-contact?openModal=true"
-                className={`flex items-center gap-1.5 font-bold text-sm transition-colors ${
+                className={`flex items-center gap-1 font-bold text-xs 2xl:text-sm transition-colors px-1.5 py-1 rounded-md shrink-0 ${
                   isDarkTheme ? "text-white hover:text-gray-300" : "text-slate-700 hover:text-brand-600"
                 }`}
                 title="Talk to Drivers"
               >
-                <PhoneCall size={15} className={isDarkTheme ? "text-white" : "text-brand-500"} />
-                <span className="hidden lg:inline">Talk to Drivers</span>
+                <PhoneCall size={14} className={isDarkTheme ? "text-white" : "text-brand-500"} />
+                <span className="hidden 2xl:inline whitespace-nowrap">Talk to Drivers</span>
               </Link>
 
               {isLoggedIn ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-600 hidden xl:inline">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-600 hidden 2xl:inline">
                     {user?.name || (user?.phone ? `+91 ${user.phone}` : "Account")}
                   </span>
                   <button
                     onClick={handleLogout}
-                    className={`font-bold text-sm transition-colors px-2 cursor-pointer ${isDarkTheme ? "text-gray-200 hover:text-rose-400" : "text-slate-600 hover:text-rose-600"}`}
+                    className={`font-bold text-xs 2xl:text-sm transition-colors px-1.5 py-1 cursor-pointer ${isDarkTheme ? "text-gray-200 hover:text-rose-400" : "text-slate-600 hover:text-rose-600"}`}
                   >
                     Logout
                   </button>
@@ -330,11 +364,11 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               ) : (
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
-                  className={`font-bold text-sm transition-colors px-2 flex items-center gap-1 cursor-pointer ${
+                  className={`font-bold text-xs 2xl:text-sm transition-colors px-1.5 py-1 flex items-center gap-1 cursor-pointer shrink-0 ${
                     isDarkTheme ? "text-white hover:text-gray-300" : "text-slate-600 hover:text-brand-600"
                   }`}
                 >
-                  <LogIn size={16} />
+                  <LogIn size={14} />
                   Login
                 </button>
               )}
@@ -342,58 +376,66 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
               <button
                 type="button"
                 onClick={handleAgentClick}
-                className="btn-ripple bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-sm px-4 py-1.5 rounded-lg shadow-md shadow-emerald-600/25 hover:shadow-emerald-600/35 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="btn-ripple bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-xs 2xl:text-sm px-3 py-1.5 rounded-lg shadow-md shadow-emerald-600/25 active:scale-95 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
                 title="GMT Agent Portal"
               >
-                <Briefcase size={15} className="relative z-10 text-emerald-100" />
+                <Briefcase size={14} className="relative z-10 text-emerald-100" />
                 <span className="relative z-10 whitespace-nowrap">GMT Agent</span>
-                <ChevronRight size={15} className="relative z-10 text-emerald-200" />
+                <ChevronRight size={14} className="relative z-10 text-emerald-200 hidden 2xl:inline" />
               </button>
 
               <button
-                onClick={() => setIsDownloadModalOpen(true)}
-                className="btn-ripple bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm px-4 py-1.5 rounded-lg shadow-sm active:scale-95 transition-all flex items-center gap-2"
+                onClick={() => {
+                  setDownloadTrack("customer")
+                  setIsDownloadModalOpen(true)
+                }}
+                className="btn-ripple bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold text-xs 2xl:text-sm px-2.5 2xl:px-3 py-1.5 rounded-lg shadow-2xs active:scale-95 transition-all flex items-center gap-1.5 shrink-0"
               >
-                <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4.093 2.05A2.32 2.32 0 003 4.155v15.69c0 .878.47 1.674 1.223 2.08l10.364-10.426L4.093 2.05z" fill="#00C1FF" />
                   <path d="M15.918 10.31L19.46 8.3c1.19-.675 1.19-2.368 0-3.044L15.918 3.24l-1.332 1.334L15.918 10.31z" fill="#FFC900" />
                   <path d="M14.586 11.644L4.093 2.05l9.16 9.22 1.333.374z" fill="#00E676" />
                   <path d="M14.586 11.644l-10.493 10.56 11.825-6.68-1.332-3.88z" fill="#FF3A44" />
                 </svg>
-                <span className="relative z-10 whitespace-nowrap">Download App</span>
+                <span className="relative z-10 whitespace-nowrap hidden 2xl:inline">Download App</span>
+                <span className="relative z-10 whitespace-nowrap 2xl:hidden">App</span>
               </button>
             </div>
           </div>
 
-          {/* Mobile menu button & quick city select (right side, left of caller) */}
-          <div className="lg:hidden flex items-center gap-1.5 sm:gap-2">
+          {/* Mobile & Tablet navigation controls (Visible on screens < 1280px) */}
+          <div className="xl:hidden flex items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={() => setIsCityModalOpen(true)}
-              className="flex items-center gap-1 p-1.5 px-2 rounded-full bg-brand-100/90 hover:bg-brand-200/90 active:scale-95 border border-brand-200/80 text-brand-800 transition-all cursor-pointer shadow-2xs"
+              className="sm:hidden flex items-center gap-1 p-1.5 px-2 rounded-full bg-brand-100/90 hover:bg-brand-200/90 active:scale-95 border border-brand-200/80 text-brand-800 transition-all cursor-pointer shadow-2xs"
               title={`Current City: ${currentCity?.name || "Kolkata"} (Tap to change)`}
               aria-label={`Change City, current is ${currentCity?.name || "Kolkata"}`}
             >
-              <img src="/google-maps-icon.webp" alt="Location" width={20} height={20} className="w-5 h-5 object-contain shrink-0" />
-              <ChevronDown size={14} className="text-slate-600 shrink-0" />
+              <img src="/google-maps-icon.webp" alt="Location" width={18} height={18} className="w-4.5 h-4.5 object-contain shrink-0" />
+              <ChevronDown size={12} className="text-slate-600 shrink-0" />
             </button>
             <Link
               to="/direct-driver-contact?openModal=true"
-              className="p-2 rounded-lg text-slate-700 hover:bg-slate-100"
+              className="p-1.5 sm:p-2 rounded-lg text-slate-700 hover:bg-slate-100"
               title="Talk to Drivers"
               aria-label="Talk to Drivers"
             >
               <PhoneCall size={18} />
             </Link>
-            <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg transition-colors text-slate-800 hover:bg-slate-100" aria-label="Toggle Menu">
+            <button 
+              onClick={() => setIsOpen(!isOpen)} 
+              className="p-1.5 sm:p-2 rounded-lg transition-colors text-slate-800 hover:bg-slate-100 cursor-pointer" 
+              aria-label="Toggle Menu"
+            >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-screen border-t border-slate-200" : "max-h-0 pointer-events-none"}`}>
+      {/* Mobile & Tablet Drawer Menu */}
+      <div className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-screen border-t border-slate-200" : "max-h-0 pointer-events-none"}`}>
         <div className="bg-brand-50/95 backdrop-blur-xl px-4 pt-4 pb-6 space-y-1 shadow-2xl">
           {/* Book a Truck section */}
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 pt-2 pb-1">
@@ -445,6 +487,19 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
           </Link>
 
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 pt-3 pb-1">Driver & Fleet Programs</p>
+          <a
+            href={APP_URLS.PARTNER}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center justify-between w-full text-left px-4 py-2.5 text-sm font-black text-blue-900 bg-blue-50/90 rounded-lg border border-blue-200"
+          >
+            <span className="flex items-center gap-2">
+              <Download size={15} className="text-blue-600" />
+              Download Driver Partner App
+            </span>
+            <span className="text-[10px] bg-blue-600 text-white font-bold px-2 py-0.5 rounded-full uppercase">Android</span>
+          </a>
           <Link to="/minimum-earnings-guarantee" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-black text-emerald-800 bg-emerald-50 rounded-lg border border-emerald-200/60">₹25,000 MEG Driver Guarantee</Link>
           <Link to="/fleet-attachment" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">Fleet Attachment (₹5,000 FASTag Bonus)</Link>
           <Link to="/fleet-partner-registration" onClick={() => setIsOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-600 rounded-lg">Fleet Partner Registration</Link>
@@ -497,7 +552,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
                 <span>Login</span>
               </button>
             )}
-            <button onClick={() => { setIsOpen(false); setIsDownloadModalOpen(true) }} className="flex items-center justify-center gap-2 border border-slate-300 bg-slate-50 text-slate-800 font-bold py-3 rounded-lg text-sm hover:bg-slate-100 active:scale-98 transition-all">
+            <button onClick={() => { setIsOpen(false); setDownloadTrack("customer"); setIsDownloadModalOpen(true) }} className="flex items-center justify-center gap-2 border border-slate-300 bg-slate-50 text-slate-800 font-bold py-3 rounded-lg text-sm hover:bg-slate-100 active:scale-98 transition-all">
               <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4.093 2.05A2.32 2.32 0 003 4.155v15.69c0 .878.47 1.674 1.223 2.08l10.364-10.426L4.093 2.05z" fill="#00C1FF" />
                 <path d="M15.918 10.31L19.46 8.3c1.19-.675 1.19-2.368 0-3.044L15.918 3.24l-1.332 1.334L15.918 10.31z" fill="#FFC900" />
@@ -511,7 +566,7 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
       </div>
     </nav>
 
-    <AppDownloadModal isOpen={isDownloadModalOpen} onClose={() => setIsDownloadModalOpen(false)} />
+    <AppDownloadModal isOpen={isDownloadModalOpen} onClose={() => setIsDownloadModalOpen(false)} initialTrack={downloadTrack} />
     <CitySelectorModal isOpen={isCityModalOpen} onClose={() => setIsCityModalOpen(false)} />
   </>
 )

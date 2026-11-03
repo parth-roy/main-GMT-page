@@ -6,6 +6,7 @@ import PartnerBenefits from "../components/PartnerBenefits"
 import PartnerVehicles from "../components/PartnerVehicles"
 import PartnerHowItWorks from "../components/PartnerHowItWorks"
 import DirectDriverContactBanner from "../components/common/DirectDriverContactBanner"
+import { APP_URLS } from "../constants/appUrls"
 
 const schema = [
   {
@@ -140,7 +141,7 @@ export default function FleetPartnerPage() {
               Submit your fleet details for review. Approval and available loads depend on eligibility, location, vehicle type, and customer demand.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a href="https://play.google.com/store/apps/details?id=com.gomytruck.partner" target="_blank" rel="noreferrer" className="w-full sm:w-auto bg-brand-600 hover:bg-brand-500 text-white font-bold px-8 py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-1">
+              <a href={APP_URLS.PARTNER} target="_blank" rel="noreferrer" className="w-full sm:w-auto bg-brand-600 hover:bg-brand-500 text-white font-bold px-8 py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-1">
                 Download Partner App
               </a>
               <a href="https://wa.me/919331488999?text=Hello%20Sir%2FMa'am%20%F0%9F%91%8B%0A%0AThank%20you%20for%20contacting%20GoMyTruck.%0A%0AKindly%20share%20the%20following%20details%3A%0A%0A%F0%9F%93%8D%20Pickup%20Location%3A%0A%F0%9F%93%8D%20Drop%20Location%3A%0A%F0%9F%93%A6%20Goods%20Type%3A%0A%E2%9A%96%20Approx%20Weight%3A%0A%F0%9F%9A%9A%20Truck%20Required%3A%0A%F0%9F%93%85%20Loading%20Date%20%26%20Time%3A%0A%F0%9F%92%B0%20Budget%20(if%20any)%3A%0A%F0%9F%91%A4%20Contact%20Person%3A%0A%F0%9F%93%9E%20Contact%20Number%3A%0A%0AOnce%20received%2C%20we'll%20arrange%20the%20best%20verified%20truck%20for%20you." target="_blank" rel="noreferrer" className="w-full sm:w-auto bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold px-8 py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-1">

@@ -1068,11 +1068,26 @@ export default function Hero({
     }
   }
 
-  // Handle "Book Truck" click: scroll to pickup box and focus it directly without modal
+  // Handle "Book Truck" click: trigger high-converting app install modal first if not yet seen
   const handleBookTruckClick = () => {
+    const alreadySeen = typeof window !== "undefined" && sessionStorage.getItem("gmt_app_intercept_dismissed")
+    if (!alreadySeen) {
+      window.dispatchEvent(new CustomEvent("open-app-modal", { detail: { track: "customer" } }))
+      sessionStorage.setItem("gmt_app_intercept_dismissed", "true")
+      return
+    }
     if (pickupInputRef.current) {
       pickupInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
       pickupInputRef.current.focus()
+    }
+  }
+
+  const handleAttachTruckClick = (e) => {
+    const alreadySeen = typeof window !== "undefined" && sessionStorage.getItem("gmt_partner_intercept_dismissed")
+    if (!alreadySeen) {
+      if (e && e.preventDefault) e.preventDefault()
+      window.dispatchEvent(new CustomEvent("open-app-modal", { detail: { track: "partner" } }))
+      sessionStorage.setItem("gmt_partner_intercept_dismissed", "true")
     }
   }
 
@@ -1156,6 +1171,7 @@ export default function Hero({
               {/* Attach Truck */}
               <Link
                 to="/fleet-partner-registration"
+                onClick={handleAttachTruckClick}
                 className="flex flex-col items-center justify-center gap-1.5 bg-white hover:bg-slate-50 active:scale-95 text-slate-950 font-black rounded-2xl py-4 px-3 shadow-md shadow-slate-900/10 transition-all cursor-pointer"
               >
                 <AttachTruckIcon className="w-10 h-8 text-slate-950 mb-0.5" />
@@ -1249,6 +1265,7 @@ export default function Hero({
                 {/* Attach Truck */}
                 <Link
                   to="/fleet-partner-registration"
+                  onClick={handleAttachTruckClick}
                   className="flex flex-col items-center justify-center gap-1 bg-white hover:bg-slate-50 active:scale-95 text-slate-950 font-black rounded-2xl py-3 px-3 shadow-md shadow-slate-900/10 transition-all cursor-pointer"
                 >
                   <AttachTruckIcon className="w-9 h-7 text-slate-950 mb-0.5" />

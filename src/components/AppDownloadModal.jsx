@@ -1,36 +1,29 @@
 import React, { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
-import { X, ArrowRight, Download, Truck, Navigation, Users } from "lucide-react"
+import { 
+  X, 
+  Truck, 
+  Users, 
+  Smartphone, 
+  ChevronRight, 
+  ExternalLink 
+} from "lucide-react"
+import QRCode from "qrcode"
 import { lockScroll, unlockScroll } from "../utils/scrollLock"
+import { APP_URLS } from "../constants/appUrls"
 
-const APPS = [
-  { 
-    id: "customer",  
-    name: "GoMyTruck",             
-    desc: "Customer app for booking mini trucks, pickups & heavy trucks.",     
-    iconSrc: "/app-icons/gomytruck-customer.png",
-    bg: "bg-amber-50",
-    url: "https://play.google.com/store/apps/details?id=com.gomytruck.customer"
-  },
-  { 
-    id: "driver",   
-    name: "GoMyTruck Partner",        
-    desc: "Driver partner app to earn from trips.",     
-    iconSrc: "/app-icons/gomytruck-partner.png",
-    bg: "bg-orange-50",
-    url: "https://play.google.com/store/apps/details?id=com.gomytruck.partner"
-  },
-  { 
-    id: "workforce", 
-    name: "Metro Mitra: Daily Gig Jobs",   
-    desc: "On-demand home services, skilled technicians & shifting helpers.",        
-    iconSrc: "/app-icons/metromitra-workforce.png",
-    bg: "bg-emerald-50",
-    url: "https://play.google.com/store/apps/details?id=com.gomytruck.workforce"
-  },
-]
+export default function AppDownloadModal({ isOpen, onClose, initialTrack = "customer" }) {
+  const [activeTab, setActiveTab] = useState(initialTrack) // "customer" | "partner"
+  const [customerQrDataUrl, setCustomerQrDataUrl] = useState("")
+  const [partnerQrDataUrl, setPartnerQrDataUrl] = useState("")
 
-export default function AppDownloadModal({ isOpen, onClose }) {
+  // Sync tab if initialTrack changes
+  useEffect(() => {
+    if (initialTrack) {
+      setActiveTab(initialTrack)
+    }
+  }, [initialTrack])
+
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -45,78 +38,183 @@ export default function AppDownloadModal({ isOpen, onClose }) {
     }
   }, [isOpen])
 
+  // Generate crisp QR codes
+  useEffect(() => {
+    QRCode.toDataURL(APP_URLS.CUSTOMER, {
+      width: 160,
+      margin: 1,
+      color: { dark: "#0f172a", light: "#ffffff" },
+      errorCorrectionLevel: "M"
+    }).then(setCustomerQrDataUrl).catch(() => {})
+
+    QRCode.toDataURL(APP_URLS.PARTNER, {
+      width: 160,
+      margin: 1,
+      color: { dark: "#0f172a", light: "#ffffff" },
+      errorCorrectionLevel: "M"
+    }).then(setPartnerQrDataUrl).catch(() => {})
+  }, [])
+
   if (!isOpen) return null
   if (typeof document === "undefined") return null
 
-  const handleDownload = (id) => {
-    const app = APPS.find(a => a.id === id)
-    if (app && app.url) {
-      window.open(app.url, '_blank', 'noopener,noreferrer')
-    } else {
-      alert("Play Store link coming soon!")
-    }
-    onClose()
-  }
+  const isCustomer = activeTab === "customer"
+  const activeUrl = isCustomer ? APP_URLS.CUSTOMER : APP_URLS.PARTNER
+  
+  const activeQr = isCustomer 
+    ? (customerQrDataUrl || APP_URLS.CUSTOMER_QR_IMAGE || "/app-qr.png") 
+    : (partnerQrDataUrl || APP_URLS.PARTNER_QR_IMAGE || "/download-qr.webp")
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      {/* Frosted Backdrop */}
       <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-200" 
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Modal Container */}
+      {/* Main Modal Dialog - Compact, Pure White, Highly Visible on Mobile & Desktop */}
       <div 
-        className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row transform transition-all animate-in fade-in zoom-in duration-300"
+        className="relative w-full max-w-md bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all duration-200 my-auto text-slate-900 z-10"
         role="dialog"
         aria-modal="true"
       >
+        {/* Subtle Top Accent Line */}
+        <div className={`h-1.5 w-full bg-gradient-to-r ${isCustomer ? 'from-amber-400 via-orange-500 to-amber-500' : 'from-blue-600 via-indigo-600 to-cyan-500'}`} />
+
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-all z-20 cursor-pointer"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all z-20 cursor-pointer active:scale-95"
           aria-label="Close modal"
         >
-          <X size={18} />
+          <X size={16} />
         </button>
 
-        {/* Left Sidebar */}
-        <div className="md:w-[35%] bg-brand-50 p-6 md:p-10 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-100">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-extrabold text-slate-900 leading-tight">
-            Download <br className="hidden sm:block" /><span className="text-brand-600">Our Apps</span>
-          </h2>
-          <p className="text-slate-500 mt-4 text-xs sm:text-sm leading-relaxed font-medium">
-            Select the app you need. Our digital ecosystem is designed for customers, drivers, and workforce partners to connect seamlessly.
-          </p>
-        </div>
-
-        {/* Right Content */}
-        <div className="md:w-[65%] p-4 sm:p-8 md:px-10 bg-white flex flex-col justify-center">
-          <h3 className="font-bold text-slate-400 uppercase tracking-widest text-xs mb-3 sm:mb-4">Select an App</h3>
-          <div className="flex flex-col gap-3 sm:gap-4 overflow-y-auto max-h-[50vh] sm:max-h-none pr-2">
-            {APPS.map((app) => {
-              return (
-                <button
-                  key={app.id}
-                  onClick={() => handleDownload(app.id)}
-                  className="relative flex items-center w-full p-3 sm:p-5 rounded-2xl transition-all duration-300 group overflow-hidden bg-slate-50 border border-slate-200/60 hover:border-brand-300 hover:bg-brand-50/60 hover:shadow-lg cursor-pointer text-left shrink-0"
-                >
-                  <div className={`w-14 h-14 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center rounded-xl sm:rounded-2xl ${app.bg} transition-all duration-300 group-hover:scale-105 p-1.5 sm:p-2 shadow-xs`}>
-                    <img src={app.iconSrc} alt={app.name} className="w-full h-full object-contain drop-shadow-sm rounded-lg sm:rounded-xl" />
-                  </div>
-                  <div className="ml-4 sm:ml-6 flex-grow">
-                    <h3 className="font-bold text-base sm:text-xl text-slate-800 group-hover:text-brand-700 transition-colors">{app.name}</h3>
-                    <p className="text-xs sm:text-sm text-slate-500 mt-1 line-clamp-2">{app.desc}</p>
-                  </div>
-                  <div className="ml-2 sm:ml-4 shrink-0 h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-slate-900 text-white shadow-sm flex items-center justify-center group-hover:bg-brand-600 transition-all duration-300 group-hover:scale-105">
-                    <Download size={18} className="text-white" />
-                  </div>
-                </button>
-              )
-            })}
+        {/* Modal Inner Container - Compact vertical spacing */}
+        <div className="p-4 sm:p-5 flex flex-col items-center text-center">
+          
+          {/* App Icon + Rating */}
+          <div className="flex items-center gap-2.5 mb-2.5">
+            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 p-1.5 shadow-sm border ${
+              isCustomer ? 'bg-amber-50 border-amber-200' : 'bg-blue-50 border-blue-200'
+            }`}>
+              <img 
+                src={isCustomer ? "/app-icons/gomytruck-customer.png" : "/app-icons/gomytruck-partner.png"} 
+                alt={isCustomer ? "GoMyTruck Customer App" : "GoMyTruck Partner App"} 
+                className="w-full h-full object-contain rounded-xl"
+                onError={(e) => { e.target.src = "/go-my-truck-logo.png" }}
+              />
+            </div>
+            <div className="text-left">
+              <h3 className="font-black text-sm text-slate-900 leading-tight">
+                {isCustomer ? "GoMyTruck App" : "GoMyTruck Partner App"}
+              </h3>
+              <span className="text-[11px] text-slate-500 font-medium">Official Mobile Application</span>
+            </div>
           </div>
+
+          {/* Simple Direct Title */}
+          <h2 className="text-lg sm:text-xl font-display font-black tracking-tight text-slate-950 leading-snug">
+            {isCustomer ? (
+              <>To Book Trucks &amp; Services, <span className="text-amber-600">Install GoMyTruck</span></>
+            ) : (
+              <>To Attach Truck &amp; Get Loads, <span className="text-blue-600">Install Partner App</span></>
+            )}
+          </h2>
+
+          <p className="mt-1 text-xs text-slate-500 font-medium max-w-xs leading-relaxed">
+            {isCustomer 
+              ? "Book any truck instantly, get live GPS tracking, and transparent upfront fares."
+              : "Attach your truck, onboard in minutes, and get guaranteed daily regular loads."}
+          </p>
+
+          {/* Segmented Switcher (Customer vs Partner) */}
+          <div className="flex items-center p-0.5 bg-slate-100 rounded-xl w-full max-w-xs mt-3 mb-3 border border-slate-200 shadow-inner">
+            <button
+              type="button"
+              onClick={() => setActiveTab("customer")}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs transition-all cursor-pointer ${
+                isCustomer 
+                  ? "bg-white text-slate-950 font-black shadow-xs border border-slate-200/80" 
+                  : "text-slate-500 hover:text-slate-900 font-semibold"
+              }`}
+            >
+              <Truck size={13} className={isCustomer ? "text-[#f99f1b]" : "text-slate-400"} />
+              <span>Book Truck</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("partner")}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs transition-all cursor-pointer ${
+                !isCustomer 
+                  ? "bg-white text-slate-950 font-black shadow-xs border border-slate-200/80" 
+                  : "text-slate-500 hover:text-slate-900 font-semibold"
+              }`}
+            >
+              <Users size={13} className={!isCustomer ? "text-blue-600" : "text-slate-400"} />
+              <span>Attach Truck</span>
+            </button>
+          </div>
+
+          {/* Desktop QR Code (Hidden on mobile for super compact view) */}
+          <div className="hidden sm:flex flex-col items-center bg-slate-50 border border-slate-200 rounded-xl p-2.5 mb-3 w-full max-w-[190px]">
+            {activeQr ? (
+              <img 
+                src={activeQr} 
+                alt="App QR Code" 
+                className="w-24 h-24 object-contain rounded-lg bg-white p-1 border border-slate-200"
+              />
+            ) : null}
+            <span className="text-[10px] text-slate-500 font-semibold mt-1 flex items-center gap-1">
+              <Smartphone size={10} className="text-slate-400" />
+              Scan to install on phone
+            </span>
+          </div>
+
+          {/* Google Play Install Button (Full Width, 1-Tap on Mobile & Desktop) */}
+          <a
+            href={activeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 px-4 rounded-xl text-white flex items-center justify-center gap-2.5 bg-slate-950 hover:bg-slate-900 active:scale-98 transition-all shadow-md cursor-pointer group"
+            onClick={onClose}
+          >
+            <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3.609 1.814L13.792 12 3.61 22.186a2.006 2.006 0 01-.61-1.442V3.256c0-.555.226-1.073.61-1.442z" fill="#00C1FF"/>
+              <path d="M17.155 8.637l-3.363 3.363 3.363 3.363 3.82-2.183c1.096-.627 1.096-1.733 0-2.36l-3.82-2.183z" fill="#FFC900"/>
+              <path d="M3.609 1.814l10.183 10.186 3.363-3.363L6.34 2.378C5.267 1.764 4.195 1.542 3.609 1.814z" fill="#00E676"/>
+              <path d="M13.792 12L3.609 22.186c.586.272 1.658.05 2.731-.564l10.815-6.259-3.363-3.363z" fill="#FF3A44"/>
+            </svg>
+            <div className="flex flex-col text-left leading-none whitespace-nowrap">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-300">GET IT ON</span>
+              <span className="text-sm font-black text-white tracking-tight mt-0.5">Google Play</span>
+            </div>
+            <ExternalLink size={14} className="ml-auto text-slate-400 group-hover:text-white transition-colors shrink-0" />
+          </a>
+
+          {/* Footer Escape Hatch & Cross-Promotion */}
+          <div className="mt-3 pt-2.5 border-t border-slate-100 w-full flex items-center justify-between text-[11px] text-slate-500">
+            <a 
+              href={APP_URLS.WORKFORCE} 
+              target="_blank" 
+              rel="noreferrer" 
+              className="text-slate-500 hover:text-emerald-700 font-semibold flex items-center gap-0.5 transition-colors"
+            >
+              Metro Mitra <ChevronRight size={11} />
+            </a>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-slate-500 hover:text-slate-900 font-bold underline transition-colors cursor-pointer"
+            >
+              Skip &amp; Continue on Web
+            </button>
+          </div>
+
         </div>
       </div>
     </div>,
