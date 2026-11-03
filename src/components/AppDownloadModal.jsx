@@ -17,6 +17,10 @@ export default function AppDownloadModal({ isOpen, onClose, initialTrack = "cust
   const [customerQrDataUrl, setCustomerQrDataUrl] = useState("")
   const [partnerQrDataUrl, setPartnerQrDataUrl] = useState("")
 
+  // Direct Play Store URLs encoded into QR codes
+  const CUSTOMER_STORE_URL = "https://play.google.com/store/apps/details?id=com.gomytruck.customer&pcampaignid=web_share"
+  const PARTNER_STORE_URL = "https://play.google.com/store/apps/details?id=com.parther.driver&pcampaignid=web_share"
+
   // Sync tab if initialTrack changes
   useEffect(() => {
     if (initialTrack) {
@@ -38,32 +42,29 @@ export default function AppDownloadModal({ isOpen, onClose, initialTrack = "cust
     }
   }, [isOpen])
 
-  // Generate crisp QR codes
+  // Generate crisp, high-resolution QR codes using qrcode npm package
   useEffect(() => {
-    QRCode.toDataURL(APP_URLS.CUSTOMER, {
-      width: 160,
-      margin: 1,
+    QRCode.toDataURL(CUSTOMER_STORE_URL, {
+      width: 400,
+      margin: 2,
       color: { dark: "#0f172a", light: "#ffffff" },
       errorCorrectionLevel: "M"
-    }).then(setCustomerQrDataUrl).catch(() => {})
+    }).then(setCustomerQrDataUrl).catch(console.error)
 
-    QRCode.toDataURL(APP_URLS.PARTNER, {
-      width: 160,
-      margin: 1,
+    QRCode.toDataURL(PARTNER_STORE_URL, {
+      width: 400,
+      margin: 2,
       color: { dark: "#0f172a", light: "#ffffff" },
       errorCorrectionLevel: "M"
-    }).then(setPartnerQrDataUrl).catch(() => {})
+    }).then(setPartnerQrDataUrl).catch(console.error)
   }, [])
 
   if (!isOpen) return null
   if (typeof document === "undefined") return null
 
   const isCustomer = activeTab === "customer"
-  const activeUrl = isCustomer ? APP_URLS.CUSTOMER : APP_URLS.PARTNER
-  
-  const activeQr = isCustomer 
-    ? (customerQrDataUrl || APP_URLS.CUSTOMER_QR_IMAGE || "/app-qr.png") 
-    : (partnerQrDataUrl || APP_URLS.PARTNER_QR_IMAGE || "/download-qr.webp")
+  const activeUrl = isCustomer ? CUSTOMER_STORE_URL : PARTNER_STORE_URL
+  const activeQr = isCustomer ? customerQrDataUrl : partnerQrDataUrl
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
@@ -92,12 +93,12 @@ export default function AppDownloadModal({ isOpen, onClose, initialTrack = "cust
           <X size={16} />
         </button>
 
-        {/* Modal Inner Container - Compact vertical spacing */}
-        <div className="p-4 sm:p-5 flex flex-col items-center text-center">
+        {/* Modal Inner Container */}
+        <div className="p-4 sm:p-6 flex flex-col items-center text-center">
           
-          {/* App Icon + Rating */}
-          <div className="flex items-center gap-2.5 mb-2.5">
-            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 p-1.5 shadow-sm border ${
+          {/* App Header */}
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 p-1.5 shadow-xs border ${
               isCustomer ? 'bg-amber-50 border-amber-200' : 'bg-blue-50 border-blue-200'
             }`}>
               <img 
@@ -131,7 +132,7 @@ export default function AppDownloadModal({ isOpen, onClose, initialTrack = "cust
           </p>
 
           {/* Segmented Switcher (Customer vs Partner) */}
-          <div className="flex items-center p-0.5 bg-slate-100 rounded-xl w-full max-w-xs mt-3 mb-3 border border-slate-200 shadow-inner">
+          <div className="flex items-center p-0.5 bg-slate-100 rounded-xl w-full max-w-xs mt-3 mb-2 border border-slate-200 shadow-inner">
             <button
               type="button"
               onClick={() => setActiveTab("customer")}
@@ -159,27 +160,31 @@ export default function AppDownloadModal({ isOpen, onClose, initialTrack = "cust
             </button>
           </div>
 
-          {/* Desktop QR Code (Hidden on mobile for super compact view) */}
-          <div className="hidden sm:flex flex-col items-center bg-slate-50 border border-slate-200 rounded-xl p-2.5 mb-3 w-full max-w-[190px]">
+          {/* Web Mode: Big Crisp QR Code */}
+          <div className="hidden sm:flex flex-col items-center justify-center bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 my-2 w-full max-w-[270px] shadow-sm">
             {activeQr ? (
               <img 
                 src={activeQr} 
-                alt="App QR Code" 
-                className="w-24 h-24 object-contain rounded-lg bg-white p-1 border border-slate-200"
+                alt={isCustomer ? "GoMyTruck Customer App QR" : "GoMyTruck Partner App QR"} 
+                className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-xl bg-white p-2 border border-slate-200 shadow-xs"
               />
-            ) : null}
-            <span className="text-[10px] text-slate-500 font-semibold mt-1 flex items-center gap-1">
-              <Smartphone size={10} className="text-slate-400" />
-              Scan to install on phone
-            </span>
+            ) : (
+              <div className="w-48 h-48 sm:w-52 sm:h-52 bg-white border border-slate-200 rounded-xl flex items-center justify-center animate-pulse">
+                <span className="text-xs text-slate-400 font-medium">Loading QR...</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-700 font-bold">
+              <Smartphone size={13} className="text-amber-500" />
+              <span>Scan with phone camera to install</span>
+            </div>
           </div>
 
-          {/* Google Play Install Button (Full Width, 1-Tap on Mobile & Desktop) */}
+          {/* Google Play Install Button (Visible on both Web & Mobile, Pure White Mode) */}
           <a
             href={activeUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-2.5 px-4 rounded-xl text-white flex items-center justify-center gap-2.5 bg-slate-950 hover:bg-slate-900 active:scale-98 transition-all shadow-md cursor-pointer group"
+            className="w-full py-2.5 px-4 rounded-xl text-slate-900 flex items-center justify-center gap-3 bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-300 hover:border-slate-400 active:scale-98 transition-all shadow-xs hover:shadow-sm cursor-pointer group mt-1.5"
             onClick={onClose}
           >
             <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -189,10 +194,10 @@ export default function AppDownloadModal({ isOpen, onClose, initialTrack = "cust
               <path d="M13.792 12L3.609 22.186c.586.272 1.658.05 2.731-.564l10.815-6.259-3.363-3.363z" fill="#FF3A44"/>
             </svg>
             <div className="flex flex-col text-left leading-none whitespace-nowrap">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-300">GET IT ON</span>
-              <span className="text-sm font-black text-white tracking-tight mt-0.5">Google Play</span>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-600">GET IT ON</span>
+              <span className="text-sm font-black text-slate-900 tracking-tight mt-0.5">Google Play</span>
             </div>
-            <ExternalLink size={14} className="ml-auto text-slate-400 group-hover:text-white transition-colors shrink-0" />
+            <ExternalLink size={14} className="ml-auto text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" />
           </a>
 
           {/* Footer Escape Hatch & Cross-Promotion */}
