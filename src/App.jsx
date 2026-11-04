@@ -16,7 +16,6 @@ const TruckPage = lazy(() => import("./pages/TruckPage"))
 const PricingPage = lazy(() => import("./pages/PricingPage"))
 const PlansPage = lazy(() => import("./pages/PlansPage"))
 const ContactPage = lazy(() => import("./pages/ContactPage"))
-const GetEstimateModal = lazy(() => import("./components/GetEstimateModal"))
 const BikePage = lazy(() => import("./pages/BikePage"))
 const ServicesPage = lazy(() => import("./pages/ServicesPage"))
 const EnterprisePage = lazy(() => import("./pages/EnterprisePage"))
@@ -88,7 +87,6 @@ const PageLoader = () => (
 )
 
 export default function App() {
-  const [isSelectServiceOpen, setIsSelectServiceOpen] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
   const [isAppDownloadOpen, setIsAppDownloadOpen] = useState(false)
   const [appDownloadTrack, setAppDownloadTrack] = useState("customer")
@@ -123,14 +121,8 @@ export default function App() {
   }, [isAgentRoute])
 
   const handleOpenEstimate = () => {
-    const alreadySeen = typeof window !== "undefined" && sessionStorage.getItem("gmt_app_intercept_dismissed")
-    if (!alreadySeen) {
-      setAppDownloadTrack("customer")
-      setIsAppDownloadOpen(true)
-      sessionStorage.setItem("gmt_app_intercept_dismissed", "true")
-    } else {
-      setIsSelectServiceOpen(true)
-    }
+    setAppDownloadTrack("customer")
+    setIsAppDownloadOpen(true)
   }
 
   const handleScrollToSection = (id) => {
@@ -439,17 +431,6 @@ export default function App() {
       </main>
       {!isAgentRoute && <Footer onScrollToSection={handleScrollToSection} />}
       
-      <Suspense fallback={null}>
-        {/* Upgraded 2-step GetEstimateModal: selects service → fills route → calls live API */}
-        {isSelectServiceOpen && (
-          <GetEstimateModal
-            isOpen
-            onClose={() => setIsSelectServiceOpen(false)}
-            onSelectService={handleSelectVehicle}
-          />
-        )}
-      </Suspense>
-
       {/* Global Floating Action Buttons for WhatsApp and Booking */}
       {!isAgentRoute && <GlobalFABs onOpenEstimate={handleOpenEstimate} />}
       
@@ -469,7 +450,6 @@ export default function App() {
           if (typeof window !== "undefined") {
             sessionStorage.setItem("gmt_app_intercept_dismissed", "true")
           }
-          setIsSelectServiceOpen(true)
         }} 
         initialTrack={appDownloadTrack} 
       />
