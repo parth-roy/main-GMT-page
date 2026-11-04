@@ -6,6 +6,7 @@ import CitySelectorModal from "./CitySelectorModal"
 import { useAuth } from "../context/AuthContext"
 import { useCity } from "../context/CityContext"
 import { APP_URLS } from "../constants/appUrls"
+import { lockScroll, unlockScroll } from "../utils/scrollLock"
 
 // Dropdown data
 
@@ -189,6 +190,39 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
     }
   }, [])
 
+  // Lock background body scroll when mobile navigation drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      lockScroll()
+      document.body.setAttribute("data-nav-open", "true")
+    } else {
+      unlockScroll()
+      document.body.removeAttribute("data-nav-open")
+    }
+    return () => {
+      if (isOpen) {
+        unlockScroll()
+        document.body.removeAttribute("data-nav-open")
+      }
+    }
+  }, [isOpen])
+
+  // Automatically close mobile menu when route changes
+  useEffect(() => {
+    setIsOpen(false)
+  }, [location.pathname])
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false)
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isOpen])
+
   const handleLogout = () => {
     logout()
     setIsOpen(false)
@@ -214,11 +248,11 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
   return (
     <>
       <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
+      className={`fixed top-0 left-0 right-0 ${isOpen ? "z-[85]" : "z-50"} transition-all duration-300 ${
+        isScrolled || isOpen
           ? isDarkTheme
-            ? "bg-[#262833]/90 backdrop-blur-md shadow-md py-1 border-b border-white/10"
-            : "bg-white/90 backdrop-blur-md shadow-md py-1 border-b border-slate-200/50"
+            ? "bg-[#262833]/95 backdrop-blur-md shadow-md py-1 border-b border-white/10"
+            : "bg-white/95 backdrop-blur-md shadow-md py-1 border-b border-slate-200/50"
           : isDarkTheme
           ? "bg-[#262833] py-1.5 border-b border-transparent"
           : "bg-brand-50 py-1.5 border-b border-slate-200"
@@ -434,9 +468,21 @@ export default function Navbar({ onOpenEstimate, onScrollToSection }) {
         </div>
       </div>
 
-      {/* Mobile & Tablet Drawer Menu */}
-      <div className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-screen border-t border-slate-200" : "max-h-0 pointer-events-none"}`}>
-        <div className="bg-brand-50/95 backdrop-blur-xl px-4 pt-4 pb-6 space-y-1 shadow-2xl">
+      {/* Mobile & Tablet Drawer Menu - Isolated Scroll Container */}
+      <div 
+        className={`xl:hidden fixed top-[49px] sm:top-[56px] inset-x-0 bottom-0 bg-brand-50/98 backdrop-blur-2xl border-t border-slate-200/90 overflow-y-auto overscroll-contain transition-all duration-300 ease-in-out ${
+          isOpen 
+            ? "opacity-100 pointer-events-auto translate-y-0 visible" 
+            : "opacity-0 pointer-events-none -translate-y-2 invisible"
+        }`}
+        style={{
+          WebkitOverflowScrolling: "touch",
+          overscrollBehavior: "contain",
+          overscrollBehaviorY: "contain",
+          touchAction: "pan-y"
+        }}
+      >
+        <div className="max-w-lg mx-auto px-4 pt-3 pb-36 space-y-1">
           {/* Book a Truck section */}
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 pt-2 pb-1">
             Book a Truck ({currentCity?.name || "Kolkata"})

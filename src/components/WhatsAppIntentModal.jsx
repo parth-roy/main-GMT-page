@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Truck, UserCheck, Building2, HelpCircle, ArrowRight, Check, AlertCircle, Calendar } from 'lucide-react';
 import GooglePlacesSearchInput from './common/GooglePlacesSearchInput';
+import { lockScroll, unlockScroll } from '../utils/scrollLock';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.gomytruck.com/api/v1';
 
@@ -119,12 +120,11 @@ export default function WhatsAppIntentModal({ initialIntent = 'BOOK' }) {
   // Scroll-lock + ESC
   useEffect(() => {
     if (!isOpen) return;
-    const orig = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    lockScroll();
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
     return () => {
-      document.body.style.overflow = orig;
+      unlockScroll();
       window.removeEventListener('keydown', onKey);
     };
   }, [isOpen]);

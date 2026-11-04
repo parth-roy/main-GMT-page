@@ -6,6 +6,7 @@ import { openGMTWhatsAppModal } from "./WhatsAppIntentModal"
 export default function GlobalFABs() {
   const { pathname } = useLocation()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isNavOpen, setIsNavOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const menuRef = useRef(null)
 
@@ -18,6 +19,9 @@ export default function GlobalFABs() {
   // Observe active modals in DOM or body overflow
   useEffect(() => {
     const checkModal = () => {
+      const isNav = document.body.getAttribute("data-nav-open") === "true"
+      setIsNavOpen(isNav)
+
       const hasModal = 
         document.body.getAttribute("data-modal-open") === "true" ||
         document.body.style.overflow === "hidden" ||
@@ -26,7 +30,7 @@ export default function GlobalFABs() {
         Boolean(document.querySelector(".modal-open"))
 
       setIsModalOpen(Boolean(hasModal))
-      if (!hasModal) setIsExpanded(false)
+      if (!hasModal || isNav) setIsExpanded(false)
     }
 
     checkModal()
@@ -34,7 +38,7 @@ export default function GlobalFABs() {
     const observer = new MutationObserver(checkModal)
     observer.observe(document.body, {
       attributes: true,
-      attributeFilter: ["style", "data-modal-open", "class"],
+      attributeFilter: ["style", "data-modal-open", "data-nav-open", "class"],
       childList: true,
       subtree: true,
     })
@@ -65,6 +69,9 @@ export default function GlobalFABs() {
       document.removeEventListener("touchstart", handleClickOutside)
     }
   }, [isExpanded])
+
+  // Hide FABs completely when mobile navigation drawer is active
+  if (isNavOpen) return null
 
   return (
     <>
