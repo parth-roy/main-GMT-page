@@ -254,8 +254,9 @@ export function CityProvider({ children }) {
               clearTimeout(timeout);
               // 1a. Try backend reverse geocode
               try {
+                const apiBase = import.meta.env.VITE_API_URL || 'https://api.gomytruck.com/api/v1';
                 const res = await fetch(
-                  `https://api-test.gomytruck.com/api/v1/maps/reverse-geocode?lat=${coords.latitude}&lng=${coords.longitude}`
+                  `${apiBase}/maps/reverse-geocode?lat=${coords.latitude}&lng=${coords.longitude}`
                 );
                 if (res.ok) {
                   const json = await res.json();

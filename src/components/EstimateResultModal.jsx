@@ -282,6 +282,7 @@ export default function EstimateResultModal({ isOpen, onClose, estimateData }) {
         contractDuration: contractDuration || undefined,
         urgencyWindow: urgency || "FLEXIBLE",
         slaExpiresAt,
+        ...(liveEstimate?.quoteToken ? { quoteToken: liveEstimate.quoteToken } : {}),
       };
 
       const draft = await createBooking(payload);
