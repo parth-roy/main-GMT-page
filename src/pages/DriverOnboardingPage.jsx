@@ -15,10 +15,15 @@ import {
   Loader2,
   Lock,
   Phone,
+  Smartphone,
+  Download,
+  Clock,
+  ExternalLink,
 } from "lucide-react";
 import SEOHead from "../seo/SEOHead";
 import LocationPicker from "../components/LocationPicker";
 import { VEHICLE_CATEGORIES, getVehicleLabel } from "../constants/vehicleOptions";
+import { APP_URLS } from "../constants/appUrls";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -517,91 +522,103 @@ export default function DriverOnboardingPage() {
 
   // ── SUCCESS CONFIRMATION SCREEN ──
   if (status === "success") {
-    const subscriptionEndDate = successData?.subscription?.endDate
-      ? new Date(successData.subscription.endDate).toLocaleDateString("en-IN", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        })
-      : "90 Days from Today";
-
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6">
-        <div className="bg-white max-w-lg w-full rounded-3xl shadow-2xl p-8 sm:p-10 text-center border-t-8 border-emerald-500 animate-in zoom-in-95 duration-300 relative overflow-hidden">
+        <div className="bg-white max-w-lg w-full rounded-3xl shadow-2xl p-6 sm:p-9 text-center border-t-8 border-emerald-500 animate-in zoom-in-95 duration-300 relative overflow-hidden">
           {/* Subtle glowing blob */}
           <div className="absolute top-0 right-0 -mr-12 -mt-12 w-40 h-40 bg-emerald-100 rounded-full blur-2xl pointer-events-none" />
 
-          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5 text-emerald-600 shadow-md">
-            <CheckCircle className="w-10 h-10" />
+          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 shadow-sm animate-bounce" style={{ animationDuration: "2s" }}>
+            <CheckCircle className="w-9 h-9" />
           </div>
 
-          {/*
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black uppercase tracking-wider mb-2">
-            <Crown className="w-3.5 h-3.5 text-amber-500" />
-            <span>Registration & Payment Verified</span>
-          </div>
-          */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black uppercase tracking-wider mb-2">
             <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Registration Submitted Successfully</span>
+            <span>Onboarding Details Collected</span>
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">
             Welcome to GoMyTruck! 🚚
           </h2>
 
-          {/*
-          <p className="text-sm text-slate-600 mb-6">
-            Congratulations <strong>{formData.name}</strong>! Your driver profile
-            and ₹99 onboarding payment are verified.
-          </p>
-          */}
-          <p className="text-sm text-slate-600 mb-6">
-            Congratulations <strong>{formData.name}</strong>! Your driver profile registration has been submitted successfully.
+          <p className="text-sm text-slate-600 mb-5">
+            Thank you, <strong>{formData.name}</strong>! Your driver onboarding details and documents have been successfully collected by our admin team.
           </p>
 
-          {/* Active 90-Day Premium Membership Box */}
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 text-left mb-6 space-y-2.5 shadow-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-yellow-500" />
-                <span>90-Day Premium Membership</span>
-              </span>
-              <span className="bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
-                Active
-              </span>
+          {/* 12-24 Hours Admin Review Box */}
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-left mb-5 space-y-1.5">
+            <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
+              <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>Admin Verification in Progress (12–24 Hours)</span>
             </div>
-            <p className="text-xs text-amber-900 font-medium leading-relaxed">
-              Priority load allocation is now active for your vehicle (
-              <strong>{getVehicleLabel(formData.vehicleType)}</strong>) across your registered
-              operating location.
+            <p className="text-xs text-amber-800 leading-relaxed font-medium">
+              Our team is currently reviewing your uploaded documents. Within <strong>12 to 24 hours</strong>, your account will be approved and converted to a fully verified driver profile.
             </p>
-            <div className="flex items-center justify-between text-xs pt-1 border-t border-amber-200/60 text-amber-900 font-bold">
-              <span>Valid Until:</span>
-              <span className="text-amber-700 font-black">
-                {subscriptionEndDate} (90 Days)
-              </span>
-            </div>
           </div>
 
-          {/* Login Callout */}
-          <div className="p-4 rounded-xl bg-slate-100 border border-slate-200 text-left mb-6 space-y-1 text-xs text-slate-600">
-            <div className="font-bold text-slate-800 flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-blue-600" />
-              <span>Registered Mobile Number</span>
+          {/* App Installation & Login Instructions Box */}
+          <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-[#112a46] text-white text-left mb-6 space-y-4 shadow-lg">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl">
+                <Smartphone className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-black text-sm text-white">Next Step: Install GoMyTruck Driver Partner</h4>
+                <p className="text-[11px] text-slate-300">Available on Google Play Store for Android</p>
+              </div>
             </div>
-            <p className="font-mono font-bold text-slate-900 text-sm">
-              +91 {formData.phone}
+
+            <p className="text-xs text-slate-200 leading-relaxed">
+              After 12–24 hours (or once you receive our notification), open the <strong>GoMyTruck Driver Partner</strong> app and log in with your registered mobile number:
             </p>
-            <p className="text-[11px] text-slate-500">
-              You can log in anytime on GoMyTruck Web or our Driver App using this
-              number to view your verified status and access premium loads.
+
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 flex items-center justify-between border border-white/15">
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-emerald-400" />
+                <span className="font-mono font-bold text-white text-sm sm:text-base">
+                  +91 {formData.phone}
+                </span>
+              </div>
+              <span className="text-[10px] bg-emerald-500 text-slate-950 font-black px-2 py-0.5 rounded-full uppercase">
+                Registered
+              </span>
+            </div>
+
+            <p className="text-[11px] text-emerald-300/90 font-medium leading-relaxed">
+              ✨ Once verified by admin, you will be automatically logged in with a fully approved profile so you can immediately receive live loads, place bids, and start your trips!
             </p>
+
+            {/* Direct Play Store Download Button */}
+            <a
+              href={APP_URLS.PARTNER}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-3.5 px-4 rounded-xl transition-all shadow-md active:scale-98 text-sm cursor-pointer"
+            >
+              <Download className="w-4 h-4" />
+              <span>Install GoMyTruck Driver Partner App</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+            </a>
+
+            {/* QR Code Section */}
+            {APP_URLS.PARTNER_QR_IMAGE && (
+              <div className="pt-2 border-t border-white/10 flex items-center justify-center gap-3">
+                <img
+                  src={APP_URLS.PARTNER_QR_IMAGE}
+                  alt="Scan to download GoMyTruck Driver App"
+                  className="w-16 h-16 bg-white p-1 rounded-lg shrink-0 object-contain shadow-xs"
+                />
+                <div className="text-left">
+                  <p className="text-[11px] font-bold text-white">Scan QR code to install</p>
+                  <p className="text-[10px] text-slate-400">Directly on your smartphone camera</p>
+                </div>
+              </div>
+            )}
           </div>
 
           <button
             onClick={() => (window.location.href = "/")}
-            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md active:scale-98 text-sm cursor-pointer"
+            className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl transition-all text-xs cursor-pointer border border-slate-200"
           >
             Return to Homepage
           </button>
