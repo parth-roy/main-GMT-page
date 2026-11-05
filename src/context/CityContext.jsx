@@ -120,22 +120,28 @@ export function CityProvider({ children }) {
     location = { pathname: "/" };
   }
 
-  // Initial city resolved synchronously from current route (SSR & Client)
+  // Initial city resolved synchronously from current route (SSR & Client parity)
   const [currentCity, setCurrentCity] = useState(() => {
     const urlCity = extractCityFromUrl(location?.pathname);
-    if (urlCity) return urlCity;
-
-    if (typeof window !== "undefined") {
-      try {
-        const sessionRaw = sessionStorage.getItem(SESSION_CITY_KEY);
-        if (sessionRaw) {
-          const parsed = JSON.parse(sessionRaw);
-          if (parsed?.name && parsed?.slug) return parsed;
-        }
-      } catch {}
-    }
-    return DEFAULT_CITY;
+    return urlCity || DEFAULT_CITY;
   });
+
+  // Client-only mount synchronization to avoid SSR hydration mismatch (#425, #418)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const urlCity = extractCityFromUrl(location?.pathname);
+      if (urlCity) return;
+      const sessionRaw = sessionStorage.getItem(SESSION_CITY_KEY);
+      if (sessionRaw) {
+        const parsed = JSON.parse(sessionRaw);
+        if (parsed?.name && parsed?.slug) {
+          currentCityRef.current = parsed;
+          setCurrentCity(parsed);
+        }
+      }
+    } catch {}
+  }, []);
 
   const [isDetecting, setIsDetecting] = useState(false);
   const [hasDetected, setHasDetected] = useState(false);

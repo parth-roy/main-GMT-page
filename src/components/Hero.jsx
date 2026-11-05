@@ -207,6 +207,26 @@ function HeroGooglePlacesInput({
 
     try {
       const maps = await getGoogleMaps()
+
+      // Modern Google Maps Places (Place class) avoids PlacesService deprecation warning
+      if (maps?.places?.Place) {
+        try {
+          const placeInstance = new maps.places.Place({ id: prediction.placeId })
+          await placeInstance.fetchFields({ fields: ["location", "formattedAddress"] })
+          if (placeInstance.location) {
+            sessionTokenRef.current = null
+            onSelect({
+              address: placeInstance.formattedAddress || prediction.description,
+              lat: placeInstance.location.lat(),
+              lng: placeInstance.location.lng(),
+            })
+            return
+          }
+        } catch {
+          // Graceful fallback to legacy PlacesService if Place class throws
+        }
+      }
+
       const placesService = new maps.places.PlacesService(document.createElement("div"))
 
       placesService.getDetails(

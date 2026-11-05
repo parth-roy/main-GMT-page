@@ -299,6 +299,28 @@ export default function GoogleAddressAutocomplete({
 
     try {
       const maps = await getGoogleMaps();
+
+      // Modern Google Maps Places (Place class) avoids PlacesService deprecation warning
+      if (maps?.places?.Place) {
+        try {
+          const placeInstance = new maps.places.Place({ id: prediction.placeId });
+          await placeInstance.fetchFields({ fields: ['location', 'formattedAddress'] });
+          if (placeInstance.location) {
+            sessionTokenRef.current = null;
+            const result = {
+              address: placeInstance.formattedAddress || prediction.description,
+              lat: placeInstance.location.lat(),
+              lng: placeInstance.location.lng(),
+            };
+            setBoundedCache(placeDetailsCache, prediction.placeId, result);
+            onAddressSelect(result);
+            return;
+          }
+        } catch {
+          // Graceful fallback to legacy PlacesService
+        }
+      }
+
       // Use PlacesService.getDetails with the session token to terminate the billing
       // session — groups all keystrokes into ONE billed session unit (not per-keystroke).
       const placesService = new maps.places.PlacesService(document.createElement('div'));

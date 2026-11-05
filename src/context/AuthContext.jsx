@@ -4,18 +4,9 @@ import { setupApiClient, apiClient } from '../api/apiClient';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('vahan_user');
-        return saved ? JSON.parse(saved) : null;
-      } catch (e) {
-        return null;
-      }
-    }
-    return null;
-  });
-  const [accessToken, setAccessToken] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('vahan_access_token') : null);
+  // Initialize with null to match SSR rendered markup and prevent React hydration errors (#425, #418)
+  const [user, setUser] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   
   // A queue of callbacks waiting for authentication
   const [authCallback, setAuthCallback] = useState(null);
@@ -94,13 +85,8 @@ export function AuthProvider({ children }) {
     window.addEventListener("auth_changed", handleAuthChange);
     window.addEventListener("storage", handleAuthChange);
     
-    // Background validation if token exists
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('vahan_access_token');
-      if (token) {
-        fetchUser(token);
-      }
-    }
+    // Initial mount sync from localStorage
+    handleAuthChange();
 
     return () => {
       window.removeEventListener("auth_changed", handleAuthChange);
